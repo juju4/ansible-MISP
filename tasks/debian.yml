@@ -38,5 +38,5 @@
 
 - set_fact:
     mysql_svc: mysql
-    rng_svc: rngd
+    rng_svc: rng-tools
 
