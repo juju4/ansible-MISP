@@ -1,0 +1,38 @@
+---
+# debian wheezy: add backports
+# deb http://http.debian.net/debian wheezy-backports main
+
+- name: apt | MISP dependencies install
+  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - openssh-server
+    - apache2
+    - mysql-server
+    - php5
+    - php5-mysql
+    - postfix
+    - gcc
+    - zip
+    - php-pear
+    - git
+    - redis-server
+    - make
+    - python-dev
+    - python-pip
+    - libxml2-dev
+    - libxslt1-dev
+    - zlib1g-dev
+    - php5-dev
+    - libapache2-mod-php5
+    - curl
+    - gnupg
+#
+    - php5-redis
+    - python-mysqldb
+    - rng-tools
+# misp-modules
+    - python3
+    - python3-pip
+  async: 3600
+  poll: 300
+

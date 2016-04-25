@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    config.vm.box = "ubuntu/trusty64"
+    #config.vm.box = "centos/7"
+
+    config.vm.provision :ansible do |ansible|
+       ansible.playbook = "site.yml"
+       #ansible.verbose = "vvvv"
+       #ansible.host_key_checking = false
+       #ansible.limit = 'all'
+       ansible.sudo = true
+       ansible.extra_vars = { ansible_ssh_user: 'vagrant', misp_base_url: 'http://127.0.0.1:8888' }
+       ansible.groups = {
+          "myrole" => ["vhost" ],
+       }
+    end
+
+    config.vm.define "vhost" do |vhost|
+        vhost.vm.hostname = "vhost"
+        vhost.vm.provider "virtualbox" do |v|
+          v.memory = 1024
+        end
+        vhost.vm.network "forwarded_port", guest: 80, host: 8888
+    end
+
+end
+

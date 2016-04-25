@@ -1,0 +1,34 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: ansible_playbook
+  roles_path: ../../roles
+  hosts: test-kitchen
+#  ansible_verbose: true
+  ansible_verbose: false
+  ansible_verbosity: 3
+  ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
+#  name: chef_solo
+
+platforms:
+  - name: ubuntu-14.04
+    driver_config:
+      network:
+        - ["forwarded_port", {guest: 80, host: 8888}]
+## No package matching 'php5-redis' is available
+#  - name: ubuntu-12.04
+## test for agent windows/wixl ? no image available
+#  - name: ubuntu-15.10
+## mig-scheduler issue w rights on database
+  - name: centos-7.1
+    driver_config:
+      network:
+        - ["forwarded_port", {guest: 80, host: 8890}]
+
+suites:
+  - name: default
+    run_list:
+    attributes:
+

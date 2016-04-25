@@ -1,0 +1,300 @@
+---
+
+- include: apache-env.yml
+
+- include: debian.yml
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: check installed pear packages
+  command: pear list
+  register: pearinstalled
+  changed_when: false
+- name: updated access to pear.php.net
+  command: pear channel-update pear.php.net
+  when: pearinstalled.stdout.find("Crypt_GPG") == -1
+- name: install php pear dependencies
+# New in version 2.0.
+#  pear: name={{item}} state=present
+  command: "pear install {{ item }}"
+  with_items:
+    - Crypt_GPG
+    - Net_GeoIP
+  when: pearinstalled.stdout.find("Crypt_GPG") == -1
+
+- pip: name=pyzmq
+
+- stat: path={{ misp_rootdir }}/INSTALL
+  register: m
+- name: git clone MISP
+  git: repo=https://github.com/MISP/MISP.git 
+       dest={{ misp_rootdir }}
+  when: not m.stat.exists
+
+## https://github.com/kosssi/ansible-role-gitconfig ?
+- name: get git config
+  command: "git config core.filemode chdir={{ misp_rootdir }}"
+  changed_when: false
+  register: gc
+- name: setting core.filemode for git
+  command: "git config core.filemode false chdir={{ misp_rootdir }}"
+  when: gc.stdout != 'false'
+
+- stat: path={{ misp_rootdir }}/app/files/scripts/python-cybox/setup.py
+  register: pc
+- name: git clone python-cybox
+  git: repo=https://github.com/CybOXProject/python-cybox.git
+       dest={{ misp_rootdir }}/app/files/scripts/python-cybox
+       version=v2.1.0.12
+  when: not pc.stat.exists
+## how to make independent of version?
+- stat: path=/usr/local/lib/python2.7/dist-packages/cybox-2.1.0.10-py2.7.egg
+  register: pcegg
+- name: setup python-cybox
+  command: "python setup.py install chdir={{ misp_rootdir }}/app/files/scripts/python-cybox"
+  when: not pcegg.stat.exists
+
+- stat: path={{ misp_rootdir }}/app/files/scripts/python-stix/setup.py
+  register: ps
+- name: git clone python-stix
+  git: repo=https://github.com/STIXProject/python-stix.git
+       dest={{ misp_rootdir }}/app/files/scripts/python-stix
+       version=v1.1.1.4
+  when: not ps.stat.exists
+- stat: path=/usr/local/lib/python2.7/dist-packages/stix-1.1.1.4-py2.7.egg
+  register: psegg
+- name: setup python-stix
+  command: "python setup.py install chdir={{ misp_rootdir }}/app/files/scripts/python-stix"
+  when: not psegg.stat.exists
+
+## Need composer.json
+- copy: src=composer.json dest={{ misp_rootdir }}/app/composer.json mode=0644
+## FIXME! no better way to do that?
+- name: Download Composer installer.
+  get_url:
+    url: https://getcomposer.org/installer
+    dest: /tmp/composer-installer.php
+    mode: 0755
+- name: install composer
+  shell: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
+  args:
+    creates: /usr/local/bin/composer
+- name: install PHP dependencies via composer
+  composer: command=install working_dir={{ misp_rootdir }}/app
+#  shell: "{{ item }} chdir={{ misp_rootdir }}/app"
+#  with_items:
+#    - "curl -s https://getcomposer.org/installer | php"
+#    - "php composer.phar require kamisama/cake-resque:4.1.2"
+#    - "php composer.phar config vendor-dir Vendor"
+#    - "php composer.phar install"
+
+## https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
+- name: Install PECL libaries.
+  shell: "yes \"\" | pecl install {{ item }}"
+  register: pecl_result
+  changed_when: "pecl_result.rc == 0"
+  failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
+  with_items:
+    - redis
+
+- name: setup MISP Cake config
+  command: "rsync -ci {{ misp_rootdir }}/INSTALL/setup/config.php {{ misp_rootdir }}/app/Plugin/CakeResque/Config/config.php"
+  register: rsync_result
+  changed_when: 'rsync_result.stdout != ""'
+
+- file: "dest={{ misp_rootdir }} mode=0750 owner={{ www_user }} group={{ www_user }} state=directory"
+- file: "dest={{ misp_rootdir }}/app/tmp mode=2770 owner={{ www_user }} group={{ www_user }} state=directory"
+- file: "dest={{ misp_rootdir }}/app/files mode=2770 owner={{ www_user }} group={{ www_user }} state=directory"
+- file: "dest={{ misp_rootdir }}/app/files/scripts/tmp mode=2770 owner={{ www_user }} group={{ www_user }} state=directory"
+- name: check owner/group for multiple MISP folders
+  file: "dest={{ item }} owner={{ www_user }} group={{ www_user }} state=directory"
+#  with_fileglob:
+#    - {{ misp_rootdir }}/app/files/scripts/tmp/*
+#    - {{ misp_rootdir }}/app/files/scripts/tmp/cache/*
+#    - {{ misp_rootdir }}/app/files/scripts/tmp/cached_exports/*
+  with_items:
+    - "{{ misp_rootdir }}/app/tmp/"
+    - "{{ misp_rootdir }}/app/tmp/sessions"
+    - "{{ misp_rootdir }}/app/tmp/cache"
+    - "{{ misp_rootdir }}/app/tmp/cache/models"
+    - "{{ misp_rootdir }}/app/tmp/cache/persistent"
+    - "{{ misp_rootdir }}/app/tmp/cache/views"
+    - "{{ misp_rootdir }}/app/tmp/tests"
+    - "{{ misp_rootdir }}/app/tmp/logs"
+    - "{{ misp_rootdir }}/app/tmp/files"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports/md5"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports/suricata"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports/text"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports/snort"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports/sha1"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports/csv_sig"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports/csv_all"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports/xml"
+    - "{{ misp_rootdir }}/app/tmp/cached_exports/rpz"
+
+
+## not idempotent but above is not recursive
+#- command: "{{ item }}"
+#  with_items:
+#    - chown -R www-data:www-data {{ misp_rootdir }}
+#    - chmod -R 750 {{ misp_rootdir }}
+#    - chmod -R g+ws {{ misp_rootdir }}/app/tmp
+#    - chmod -R g+ws {{ misp_rootdir }}/app/files
+#    - chmod -R g+ws {{ misp_rootdir }}/app/files/scripts/tmp
+
+- name: creating mysql misp db
+  mysql_db: name=misp state=present
+- stat: path=/root/.mysql_misp_imported
+  register: mispdbloaded
+- name: importing mysql misp db template
+  mysql_db: name=misp state=import target={{ misp_rootdir }}/INSTALL/MYSQL.sql
+  when: not mispdbloaded.stat.exists
+- file: dest=/root/.mysql_misp_imported state=touch
+  when: not mispdbloaded.stat.exists
+- name: creating mysql misp db user
+  mysql_user: name="{{ misp_db_user }}" password="{{ misp_db_pass }}" priv=*.*:USAGE/misp.*:ALL state=present
+
+## FIXME! or ssl ?
+#- command: "rsync -ci {{ misp_rootdir }}/INSTALL/apache.misp.ssl {{ apache_sitedir }}/misp-ssl.conf"
+- command: "rsync -ci {{ misp_rootdir }}/INSTALL/apache.misp.ubuntu {{ apache_sitedir }}/misp.conf"
+  register: rsync_result
+  changed_when: 'rsync_result.stdout != ""'
+  notify:
+    - restart apache
+
+- name: redhat | update log path
+  replace: "dest={{ apache_sitedir }}/misp.conf regexp='/var/log/apache2/' replace='{{ apache_logs }}/'"
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- file: dest="{{ apache_sitedir }}/misp.conf" mode=0644
+- file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
+  notify:
+    - restart apache
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- file: "src={{ apache_sitedir }}/misp.conf dest=/etc/apache2/sites-enabled/misp.conf state=link"
+  notify:
+    - restart apache
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: debian | ensure mod_rewrite is present
+  apache2_module: state=present name=rewrite
+  notify:
+    - restart apache
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- stat: path={{ misp_rootdir }}/app/Config/config.php
+  register: conffiles
+- name: create config files from default
+  command: "rsync -ci --chown={{ www_user }} {{ misp_rootdir }}/app/Config/{{ item }}.default.php {{ misp_rootdir }}/app/Config/{{ item }}.php"
+  register: rsync_result
+  changed_when: 'rsync_result.stdout != ""'
+  with_items:
+    - bootstrap
+    - database
+    - core
+    - config
+  when: not conffiles.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+- name: create config files from default
+  command: "rsync -ci {{ misp_rootdir }}/app/Config/{{ item }}.default.php {{ misp_rootdir }}/app/Config/{{ item }}.php"
+  register: rsync_result
+  changed_when: 'rsync_result.stdout != ""'
+  with_items:
+    - bootstrap
+    - database
+    - core
+    - config
+  when: not conffiles.stat.exists and not (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+- name: ensure right owner for conf file
+  file: "dest={{ misp_rootdir }}/app/Config/{{ item }}.php owner={{ www_user }}"
+  with_items:
+    - bootstrap
+    - database
+    - core
+    - config
+
+- name: update database settings
+  replace: dest={{ misp_rootdir }}/app/Config/database.php regexp="{{ item.regexp }}" replace="{{ item.replace }}"
+  with_items:
+    - { regexp: 'db login', replace: "{{ misp_db_user }}" }
+    - { regexp: 'db password', replace: "{{ misp_db_pass }}" }
+- name: set CakeResque bootstrap to true
+  lineinfile: dest={{ misp_rootdir }}/app/Config/bootstrap.php line="CakePlugin::loadAll(array( 'CakeResque' => array('bootstrap' => true) ));"
+- name: add vendor/autoload.php to core
+  lineinfile: 'dest={{ misp_rootdir }}/app/Config/core.php line="{{ item }}"'
+  with_items:
+    - "require_once dirname(__DIR__) . '/Vendor/autoload.php';"
+
+- name: check some permissions
+  file: "dest={{ misp_rootdir }}/app/Config/{{ item }}.php mode=0600 owner={{ www_user }}"
+  with_items:
+    - bootstrap
+    - database
+    - core
+    - config
+
+- name: Generating salt
+  shell: "openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;'"
+  register: salt
+  changed_when: false
+  tags:
+    - salt
+- name: add a salt to MISP config
+  replace: dest={{ misp_rootdir }}/app/Config/config.php regexp="'salt' => 'Rooraenietu8Eeyo<Qu2eeNfterd-dd\+'," replace="'salt' => '{{ salt.stdout }}',"
+  tags:
+    - salt
+- name: updating MISP config
+  template: src=config.php.j2 dest="{{ misp_rootdir }}/app/Config/config.php" mode=0600 backup=yes
+
+- file: "dest={{ misp_rootdir }}/app/Config mode=0750 owner={{ www_user }} group={{ www_user }} state=directory"
+#- command: "{{ item }}"
+#  with_items:
+#    - chown -R {{ www_user }}:{{ www_user }} {{ misp_rootdir }}/app/Config
+#    - chmod -R 750 {{ misp_rootdir }}/app/Config
+
+- file: "dest={{ misp_rootdir }}/.gnupg mode=0700 owner={{ www_user }} group={{ www_user }} state=directory"
+- file: "dest={{ misp_rootdir }}/app/webroot mode=0700 owner={{ www_user }} group={{ www_user }} state=directory"
+- stat: "path={{ misp_rootdir }}/app/webroot/gpg.asc"
+  register: gkey
+- name: create gpg configuration template
+  template: "src=gpg-template.j2 dest=/var/tmp/gpg-template owner={{ www_user }} mode=0600"
+  when: not gkey.stat.exists
+- name: create gnupg key for {{ misp_email }}
+  shell: "{{ item }} chdir={{ misp_rootdir }}/.gnupg"
+  with_items:
+    - "gpg --homedir {{ misp_rootdir }}/.gnupg --gen-key --batch /var/tmp/gpg-template"
+    - "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc"
+  become: yes
+  become_user: "{{ www_user }}"
+  when: not gkey.stat.exists
+## it seems to be done by gpg
+#- command: wipe -q -y /var/tmp/gpg-template
+#  when: not gkey.stat.exists
+
+- file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
+
+- name: start MISP worker
+  lineinfile: dest={{ misp_rootdir }}/app/Console/worker/start.sh line="su {{ www_user }} -c 'bash {{ misp_rootdir }}/app/Console/worker/start.sh'"
+
+- name: extra php settings
+  template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.ini mode=0644"
+- name: enabling MISP php settings
+  file: "src={{ php_confdir }}/misp-php.ini dest=/etc/php5/apache2/conf.d/99-misp.ini state=link"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- name: Enforce Timezone in php.ini
+  replace: "dest={{ php_ini }} regexp='^;date.timezone =' replace='date.timezone = {{ tz }}'"
+
+- stat: path={{ mispmodules_rootdir }}/misp-modules
+  register: mm
+- name: git clone MISP modules
+  git: repo=https://github.com/MISP/misp-modules.git 
+       dest={{ mispmodules_rootdir }}/misp-modules
+  when: not mm.stat.exists
+
+## FIXME! pip3 bug in centos7
+- name: install pip3 dependencies for MISP modules
+  pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip3
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+

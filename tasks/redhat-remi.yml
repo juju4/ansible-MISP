@@ -1,0 +1,18 @@
+---
+
+## FIXME! ansible not detecting package already installed if http
+- name: check if remi repo installed
+  command: rpm -q remi-release
+  register: rpmremi
+  changed_when: false
+  ignore_errors: true
+
+- name: RedHat6 | Install Remi repo
+  yum: name=http://rpms.remirepo.net/enterprise/remi-release-6.rpm
+       state=present
+  when: ansible_distribution_major_version == "6" and rpmremi.rc != 0
+- name: RedHat7 | Install Remi repo
+  yum: name=http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+       state=present
+  when: ansible_distribution_major_version == "7" and rpmremi.rc != 0
+

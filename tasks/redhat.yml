@@ -1,0 +1,65 @@
+---
+
+- include: redhat-epel.yml
+## for php-redis
+- include: redhat-remi.yml
+
+- name: yum | remi yum-utils
+  yum: name=yum-utils state=present update_cache=yes
+- name: enable remi repository for php56
+  command: "yum-config-manager --enable remi-php56"
+- name: yum | MISP dependencies install
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - openssh-server
+    - httpd
+    - mariadb
+    - mariadb-server
+    - MySQL-python
+    - php
+    - php-mysql
+    - php-mbstring
+    - php-devel
+    - php-redis
+#    - php56
+#    - php56-php-mysqlnd
+#    - php56-php-mbstring
+#    - php56-php-devel
+#    - php56-php-redis
+    - postfix
+    - "@Development tools"
+    - zip
+    - php-pear
+    - git
+    - redis
+    - make
+    - python-devel
+    - python-pip
+    - libxml2-devel
+    - libxslt-devel
+    - zlib-devel
+    - curl
+    - gnupg
+#
+    - rng-tools
+# misp-modules
+    - python34
+## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
+#    - python3-pip
+  async: 3600
+  poll: 300
+
+- set_fact:
+    mysql_svc: mariadb
+    www_user: apache
+    apache_svc: httpd
+    apache_confdir: /etc/httpd/conf.d
+    modsecurity_active: /etc/httpd/modsecurity.d/activated_rules
+
+- name: Redhat | Ensure services are enabled
+  service: "name={{ item }} state=started enabled=yes"
+  with_items:
+    - "{{ apache_svc }}"
+    - "{{ mysql_svc }}"
+    - rngd
+
