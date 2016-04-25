@@ -51,15 +51,5 @@
 
 - set_fact:
     mysql_svc: mariadb
-    www_user: apache
-    apache_svc: httpd
-    apache_confdir: /etc/httpd/conf.d
-    modsecurity_active: /etc/httpd/modsecurity.d/activated_rules
-
-- name: Redhat | Ensure services are enabled
-  service: "name={{ item }} state=started enabled=yes"
-  with_items:
-    - "{{ apache_svc }}"
-    - "{{ mysql_svc }}"
-    - rngd
+    rng_svc: rngd
 
