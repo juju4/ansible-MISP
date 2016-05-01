@@ -31,13 +31,24 @@
     - Net_GeoIP
   when: pearinstalled.stdout.find("Crypt_GPG") == -1
 
-- pip: name=pyzmq
+## https://github.com/ansible/ansible-modules-core/issues/2697
+- name: install python dependencies with pip
+#  pip: name="{{ item }}" extra_args='--no-input'
+  pip: name="{{ item }}" extra_args='--exists-action=w'
+  with_items:
+    - pyzmq
+    - git+https://github.com/CybOXProject/python-cybox.git@v2.1.0.12#egg=Package
+## FIXME! ValueError: ("Missing 'Version:' header and/or PKG-INFO file", cybox [unknown version] (/tmp/src/package))
+#    - git+https://github.com/stixproject/python-stix.git@v1.2.0.0#egg=Package
+    - git+https://github.com/MISP/PyMISP.git#egg=Package
 
 - stat: path={{ misp_rootdir }}/INSTALL
   register: m
 - name: git clone MISP
   git: repo=https://github.com/MISP/MISP.git 
        dest={{ misp_rootdir }}
+       version={{ misp_version }}
+#       track_submodules=yes
   when: not m.stat.exists
 
 ## https://github.com/kosssi/ansible-role-gitconfig ?
@@ -49,53 +60,34 @@
   command: "git config core.filemode false chdir={{ misp_rootdir }}"
   when: gc.stdout != 'false'
 
-- stat: path={{ misp_rootdir }}/app/files/scripts/python-cybox/setup.py
-  register: pc
-- name: git clone python-cybox
-  git: repo=https://github.com/CybOXProject/python-cybox.git
-       dest={{ misp_rootdir }}/app/files/scripts/python-cybox
-       version=v2.1.0.12
-  when: not pc.stat.exists
-## how to make independent of version?
-- stat: path=/usr/local/lib/python2.7/dist-packages/cybox-2.1.0.10-py2.7.egg
-  register: pcegg
-- name: setup python-cybox
-  command: "python setup.py install chdir={{ misp_rootdir }}/app/files/scripts/python-cybox"
-  when: not pcegg.stat.exists
-
 - stat: path={{ misp_rootdir }}/app/files/scripts/python-stix/setup.py
   register: ps
 - name: git clone python-stix
   git: repo=https://github.com/STIXProject/python-stix.git
        dest={{ misp_rootdir }}/app/files/scripts/python-stix
-       version=v1.1.1.4
+       version=v1.2.0.0
   when: not ps.stat.exists
-- stat: path=/usr/local/lib/python2.7/dist-packages/stix-1.1.1.4-py2.7.egg
+- stat: path=/usr/local/lib/python2.7/dist-packages/stix-1.2.0.0-py2.7.egg
   register: psegg
 - name: setup python-stix
   command: "python setup.py install chdir={{ misp_rootdir }}/app/files/scripts/python-stix"
   when: not psegg.stat.exists
 
-## Need composer.json
-- copy: src=composer.json dest={{ misp_rootdir }}/app/composer.json mode=0644
+- name: define composer.json to use composer install module
+  copy: src=composer.json dest={{ misp_rootdir }}/app/composer.json mode=0644
 ## FIXME! no better way to do that?
 - name: Download Composer installer.
   get_url:
     url: https://getcomposer.org/installer
     dest: /tmp/composer-installer.php
     mode: 0755
+    sha256sum: 8f085b3e3eefaef7f29bb69f1af871406c1a346c7ae33cf61de22fa3a1d94162
 - name: install composer
   shell: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
   args:
     creates: /usr/local/bin/composer
-- name: install PHP dependencies via composer
+- name: install PHP dependencies via composer (kamisama/cake-resque, Vendor)
   composer: command=install working_dir={{ misp_rootdir }}/app
-#  shell: "{{ item }} chdir={{ misp_rootdir }}/app"
-#  with_items:
-#    - "curl -s https://getcomposer.org/installer | php"
-#    - "php composer.phar require kamisama/cake-resque:4.1.2"
-#    - "php composer.phar config vendor-dir Vendor"
-#    - "php composer.phar install"
 
 ## https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
 - name: Install PECL libaries.
@@ -111,12 +103,12 @@
   register: rsync_result
   changed_when: 'rsync_result.stdout != ""'
 
-- file: "dest={{ misp_rootdir }} mode=0750 owner={{ www_user }} group={{ www_user }} state=directory"
-- file: "dest={{ misp_rootdir }}/app/tmp mode=2770 owner={{ www_user }} group={{ www_user }} state=directory"
-- file: "dest={{ misp_rootdir }}/app/files mode=2770 owner={{ www_user }} group={{ www_user }} state=directory"
-- file: "dest={{ misp_rootdir }}/app/files/scripts/tmp mode=2770 owner={{ www_user }} group={{ www_user }} state=directory"
+- file: "dest={{ misp_rootdir }} mode=0755 owner={{ www_user }} group={{ www_user }} state=directory"
+- file: "dest={{ misp_rootdir }}/app/tmp mode=2775 owner={{ www_user }} group={{ www_user }} state=directory"
+- file: "dest={{ misp_rootdir }}/app/files mode=2775 owner={{ www_user }} group={{ www_user }} state=directory"
+- file: "dest={{ misp_rootdir }}/app/files/scripts/tmp mode=2775 owner={{ www_user }} group={{ www_user }} state=directory"
 - name: check owner/group for multiple MISP folders
-  file: "dest={{ item }} owner={{ www_user }} group={{ www_user }} state=directory"
+  file: "dest={{ item }} owner={{ www_user }} group={{ www_user }} state=directory mode=2755"
 #  with_fileglob:
 #    - {{ misp_rootdir }}/app/files/scripts/tmp/*
 #    - {{ misp_rootdir }}/app/files/scripts/tmp/cache/*
@@ -141,6 +133,7 @@
     - "{{ misp_rootdir }}/app/tmp/cached_exports/csv_all"
     - "{{ misp_rootdir }}/app/tmp/cached_exports/xml"
     - "{{ misp_rootdir }}/app/tmp/cached_exports/rpz"
+- file: "dest={{ misp_rootdir }}/app/Plugin/CakeResque/tmp mode=0775 owner={{ www_user }} group={{ www_user }} state=directory"
 
 
 ## not idempotent but above is not recursive

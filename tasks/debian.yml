@@ -19,11 +19,13 @@
     - make
     - python-dev
     - python-pip
+    - python-virtualenv
     - libxml2-dev
     - libxslt1-dev
     - zlib1g-dev
     - php5-dev
     - libapache2-mod-php5
+    - libapache2-mod-fastcgi
     - curl
     - gnupg
 #

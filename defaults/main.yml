@@ -2,6 +2,8 @@
 
 tz: UTC
 
+## branch or tags to use
+misp_version: '2.4'
 misp_rootdir: /var/www/MISP
 mispmodules_rootdir: /opt
 
@@ -11,12 +13,15 @@ misp_email: root@localhost
 misp_gpg_email: "{{ misp_email }}"
 misp_gpg_homedir: "{{ misp_rootdir }}"
 misp_gpg_pass: gpg_pass_to_change_fast
-misp_passreq_lenth: 6
-misp_passreq_complexity: ''
+## not mapped currently
+#misp_passreq_lenth: 6
+#misp_passreq_complexity: ''
 
 misp_db_user: misp
 misp_db_pass: mispdb_pass_to_change_fast
 misp_web_user: admin@admin.test
 misp_web_pass: admin
 ## TODO: either fixed for serverspec test, either random if not defined/empty
-misp_web_apikey:
+#misp_web_apikey:
+
+misp_email_contact: email@address.com
