@@ -25,7 +25,8 @@
     - zlib1g-dev
     - php5-dev
     - libapache2-mod-php5
-    - libapache2-mod-fastcgi
+## travis: "No package matching 'libapache2-mod-fastcgi' is available"
+#    - libapache2-mod-fastcgi
     - curl
     - gnupg
 #

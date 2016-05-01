@@ -10,10 +10,13 @@
     - user: vagrant
     - user_home: /home/vagrant
     - key_file: "{{ user_home }}/build/key.txt"
-    - misp_base_url: http://misp.local
+    - misp_base_url: http://localhost
     - rolesroot: /tmp/kitchen/roles/MISP
   tasks:
-    - hostname: name=misp.local
+    - name: replace misp.local hostname
+      replace: dest={{ item }} regexp='http:\/\/misp.local' replace="{{ misp_base_url }}" backup=yes
+      with_items:
+        - /var/www/MISP/tests/curl_tests.sh
     - name: check tool version for debugging
       command: "{{ item }}"
       with_items:
