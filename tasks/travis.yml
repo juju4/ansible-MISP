@@ -1,0 +1,18 @@
+---
+## Travis workaround
+
+- name: checking environment if travis
+  command: "env"
+  register: env
+  changed_when: false
+
+## Travis error: "asn1 encoding routines:ASN1_mbstring_ncopy:string too longi:a_mbstr.c:154:maxsize=64" as cn=testing-gce-4d114f77-0ff1-41fb-bd33-22879d3249da.c.eco-emissary-99515.internal
+- set_fact:
+    certificate_cn: "{{ ansible_fqdn }}"
+
+- set_fact:
+    certificate_cn: "testing-travis.internal"
+    rolesroot: '/etc/ansible/roles'
+    travisci: true
+  when: env is defined and env.stdout.find('TRAVIS=true') != -1
+

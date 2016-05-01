@@ -11,8 +11,9 @@
     - user_home: /home/vagrant
     - key_file: "{{ user_home }}/build/key.txt"
     - misp_base_url: http://localhost
-    - rolesroot: /tmp/kitchen/roles/MISP
+#    - rolesroot: /tmp/kitchen/roles/MISP
   tasks:
+    - include: travis.yml
     - name: replace misp.local hostname
       replace: dest={{ item }} regexp='http:\/\/misp.local' replace="{{ misp_base_url }}" backup=yes
       with_items:
@@ -32,7 +33,7 @@
         - "{{ user_home }}"
         - /home
    # Get authkey
-    - include: "{{ rolesroot }}/tasks/apache-env.yml"
+    - include: apache-env.yml
     - file: dest=/var/www/MISP/build mode=0777
     - copy: src=/var/www/MISP/travis/bootstrap.php dest=/var/www/MISP/app/Config/bootstrap.php backup=yes force=yes
     - name: ensure test user in group of web server
