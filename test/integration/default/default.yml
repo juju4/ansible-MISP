@@ -67,8 +67,8 @@
       file: dest=/var/www/MISP/PyMISP mode=777 recurse=yes
       become: yes
     - name: set local variables in PyMISP/test/keys.py
-      lineinfile: dest=/var/www/MISP/PyMISP/test/keys.py line="{{ item }}"
+      lineinfile: dest=/var/www/MISP/PyMISP/test/keys.py line="{{ item }}" create=yes
       with_items:
         - "url = \"{{ misp_base_url }}\""
-        - "key = \"{{ userInit.stdout_lines }}\""
+        - "key = \"{{ userInit.stdout }}\""
 
