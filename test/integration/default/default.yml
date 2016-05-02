@@ -15,7 +15,7 @@
   tasks:
     - include: travis.yml
     - name: replace misp.local hostname
-      replace: dest={{ item }} regexp='http:\/\/misp.local' replace="{{ misp_base_url }}" backup=yes
+      replace: dest="{{ item }}" regexp='http:\/\/misp.local' replace="{{ misp_base_url }}" backup=yes
       with_items:
         - /var/www/MISP/tests/curl_tests.sh
     - name: check tool version for debugging
@@ -25,22 +25,31 @@
         - composer --version
       changed_when: false
       ignore_errors: true
-    - pip: name=coveralls
-    - pip: name=codecov
-    - file: dest={{ item }} mode=0755 state=directory
+    - name: pip dependencies for testing
+      pip: name={{ item }}
+      with_items:
+        - coveralls
+        - codecov
+    - name: check home permissions
+      file: dest={{ item }} mode=0755 state=directory
       with_items:
         - "{{ user_home }}/build"
         - "{{ user_home }}"
         - /home
    # Get authkey
     - include: apache-env.yml
-    - file: dest=/var/www/MISP/build mode=0777
-    - copy: src=/var/www/MISP/travis/bootstrap.php dest=/var/www/MISP/app/Config/bootstrap.php backup=yes force=yes
+    - name: check world-writeable permissions
+      file: "dest={{ item }} mode=0777"
+      with_items:
+        - /var/www/MISP/build
+        - /var/www/MISP/tests
+    - name: use MISP travis bootstrap
+      copy: src=/var/www/MISP/travis/bootstrap.php dest=/var/www/MISP/app/Config/bootstrap.php backup=yes force=yes
     - name: ensure test user in group of web server
       user: "user={{ user }} groups={{ www_user }} append=yes"
       become: yes
     - name: check if existing key file
-      stat: path={{ key_file }}
+      stat: "path={{ key_file }}"
       register: skey
     - name: cake userInit
       shell: "/var/www/MISP/app/Console/cake userInit -q | tee {{ key_file }}"
@@ -49,19 +58,17 @@
       register: userInit
       when: not skey.stat.exists
     - debug: var=userInit
-    - file: dest={{ key_file }} mode=777
+    - file: "dest={{ key_file }} mode=777"
       become: yes
-    - file: dest=/var/www/MISP/tests mode=777 recurse=yes
+    - name: MISP tree permissions
+      file: "dest=/var/www/MISP owner={{ www_user }} mode=755 recurse=yes"
       become: yes
-    - file: dest=/var/www/MISP owner={{ www_user }} mode=755 recurse=yes
+    - name: PyMISP world-writeable permissions
+      file: dest=/var/www/MISP/PyMISP mode=777 recurse=yes
       become: yes
-    - command: cat {{ key_file }}
-      register: mispkey
-      changed_when: false
-    - file: dest=/var/www/MISP/PyMISP mode=777 recurse=yes
-      become: yes
-    - lineinfile: dest=/var/www/MISP/PyMISP/test/keys.py line={{ item }}
+    - name: set local variables in PyMISP/test/keys.py
+      lineinfile: dest=/var/www/MISP/PyMISP/test/keys.py line="{{ item }}"
       with_items:
         - "url = \"{{ misp_base_url }}\""
-        - "key = \"{{ misp_key.stdout_lines }}\""
+        - "key = \"{{ userInit.stdout_lines }}\""
 
