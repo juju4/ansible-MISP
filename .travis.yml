@@ -23,6 +23,7 @@ before_install:
   - pwd
   - find -ls
   - cp /home/travis/build/juju4/ansible-MISP/tasks/travis.yml /home/travis/build/juju4/ansible-MISP/test/integration/default/
+  - cp /home/travis/build/juju4/ansible-MISP/tasks/apache-env.yml /home/travis/build/juju4/ansible-MISP/test/integration/default/
   # Customize container
   - 'sudo docker build --rm=true --file=test/travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible test'
 
