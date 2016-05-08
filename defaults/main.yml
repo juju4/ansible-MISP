@@ -7,15 +7,24 @@ misp_version: '2.4'
 misp_rootdir: /var/www/MISP
 mispmodules_rootdir: /opt
 
+misp_testing: false
+
 ## value for kitchen forwarding
 misp_base_url: http://127.0.0.1:8888
 misp_email: root@localhost
 misp_gpg_email: "{{ misp_email }}"
 misp_gpg_homedir: "{{ misp_rootdir }}"
 misp_gpg_pass: gpg_pass_to_change_fast
+misp_SecureAuth_expire: 300
+misp_passreq_lenth: 8
 ## not mapped currently
-#misp_passreq_lenth: 6
 #misp_passreq_complexity: ''
+## leave empty when no proxy
+misp_proxy_host: ''
+misp_proxy_port: ''
+misp_proxy_method: ''
+misp_proxy_user: ''
+misp_proxy_pass: ''
 
 misp_db_user: misp
 misp_db_pass: mispdb_pass_to_change_fast
@@ -25,3 +34,8 @@ misp_web_pass: admin
 #misp_web_apikey:
 
 misp_email_contact: email@address.com
+
+## TODO: default provided feeds
+misp_enable_feeds:
+ - CIRCL OSINT Feed
+ - The Botvrij.eu Data

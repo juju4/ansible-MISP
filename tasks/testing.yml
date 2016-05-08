@@ -1,0 +1,72 @@
+---
+
+    - include: travis.yml
+    - name: install serverspec - debian
+      apt: name={{ item }} state=present
+      with_items:
+        - ruby2.0
+        - rake
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - name: install serverspec - redhat
+      yum: name={{ item }} state=present
+      with_items:
+        - rubygem-rake
+      when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    - name: replace misp.local hostname
+      replace: dest="{{ item }}" regexp='http:\/\/misp.local' replace="{{ misp_base_url }}" backup=yes
+      with_items:
+        - /var/www/MISP/tests/curl_tests.sh
+    - name: check tool version for debugging
+      command: "{{ item }}"
+      with_items:
+        - php --version
+        - composer --version
+      changed_when: false
+      ignore_errors: true
+    - name: pip dependencies for testing
+      pip: name={{ item }}
+      with_items:
+        - coveralls
+        - codecov
+    - name: check home permissions
+      file: dest={{ item }} mode=0755 state=directory
+      with_items:
+        - "{{ misp_testing_user_home }}/build"
+        - "{{ misp_testing_user_home }}"
+        - /home
+   # Get authkey
+    - include: apache-env.yml
+    - name: check world-writeable permissions
+      file: "dest={{ item }} mode=0777"
+      with_items:
+        - /var/www/MISP/build
+        - /var/www/MISP/tests
+    - name: use MISP travis bootstrap
+      copy: src=/var/www/MISP/travis/bootstrap.php dest=/var/www/MISP/app/Config/bootstrap.php backup=yes force=yes
+    - name: ensure test user in group of web server
+      user: "user={{ misp_testing_user }} groups={{ www_user }} append=yes"
+      become: yes
+    - name: check if existing key file
+      stat: "path={{ misp_testing_key_file }}"
+      register: skey
+    - name: cake userInit
+      shell: "/var/www/MISP/app/Console/cake userInit -q | tee {{ misp_testing_key_file }}"
+      become: yes
+#      become_user: "{{ user }}"
+      register: userInit
+      when: not skey.stat.exists
+    - debug: var=userInit
+    - file: "dest={{ misp_testing_key_file }} mode=777"
+      become: yes
+    - name: MISP tree permissions
+      file: "dest=/var/www/MISP owner={{ www_user }} mode=755 recurse=yes"
+      become: yes
+    - name: PyMISP world-writeable permissions
+      file: dest=/var/www/MISP/PyMISP mode=777 recurse=yes
+      become: yes
+    - name: set local variables in PyMISP/test/keys.py
+      lineinfile: dest=/var/www/MISP/PyMISP/test/keys.py line="{{ item }}" create=yes
+      with_items:
+        - "url = \"{{ misp_base_url }}\""
+        - "key = \"{{ userInit.stdout }}\""
+

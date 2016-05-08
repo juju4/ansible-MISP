@@ -16,3 +16,8 @@
     travisci: true
   when: env is defined and env.stdout.find('TRAVIS=true') != -1
 
+- set_fact:
+    misp_testing_user: travis
+    misp_testing_user_home: "/home/{{ misp_testing_user }}"
+    misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
+

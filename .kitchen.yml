@@ -2,6 +2,11 @@
 driver:
   name: vagrant
 
+driver_config:
+    customize:
+#      cpus: 2
+      memory: 1024
+
 provisioner:
   name: ansible_playbook
   roles_path: ../../roles

@@ -81,7 +81,8 @@
     url: https://getcomposer.org/installer
     dest: /tmp/composer-installer.php
     mode: 0755
-    sha256sum: 8f085b3e3eefaef7f29bb69f1af871406c1a346c7ae33cf61de22fa3a1d94162
+#    sha256sum: 8f085b3e3eefaef7f29bb69f1af871406c1a346c7ae33cf61de22fa3a1d94162
+    sha256sum: 63c07d40e076a2de577df3a78161cca3888e357ce0e3fa9a86bf86eced0cc192
 - name: install composer
   shell: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
   args:
@@ -297,4 +298,11 @@
 - name: install pip3 dependencies for MISP modules
   pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip3
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- include: testing.yml
+  when: misp_testing is defined and misp_testing
+
+## Note: more a reset as next login, will ask to change password...
+- name: set admin password
+  command: " /var/www/MISP/app/Console/cake Password admin@admin.test \"{{ misp_web_pass }}\""
 

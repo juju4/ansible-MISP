@@ -1,11 +1,13 @@
 <?php
 $config = array (
   'debug' => 0,
+  'site_admin_debug' => false,
   'Security' => 
   array (
     'level' => 'medium',
     'salt' => '{{ salt.stdout }}',
     'cipherSeed' => '',
+    'password_policy_length' => {{ misp_passreq_lenth }},
     //'auth'=>array('CertAuth.Certificate'), // additional authentication methods
   ),
   'MISP' => 
@@ -41,16 +43,16 @@ $config = array (
   ),
   'Proxy' =>
   array (
-    'host' => '',
-    'port' => '',
-    'method' => '',
-    'user' => '',
-    'password' => '',
+    'host' => '{{ misp_proxy_host }}',
+    'port' => '{{ misp_proxy_port }}',
+    'method' => '{{ misp_proxy_method }}',
+    'user' => '{{ misp_proxy_user }}',
+    'password' => '{{ misp_proxy_pass }}',
   ),
   'SecureAuth' => 
   array (
     'amount' => 5,
-    'expire' => 300,
+    'expire' => {{ misp_SecureAuth_expire }},
   ),
   // Uncomment the following to enable client SSL certificate authentication
   /*
@@ -81,4 +83,9 @@ $config = array (
     ),
   ),
   */
+  'Plugin' =>
+  array (
+    'Enrichment_services_enable' => true,
+    'Enrichment_hover_enable' => true,
+  ),
 );

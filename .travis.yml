@@ -22,8 +22,7 @@ before_install:
   - env
   - pwd
   - find -ls
-  - cp /home/travis/build/juju4/ansible-MISP/tasks/travis.yml /home/travis/build/juju4/ansible-MISP/test/integration/default/
-  - cp /home/travis/build/juju4/ansible-MISP/tasks/apache-env.yml /home/travis/build/juju4/ansible-MISP/test/integration/default/
+  - cp test/travis/initctl_faker test/
   - cp /home/travis/build/juju4/ansible-MISP/test/integration/default/serverspec/Rakefile /home/travis/build/juju4/ansible-MISP/
   # Customize container
   - 'sudo docker build --rm=true --file=test/travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible test'
@@ -34,10 +33,7 @@ script:
   - 'sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/MISP:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
 
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --version'
-
-## serverspec test; FIXME! not portable to Centos7
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm apt-get install -qq ruby2.0 rake; exit 0'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm gem2.0 install serverspec rspec; exit 0'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --connection=local -m setup localhost'
 
   # Ansible syntax check.
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/MISP/test/integration/default/default.yml --syntax-check'

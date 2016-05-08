@@ -58,7 +58,8 @@ $ vagrant ssh
 Troubleshooting
 ```
 $ tail /var/log/apache2/misp.*
-$ tail /var/www/MISP/app/tmp/logs/error.log
+$ tail /var/www/MISP/app/tmp/logs/*.log
+$ cd /var/www/MISP/app/Console && ./cake CakeResque.CakeResque tail
 ```
 
 Known bugs
@@ -68,6 +69,7 @@ check misp database exists in mysql and is filled
 * PHP Fatal error:  Can't use method return value in write context
 Only on centos71 with php54. Ok with ubuntu trusty and php55.
 = switch to php56 from remi repository
+* MISP curl_tests.sh is made to run once unlike kitchen verify. If repeated, this test will fail.
 
 TODO
 * role is not managing upgrade
