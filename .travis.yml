@@ -10,7 +10,8 @@ env:
   - distribution: ubuntu
     version: 14.04
     init: /sbin/init
-    run_opts: ""
+#    run_opts: ""
+    run_opts: "--privileged"
 
 services:
   - docker
@@ -30,7 +31,8 @@ before_install:
 script:
   - container_id=$(mktemp)
     # Run container in detached state
-  - 'sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/MISP:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
+## ## Note: mapping urandom/random to accelerate gpg key generation. Normally, have rng-tools or haveged to handle that but not running inside docker images we have
+  - 'sudo docker run --detach -v /dev/urandom:/dev/random --volume="${PWD}":/etc/ansible/roles/MISP:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
 
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --version'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --connection=local -m setup localhost'
@@ -44,7 +46,7 @@ script:
   # Test role idempotence.
 ## FIXME! known fail
   - >
-    sudo docker exec "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/MISP/test/integration/default/default.yml
+    sudo docker exec "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/MISP/test/integration/default/default.yml
     | tee /tmp/idempotency.log
     | grep -q 'changed=0.*failed=0'
     && (echo 'Idempotence test: pass' && exit 0)
