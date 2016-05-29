@@ -30,6 +30,10 @@ misp_db_user: misp
 misp_db_pass: mispdb_pass_to_change_fast
 misp_web_user: admin@admin.test
 misp_web_pass: admin
+## extra users, the password is only valid once. user will be asked to update
+#misp_webusers_list:
+# - { u: dupont@admin.test, p: dupont_passphrase. }
+# - { u: dupond@admin.test, p: dupond_passphrase. }
 ## TODO: either fixed for serverspec test, either random if not defined/empty
 #misp_web_apikey:
 

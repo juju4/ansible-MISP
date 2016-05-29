@@ -305,4 +305,9 @@
 ## Note: more a reset as next login, will ask to change password...
 - name: set admin password
   command: " /var/www/MISP/app/Console/cake Password admin@admin.test \"{{ misp_web_pass }}\""
+- block:
+    - name: set extra users
+      command: " /var/www/MISP/app/Console/cake Password {{ item.u }} \"{{ item.p }}\""
+      with_items: "{{ misp_webusers_list }}"
+  when: misp_webusers_list is defined and misp_webusers_list != ""
 
