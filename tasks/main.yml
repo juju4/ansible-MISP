@@ -1,6 +1,7 @@
 ---
 
 - include: apache-env.yml
+  when: misp_webserver is not defined or misp_webserver == 'apache2'
 
 - include: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -45,7 +46,7 @@
 - stat: path={{ misp_rootdir }}/INSTALL
   register: m
 - name: git clone MISP
-  git: repo=https://github.com/MISP/MISP.git 
+  git: repo=https://github.com/MISP/MISP.git
        dest={{ misp_rootdir }}
        version={{ misp_version }}
 #       track_submodules=yes
@@ -81,8 +82,7 @@
     url: https://getcomposer.org/installer
     dest: /tmp/composer-installer.php
     mode: 0755
-#    sha256sum: 8f085b3e3eefaef7f29bb69f1af871406c1a346c7ae33cf61de22fa3a1d94162
-    sha256sum: 63c07d40e076a2de577df3a78161cca3888e357ce0e3fa9a86bf86eced0cc192
+    sha256sum: 5af00ed7dbe47d849eca28cd44b6064d34b362ce20ba465652d72b4d121134b1
 - name: install composer
   shell: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
   args:
@@ -158,33 +158,18 @@
 - name: creating mysql misp db user
   mysql_user: name="{{ misp_db_user }}" password="{{ misp_db_pass }}" priv=*.*:USAGE/misp.*:ALL state=present
 
-## FIXME! or ssl ?
-#- command: "rsync -ci {{ misp_rootdir }}/INSTALL/apache.misp.ssl {{ apache_sitedir }}/misp-ssl.conf"
-- command: "rsync -ci {{ misp_rootdir }}/INSTALL/apache.misp.ubuntu {{ apache_sitedir }}/misp.conf"
-  register: rsync_result
-  changed_when: 'rsync_result.stdout != ""'
-  notify:
-    - restart apache
+- include: apache2.yml
+  when: misp_webserver is not defined or misp_webserver == 'apache2'
+- include: nginx.yml
+  when: misp_webserver is defined and misp_webserver == 'nginx'
 
-- name: redhat | update log path
-  replace: "dest={{ apache_sitedir }}/misp.conf regexp='/var/log/apache2/' replace='{{ apache_logs }}/'"
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-
-- file: dest="{{ apache_sitedir }}/misp.conf" mode=0644
-- file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
-  notify:
-    - restart apache
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-- file: "src={{ apache_sitedir }}/misp.conf dest=/etc/apache2/sites-enabled/misp.conf state=link"
-  notify:
-    - restart apache
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-- name: debian | ensure mod_rewrite is present
-  apache2_module: state=present name=rewrite
-  notify:
-    - restart apache
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- name: extra php settings
+  template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.ini mode=0644"
+- name: Enforce Timezone in php.ini
+  replace: "dest={{ php_ini }} regexp='^;date.timezone =' replace='date.timezone = {{ tz }}'"
+- name: enabling MISP php settings
+  file: "src={{ php_confdir }}/misp-php.ini dest=/etc/php5/apache2/conf.d/99-misp.ini state=link"
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and (misp_webserver is not defined or misp_webserver == 'apache2')
 
 - stat: path={{ misp_rootdir }}/app/Config/config.php
   register: conffiles
@@ -279,18 +264,10 @@
 - name: start MISP worker
   lineinfile: dest={{ misp_rootdir }}/app/Console/worker/start.sh line="su {{ www_user }} -c 'bash {{ misp_rootdir }}/app/Console/worker/start.sh'"
 
-- name: extra php settings
-  template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.ini mode=0644"
-- name: enabling MISP php settings
-  file: "src={{ php_confdir }}/misp-php.ini dest=/etc/php5/apache2/conf.d/99-misp.ini state=link"
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-- name: Enforce Timezone in php.ini
-  replace: "dest={{ php_ini }} regexp='^;date.timezone =' replace='date.timezone = {{ tz }}'"
-
 - stat: path={{ mispmodules_rootdir }}/misp-modules
   register: mm
 - name: git clone MISP modules
-  git: repo=https://github.com/MISP/misp-modules.git 
+  git: repo=https://github.com/MISP/misp-modules.git
        dest={{ mispmodules_rootdir }}/misp-modules
   when: not mm.stat.exists
 

@@ -1,0 +1,5 @@
+---
+
+- name: set misp nginx configuration
+  template: src=nginx-misp.conf.j2 dest=/etc/nginx/sites-available/misp.conf mode=0644
+

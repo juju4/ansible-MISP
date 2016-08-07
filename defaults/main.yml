@@ -6,6 +6,8 @@ tz: UTC
 misp_version: '2.4'
 misp_rootdir: /var/www/MISP
 mispmodules_rootdir: /opt
+misp_webserver: 'apache2'
+#misp_webserver: 'nginx'
 
 misp_testing: false
 

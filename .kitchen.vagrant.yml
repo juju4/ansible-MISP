@@ -1,6 +1,7 @@
 ---
 driver:
-  name: lxd_cli
+  name: vagrant
+  provider: <%= ENV['KITCHEN_PROVIDER'] || 'virtualbox' %>
 
 driver_config:
     customize:
@@ -9,30 +10,28 @@ driver_config:
 
 provisioner:
   name: ansible_playbook
-  roles_path: ../
+  roles_path: ../../roles
   hosts: test-kitchen
 #  ansible_verbose: true
   ansible_verbose: false
   ansible_verbosity: 3
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
-  ansible_yum_repo: http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-  require_ansible_omnibus: true
-#  require_chef_for_busser: false
-  enable_yum_epel: true
-  ansible_connection: ssh
+#  name: chef_solo
 
 platforms:
-#  - name: ubuntu-16.04
   - name: ubuntu-14.04
     driver_config:
       network:
         - ["forwarded_port", {guest: 80, host: 8888}]
+## No package matching 'php5-redis' is available
 #  - name: ubuntu-12.04
-#  - name: centos-7
-#  - name: centos-6
-## "Failed to complete #create action: [Broken pipe] on default-alpine-34"
-## do we have python2 in default image?
-#  - name: alpine-3.4
+## test for agent windows/wixl ? no image available
+#  - name: ubuntu-15.10
+## mig-scheduler issue w rights on database
+  - name: centos-7.1
+    driver_config:
+      network:
+        - ["forwarded_port", {guest: 80, host: 8890}]
 
 suites:
   - name: default
@@ -44,10 +43,9 @@ suites:
         misp_webserver: 'nginx'
     includes:
       - ubuntu-14.04
-#      - centos-7.1
+      - centos-7.1
     provisioner:
       name: ansible_playbook
       playbook: test/integration/default/default.yml
-
 
 
