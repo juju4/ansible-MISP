@@ -1,0 +1,36 @@
+---
+dist: trusty
+language: python
+python: "2.7"
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq python-apt python-pycurl
+ - ln -s ansible-MISP ../MISP
+ - ./get-dependencies.sh
+## for local travis execution as we use same default.yml than kitchen
+ - mkdir /tmp/kitchen
+ - ln -s /home/travis/build/juju4/ansible-MISP/test/integration/default/tmp /tmp/kitchen/tmp
+## serverspec test
+ - sudo apt-get install -qq ruby2.0 rake
+ - sudo gem2.0 install serverspec
+ - ln -s /home/travis/build/juju4/ansible-MISP/test/integration/default/serverspec/Rakefile
+install:
+  - pip install ansible
+  - ansible --version
+  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+  - gem2.0 --version
+script:
+  - "echo \"[test-kitchen]\nlocalhost\" > inventory"
+
+# Check the role/playbook's syntax.
+  - "ansible-playbook -i inventory --syntax-check test/integration/default/default.yml"
+
+# Run the role/playbook with ansible-playbook.
+  - "ansible-playbook -i inventory --connection=local --sudo -vvvv test/integration/default/default.yml"
+
+# Run the role/playbook again, checking to make sure it's idempotent.
+  - "ansible-playbook -i inventory test/integration/default/default.yml --connection=local --sudo | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)"
+
+# Serverspec
+#  - "test/integration/default/serverspec/run-local-tests.sh"
+  - "cd test/integration/default/serverspec/ && bundle exec rake spec"

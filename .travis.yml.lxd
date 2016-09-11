@@ -1,0 +1,92 @@
+---
+dist: trusty
+sudo: required
+rvm:
+  - 2.2
+
+env:
+  - distribution: centos
+    version: 6
+  - distribution: centos
+    version: 7
+  - distribution: ubuntu
+    version: 16.04
+  - distribution: ubuntu
+    version: 14.04
+  - distribution: ubuntu
+    version: 12.04
+  - distribution: alpine
+    version: 3.4
+
+before_install:
+  - env
+  - pwd
+  - find -ls
+## use appropriate role path and not github name
+  - ln -s ansible-MISP ../MISP && cd ../MISP
+  - ./get-dependencies.sh
+## No Xenial, https://github.com/travis-ci/travis-ci/issues/5821
+#  - sudo apt install lxd
+  - echo "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/trusty-backports.list
+  - sudo apt-get update -qq
+  - sudo apt -t trusty-backports -y install lxd acl -q
+## change of group implies logout+login to apply... can't do with travis = run as root (sic)
+## https://github.com/travis-ci/travis-ci/issues/1839   or chain: sudo -E su $USER -c "..."
+  - sudo usermod -G lxd travis
+  # Pull container
+  - sudo -E su $USER -c "lxc remote list"
+  - sudo -E su $USER -c "lxc image list"
+## pre-download base images
+  - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] || lxc image copy images:/${distribution}/${version}/amd64 local: --alias=${distribution}-${version}"'
+  - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] && lxc image copy ubuntu:${version} local: --alias=${distribution}-${version}" || true'
+## configure lxd-bridge
+  - sudo perl -pi -e 's@^LXD_IPV4_ADDR=""@LXD_IPV4_ADDR="10.252.116.1"@;s@^LXD_IPV4_NETMASK=""@LXD_IPV4_NETMASK="255.255.255.0"@;s@^LXD_IPV4_NETWORK=""@LXD_IPV4_NETWORK="10.252.116.1/24"@;s@^LXD_IPV4_DHCP_RANGE=""@LXD_IPV4_DHCP_RANGE="10.252.116.2,10.252.116.254"@;s@^LXD_IPV4_DHCP_MAX=""@LXD_IPV4_DHCP_MAX="252"@;s@LXD_IPV6_PROXY="true"@LXD_IPV6_PROXY="false"@' /etc/default/lxd-bridge
+#  - cat /etc/default/lxd-bridge
+#  - service --status-all
+  - sudo service lxd restart
+## ssh key for lxd_cli ?
+  - ls ~/.ssh
+  - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
+## sudo/su get us a non-usual PATH ...
+  - sudo -E su $USER -c "lxc launch ${distribution}-${version} run-${distribution}-${version//./}"
+#  - sudo -E su $USER -c "lxc start run-${distribution}-${version//./}"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env"
+  - '[ "X${distribution}" != "Xalpine" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- dhclient eth0" || true'
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ping -c 1 8.8.8.8"
+  - '[ "X${distribution}" == "Xubuntu" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- apt-get update" || true'
+  - '[ "X${distribution}" == "Xubuntu" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- apt-get -y install python python-apt aptitude python-pip libssl-dev python-dev libffi-dev" || true'
+  - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X6" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- rpm -iUvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm" || true'
+  - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X7" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm" || true'
+  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- yum update" || true'
+  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- yum -y install python python-pip openssl-devel python-devel libffi-devel \"@Development tools\"" || true'
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pip install ansible"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible --version"
+  - "echo localhost > inventory"
+## enable ansible profiling (https://github.com/jlafon/ansible-profile)
+#  - "printf '[defaults]\ncallback_whitelist = profile_tasks' > ansible.cfg"
+#  - sudo -E su $USER -c "lxc file push inventory ansible.cfg run-${distribution}-${version//./}/root/"
+  - sudo -E su $USER -c "lxc file push inventory run-${distribution}-${version//./}/root/"
+## these lines are necessary so lxc mount is read-write, https://github.com/lxc/lxd/issues/1879
+  - chmod -R go+w $PWD
+## OR
+  - sudo -E su $USER -c "lxc config show run-${distribution}-${version//./}"
+## FIXME! awk extraction is working in shell but not in travis... relying on global chmod as test ephemeral environment. DON'T USE IN PRODUCTION!
+  - sudo -E su $USER -c "lxc config show run-${distribution}-${version//./} | awk -F'[\":,]' '/Hostid/ { print $13 }'"
+  - CUID=`sudo -E su $USER -c "lxc config show run-${distribution}-${version//./} | awk -F'[\":,]' '/Hostid/ { print $13 }'"`
+  - "echo setfacl -Rm user:$CUID:rwx ${PWD%/*}"
+  - "setfacl -Rm user:$CUID:rwx ${PWD%/*}"
+  - sudo -E su $USER -c "lxc config device add run-${distribution}-${version//./} sharedroles disk path=/etc/ansible/roles source=${PWD%/*}"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- mount"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pwd"
+
+script:
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --syntax-check /etc/ansible/roles/MISP/test/integration/default/default.yml"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --connection=local --sudo -vvvv /etc/ansible/roles/MISP/test/integration/default/default.yml"
+## FIXME! Travis request: Build config file had a parse error: "mapping values are not allowed in this context at line 72 column 321".
+#  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory /etc/ansible/roles/MISP/test/integration/default/default.yml --connection=local --sudo | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time sh -x /etc/ansible/roles/MISP/test/integration/default/serverspec/run-local-tests.sh"
+  - sudo -E su $USER -c "lxc stop run-${distribution}-${version//./}"
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
+
