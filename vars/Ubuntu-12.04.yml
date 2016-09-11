@@ -1,0 +1,65 @@
+---
+
+misp_pkg_list:
+ - openssh-server
+ - mysql-server
+ - php5
+ - php5-mysql
+ - php5-mbstring
+ - postfix
+ - gcc
+ - zip
+ - php-pear
+ - git
+ - redis-server
+ - make
+ - python-dev
+ - python-pip
+ - python-virtualenv
+ - libxml2-dev
+ - libxslt1-dev
+ - zlib1g-dev
+ - php5-dev
+ - curl
+ - gnupg
+#
+ - php5-redis
+ - python-mysqldb
+ - rng-tools
+# misp-modules
+ - python3
+ - python3-pip
+
+mysql_svc: mysql
+rng_svc: rng-tools
+misp_services:
+    - "{{ apache_svc }}"
+    - "{{ mysql_svc }}"
+    - "{{ rng_svc }}"
+
+misp_services_nginx:
+    - "{{ apache_svc }}"
+    - "{{ mysql_svc }}"
+    - "{{ rng_svc }}"
+    - php5-fpm
+
+misp_testing_pkg:
+    - ruby2.0
+    - rake
+
+misp_webserver_apache2:
+    - apache2
+    - libapache2-mod-php5
+## travis: "No package matching 'libapache2-mod-fastcgi' is available"
+# - libapache2-mod-fastcgi
+
+misp_webserver_nginx:
+  - nginx
+  - php5-fpm
+
+php_confdir: /etc/php5/mods-available
+php_confext: ini
+php_ini: /etc/php5/apache2/php.ini
+php_ini_nginx: /etc/php5/fpm/php.ini
+php_confenable: /etc/php5/apache2/conf.d
+nginx_sock: /var/run/php5-fpm.sock

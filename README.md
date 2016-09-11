@@ -70,6 +70,30 @@ check misp database exists in mysql and is filled
 Only on centos71 with php54. Ok with ubuntu trusty and php55.
 = switch to php56 from remi repository
 * MISP curl_tests.sh is made to run once unlike kitchen verify. If repeated, this test will fail.
+* nosetests
+.coverage owned by root make the test failing
+on ubuntu trusty:
+```
+$ cd /var/www/MISP/PyMISP && nosetests --with-coverage --cover-package=pymisp tests/test_offline.py
+[...]
+ImportError: No module named packages.urllib3.response
+
+Name                 Stmts   Miss  Cover
+----------------------------------------
+pymisp/__init__.py       2      2     0%
+pymisp/api.py          782    782     0%
+----------------------------------------
+TOTAL                  784    784     0%
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (errors=1)
+$ dpkg -l |grep urllib3
+ii  python-urllib3                   1.7.1-1ubuntu4                   all          HTTP library with thread-safe connection pooling for Python
+ii  python-urllib3-whl               1.7.1-1ubuntu4                   all          HTTP library with thread-safe connection pooling
+ii  python3-urllib3                  1.7.1-1ubuntu4                   all          HTTP library with thread-safe connection pooling for Python3
+```
+
 
 TODO
 * role is not managing upgrade

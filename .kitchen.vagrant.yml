@@ -3,6 +3,9 @@ driver:
   name: vagrant
   provider: <%= ENV['KITCHEN_PROVIDER'] || 'virtualbox' %>
 
+transport:
+  name: sftp
+
 driver_config:
     customize:
 #      cpus: 2
@@ -19,10 +22,14 @@ provisioner:
 #  name: chef_solo
 
 platforms:
+  - name: ubuntu-16.04
+    driver_config:
+      network:
+        - ["forwarded_port", {guest: 80, host: 8588}]
   - name: ubuntu-14.04
     driver_config:
       network:
-        - ["forwarded_port", {guest: 80, host: 8888}]
+        - ["forwarded_port", {guest: 80, host: 8588}]
 ## No package matching 'php5-redis' is available
 #  - name: ubuntu-12.04
 ## test for agent windows/wixl ? no image available
@@ -31,7 +38,7 @@ platforms:
   - name: centos-7.1
     driver_config:
       network:
-        - ["forwarded_port", {guest: 80, host: 8890}]
+        - ["forwarded_port", {guest: 80, host: 8589}]
 
 suites:
   - name: default

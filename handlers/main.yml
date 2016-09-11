@@ -1,4 +1,6 @@
 ---
-- name: restart apache
+- name: restart webserver
   service: name={{ apache_svc }} state=restarted
+- name: restart php-fpm
+  service: name=php-fpm state=restarted
 

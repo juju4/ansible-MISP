@@ -2,60 +2,11 @@
 # debian wheezy: add backports
 # deb http://http.debian.net/debian wheezy-backports main
 
-- set_fact:
-   pkg_list:
-    - openssh-server
-    - mysql-server
-    - php5
-    - php5-mysql
-    - postfix
-    - gcc
-    - zip
-    - php-pear
-    - git
-    - redis-server
-    - make
-    - python-dev
-    - python-pip
-    - python-virtualenv
-    - libxml2-dev
-    - libxslt1-dev
-    - zlib1g-dev
-    - php5-dev
-## travis: "No package matching 'libapache2-mod-fastcgi' is available"
-#    - libapache2-mod-fastcgi
-    - curl
-    - gnupg
-#
-    - php5-redis
-    - python-mysqldb
-    - rng-tools
-# misp-modules
-    - python3
-    - python3-pip
-
-- set_fact:
-    webserver:
-      - apache2
-      - libapache2-mod-php5
-    apache_svc: apache2
-  when: misp_webserver is not defined or misp_webserver == 'apache2'
-- set_fact:
-    webserver:
-      - nginx
-      - php5-fpm
-    apache_svc: nginx
-  when: misp_webserver is defined and misp_webserver == 'nginx'
-
 - name: apt | MISP dependencies install
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
-    - "{{ pkg_list }}"
+    - "{{ misp_pkg_list }}"
     - "{{ webserver }}"
   async: 3600
   poll: 300
-
-- set_fact:
-    mysql_svc: mysql
-    rng_svc: rng-tools
 

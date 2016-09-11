@@ -1,6 +1,5 @@
 ---
 
-- include: redhat-epel.yml
 ## for php-redis
 - include: redhat-remi.yml
 
@@ -11,45 +10,38 @@
 - name: yum | MISP dependencies install
   yum: name={{item}} state=present update_cache=yes
   with_items:
-    - openssh-server
-    - httpd
-    - mariadb
-    - mariadb-server
-    - MySQL-python
-    - php
-    - php-mysql
-    - php-mbstring
-    - php-devel
-    - php-redis
-#    - php56
-#    - php56-php-mysqlnd
-#    - php56-php-mbstring
-#    - php56-php-devel
-#    - php56-php-redis
-    - postfix
-    - "@Development tools"
-    - zip
-    - php-pear
-    - git
-    - redis
-    - make
-    - python-devel
-    - python-pip
-    - libxml2-devel
-    - libxslt-devel
-    - zlib-devel
-    - curl
-    - gnupg
-#
-    - rng-tools
-# misp-modules
-    - python34
-## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
-#    - python3-pip
+    - "{{ misp_pkg_list }}"
+    - "{{ webserver }}"
   async: 3600
   poll: 300
 
-- set_fact:
-    mysql_svc: mariadb
-    rng_svc: rngd
+- block:
+    - set_fact:
+        fpm_user: nobody
+    - set_fact:
+        fpm_user: nginx
+      when: misp_webserver is defined and misp_webserver == 'nginx'
+
+    - name: set php-fpm to use socket file
+      replace: "dest=/etc/php-fpm.d/www.conf regexp={{ item.re }} replace={{ item.rep }} backup=yes"
+      with_items:
+        - { re: '^listen = .*$', rep: 'listen = /var/run/php-fpm/php-fpm.sock' }
+        - { re: '^;listen.owner = nobody', rep: 'listen.owner = {{ fpm_user }}' }
+        - { re: '^;listen.group = nobody', rep: 'listen.group = {{ fpm_user }}' }
+        - { re: '^listen.owner = .*$', rep: 'listen.owner = {{ fpm_user }}' }
+        - { re: '^listen.group = .*$', rep: 'listen.group = {{ fpm_user }}' }
+      notify:
+        - restart php-fpm
+
+    - name: ensure socket dir exists
+      file: dest=/var/run/php-fpm state=directory owner=nobody group=nobody mode=0755
+
+    - name: set php-fpm user/group to nginx
+      replace: "dest=/etc/php-fpm.d/www.conf regexp={{ item.re }} replace={{ item.rep }} backup=yes"
+      with_items:
+        - { re: '^user = .*$', rep: 'user = nginx' }
+        - { re: '^group = .*$', rep: 'group = nginx' }
+      notify:
+        - restart php-fpm
+  when: misp_webserver is defined and misp_webserver == 'nginx'
 

@@ -1,7 +1,14 @@
 ---
 
-- include: apache-env.yml
-  when: misp_webserver is not defined or misp_webserver == 'apache2'
+- name: Include version-specific variables for Ubuntu.
+  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+  when: ansible_distribution == 'Ubuntu'
+- name: Include version-specific variables for RedHat
+  include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+## must be last to override previous vars
+- name: Include webserver+distribution-specific variables
+  include_vars: "{{ misp_webserver }}-{{ ansible_distribution }}.yml"
 
 - include: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -9,12 +16,13 @@
 - include: redhat.yml
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
+- debug: var=misp_webserver
+- include: nginx.yml
+  when: misp_webserver is defined and misp_webserver == 'nginx'
+
 - name: Ensure services are enabled and started
   service: "name={{ item }} state=started enabled=yes"
-  with_items:
-    - "{{ apache_svc }}"
-    - "{{ mysql_svc }}"
-    - "{{ rng_svc }}"
+  with_items: "{{ misp_services }}"
 
 - name: check installed pear packages
   command: pear list
@@ -24,13 +32,10 @@
   command: pear channel-update pear.php.net
   when: pearinstalled.stdout.find("Crypt_GPG") == -1
 - name: install php pear dependencies
-# New in version 2.0.
-#  pear: name={{item}} state=present
-  command: "pear install {{ item }}"
+  pear: name={{item}} state=present
   with_items:
     - Crypt_GPG
     - Net_GeoIP
-  when: pearinstalled.stdout.find("Crypt_GPG") == -1
 
 ## https://github.com/ansible/ansible-modules-core/issues/2697
 - name: install python dependencies with pip
@@ -51,6 +56,10 @@
        version={{ misp_version }}
 #       track_submodules=yes
   when: not m.stat.exists
+
+## must be after git cloning MISP
+- include: apache2.yml
+  when: misp_webserver is not defined or misp_webserver == 'apache2'
 
 ## https://github.com/kosssi/ansible-role-gitconfig ?
 - name: get git config
@@ -90,14 +99,16 @@
 - name: install PHP dependencies via composer (kamisama/cake-resque, Vendor)
   composer: command=install working_dir={{ misp_rootdir }}/app
 
-## https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
-- name: Install PECL libaries.
-  shell: "yes \"\" | pecl install {{ item }}"
-  register: pecl_result
-  changed_when: "pecl_result.rc == 0"
-  failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
-  with_items:
-    - redis
+### https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
+### FIXME! pecl/redis requires PHP (version >= 7.0.0, version <= 7.1.0, excluded versions: 6.0.0)
+#- name: Install PECL libaries.
+#  shell: "yes \"\" | pecl install {{ item }}"
+#  register: pecl_result
+#  changed_when: "pecl_result.rc == 0"
+#  failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
+#  with_items:
+#    - redis
+#  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: setup MISP Cake config
   command: "rsync -ci {{ misp_rootdir }}/INSTALL/setup/config.php {{ misp_rootdir }}/app/Plugin/CakeResque/Config/config.php"
@@ -135,6 +146,7 @@
     - "{{ misp_rootdir }}/app/tmp/cached_exports/xml"
     - "{{ misp_rootdir }}/app/tmp/cached_exports/rpz"
 - file: "dest={{ misp_rootdir }}/app/Plugin/CakeResque/tmp mode=0775 owner={{ www_user }} group={{ www_user }} state=directory"
+- file: "dest={{ misp_rootdir }}/app/tmp/debug.log mode=0644 owner={{ www_user }} group={{ www_user }} state=touch"
 
 
 ## not idempotent but above is not recursive
@@ -158,17 +170,12 @@
 - name: creating mysql misp db user
   mysql_user: name="{{ misp_db_user }}" password="{{ misp_db_pass }}" priv=*.*:USAGE/misp.*:ALL state=present
 
-- include: apache2.yml
-  when: misp_webserver is not defined or misp_webserver == 'apache2'
-- include: nginx.yml
-  when: misp_webserver is defined and misp_webserver == 'nginx'
-
 - name: extra php settings
-  template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.ini mode=0644"
+  template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.{{ php_confext }} mode=0644"
 - name: Enforce Timezone in php.ini
   replace: "dest={{ php_ini }} regexp='^;date.timezone =' replace='date.timezone = {{ tz }}'"
 - name: enabling MISP php settings
-  file: "src={{ php_confdir }}/misp-php.ini dest=/etc/php5/apache2/conf.d/99-misp.ini state=link"
+  file: "src={{ php_confdir }}/misp-php.ini dest={{ php_confenable }}/99-misp.ini state=link"
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and (misp_webserver is not defined or misp_webserver == 'apache2')
 
 - stat: path={{ misp_rootdir }}/app/Config/config.php
@@ -247,6 +254,12 @@
 - name: create gpg configuration template
   template: "src=gpg-template.j2 dest=/var/tmp/gpg-template owner={{ www_user }} mode=0600"
   when: not gkey.stat.exists
+- name: redhat | start gpg-agent
+  command: "gpg-agent --daemon --homedir={{ misp_rootdir }}/.gnupg"
+  become: yes
+  become_user: "{{ www_user }}"
+  when: not gkey.stat.exists and (ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux') and misp_webserver == 'nginx'
+  ignore_errors: true
 - name: create gnupg key for {{ misp_email }}
   shell: "{{ item }} chdir={{ misp_rootdir }}/.gnupg"
   with_items:
@@ -281,10 +294,10 @@
 
 ## Note: more a reset as next login, will ask to change password...
 - name: set admin password
-  command: " /var/www/MISP/app/Console/cake Password admin@admin.test \"{{ misp_web_pass }}\""
+  command: " {{ misp_rootdir }}/app/Console/cake Password admin@admin.test \"{{ misp_web_pass }}\""
 - block:
     - name: set extra users
-      command: " /var/www/MISP/app/Console/cake Password {{ item.u }} \"{{ item.p }}\""
+      command: " {{ misp_rootdir }}/app/Console/cake Password {{ item.u }} \"{{ item.p }}\""
       with_items: "{{ misp_webusers_list }}"
   when: misp_webusers_list is defined and misp_webusers_list != ""
 

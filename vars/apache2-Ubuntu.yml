@@ -1,0 +1,12 @@
+---
+
+www_user: www-data
+apache_svc: apache2
+apache_confdir: /etc/apache2/conf-available
+apache_sitedir: /etc/apache2/sites-available
+apachesslconf: /etc/apache2/sites-enabled/default-ssl.conf
+apache_logs: /var/log/apache2
+modsecurity_conf: /etc/modsecurity/modsecurity.conf
+modsecurity_active: /usr/share/modsecurity-crs/activated_rules
+
+webserver: "{{ misp_webserver_apache2 }}"

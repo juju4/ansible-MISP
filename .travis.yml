@@ -8,10 +8,18 @@ env:
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
   - distribution: ubuntu
+    version: 16.04
+    init: /lib/systemd/systemd
+    run_opts: ""
+  - distribution: ubuntu
     version: 14.04
     init: /sbin/init
 #    run_opts: ""
     run_opts: "--privileged"
+#  - distribution: alpine
+#    version: 3.4
+#    init: /sbin/init
+#    run_opts: ""
 
 services:
   - docker
@@ -24,7 +32,8 @@ before_install:
   - pwd
   - find -ls
   - cp test/travis/initctl_faker test/
-  - cp /home/travis/build/juju4/ansible-MISP/test/integration/default/serverspec/Rakefile /home/travis/build/juju4/ansible-MISP/
+  - ln -s ansible-MISP ../MISP
+  - ./get-dependencies.sh
   # Customize container
   - 'sudo docker build --rm=true --file=test/travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible test'
 
@@ -32,7 +41,7 @@ script:
   - container_id=$(mktemp)
     # Run container in detached state
 ## ## Note: mapping urandom/random to accelerate gpg key generation. Normally, have rng-tools or haveged to handle that but not running inside docker images we have
-  - 'sudo docker run --detach -v /dev/urandom:/dev/random --volume="${PWD}":/etc/ansible/roles/MISP:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
+  - 'sudo docker run --detach -v /dev/urandom:/dev/random --volume="${PWD%/*}":/etc/ansible/roles:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
 
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --version'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --connection=local -m setup localhost'
@@ -54,7 +63,8 @@ script:
 
 # serverspec
 ## FIXME! LoadError: cannot load such file -- rspec/core/rake_task
-  - 'sudo docker exec --tty "$(cat ${container_id})" cd /etc/ansible/roles/MISP/ && rake2.0 --trace spec; exit 0'
+#  - 'sudo docker exec --tty "$(cat ${container_id})" cd /etc/ansible/roles/MISP/ && rake2.0 --trace spec; exit 0'
+  - 'sudo docker exec --tty "$(cat ${container_id})" cd /etc/ansible/roles/MISP/test/integration/default/serverspec/ && bundle exec rake spec; exit 0'
 
   # Clean up
   - 'sudo docker stop "$(cat ${container_id})"'

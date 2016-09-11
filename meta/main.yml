@@ -1,0 +1,34 @@
+---
+galaxy_info:
+  author: juju4
+  description: MISP - Malware Information Sharing Platform & Threat Sharing
+  license: BSD
+  min_ansible_version: 1.9
+  #
+  # Below are all platforms currently available. Just uncomment
+  # the ones that apply to your role. If you don't see your
+  # platform on this list, let us know and we'll get it added!
+  #
+  platforms:
+  - name: Centos
+    versions:
+     - 7
+  - name: Ubuntu
+    versions:
+    - xenial
+    - trusty
+  - name: Debian
+    versions:
+  #
+  # Below are all categories currently available. Just as with
+  # the platforms above, uncomment those that apply to your role.
+  #
+  categories:
+  - system
+  - security
+dependencies:
+  # List your role dependencies here, one per line. Only
+  # dependencies available via galaxy should be listed here.
+  # Be sure to remove the '[]' above if you add dependencies
+  # to this list.
+  - redhat-epel

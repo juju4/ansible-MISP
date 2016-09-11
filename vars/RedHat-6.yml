@@ -1,0 +1,63 @@
+---
+
+misp_pkg_list:
+    - openssh-server
+    - httpd
+    - mariadb
+    - mariadb-server
+    - MySQL-python
+    - php
+    - php-mysql
+    - php-mbstring
+    - php-devel
+    - php-redis
+#    - php56
+#    - php56-php-mysqlnd
+#    - php56-php-mbstring
+#    - php56-php-devel
+#    - php56-php-redis
+    - postfix
+    - "@Development tools"
+    - zip
+    - php-pear
+    - git
+    - redis
+    - make
+    - python-devel
+    - python-pip
+    - libxml2-devel
+    - libxslt-devel
+    - zlib-devel
+    - curl
+    - gnupg
+#
+    - rng-tools
+    - wget
+# misp-modules
+    - python34
+## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
+#    - python3-pip
+
+misp_webserver_apache2:
+    - httpd
+
+misp_webserver_nginx:
+  - nginx
+  - php-fpm
+
+mysql_svc: mariadb
+rng_svc: rngd
+misp_services:
+    - "{{ apache_svc }}"
+    - "{{ mysql_svc }}"
+    - "{{ rng_svc }}"
+    - php-fpm
+
+misp_testing_pkg:
+    - rubygem-rake
+
+nginx_sock: /var/run/php-fpm/php-fpm.sock
+php_confdir: /etc/php.d
+php_confext: conf
+php_ini: /etc/php.ini
+
