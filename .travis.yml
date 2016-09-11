@@ -10,7 +10,7 @@ env:
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
-    run_opts: ""
+    run_opts: "--cap-add SYS_ADMIN"
   - distribution: ubuntu
     version: 14.04
     init: /sbin/init
