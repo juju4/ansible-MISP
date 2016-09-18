@@ -66,6 +66,10 @@ script:
 ## travis/docker: Errno::EROFS: Read-only file system @ dir_s_mkdir - /etc/ansible/roles/ansible-MISP/test/integration/default/serverspec/.bundle
 #  - 'sudo docker exec --tty "$(cat ${container_id})" /etc/ansible/roles/MISP/test/integration/default/serverspec/run-local-tests.sh'
 
+# debug
+  - 'sudo docker exec "$(cat ${container_id})" cat /var/log/redis/redis-server.log || true'
+  - 'sudo docker exec "$(cat ${container_id})" journalctl -xe || true'
+
   # Clean up
   - 'sudo docker stop "$(cat ${container_id})"'
 
