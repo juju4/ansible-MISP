@@ -1,6 +1,5 @@
 ---
 
-
 misp_pkg_list:
     - openssh-server
     - httpd
@@ -39,6 +38,7 @@ misp_pkg_list:
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 #    - python3-pip
     - acl
+    - sudo
 
 misp_webserver_apache2:
     - httpd

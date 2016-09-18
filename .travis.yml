@@ -63,7 +63,7 @@ script:
     || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 0)
 
 # serverspec
-  - 'sudo docker exec --tty "$(cat ${container_id})" cd /etc/ansible/roles/MISP/test/integration/default/serverspec/ && bundle exec rake spec; exit 0'
+  - 'sudo docker exec --tty "$(cat ${container_id})" /etc/ansible/roles/MISP/test/integration/default/serverspec/run-local-tests.sh'
 
   # Clean up
   - 'sudo docker stop "$(cat ${container_id})"'
