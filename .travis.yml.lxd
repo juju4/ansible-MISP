@@ -5,18 +5,19 @@ rvm:
   - 2.2
 
 env:
-  - distribution: centos
-    version: 6
-  - distribution: centos
-    version: 7
+## those images need pre-configuration before being usable (openssh...) + privileged/httpd
+#  - distribution: centos
+#    version: 6
+#  - distribution: centos
+#    version: 7
   - distribution: ubuntu
     version: 16.04
   - distribution: ubuntu
     version: 14.04
   - distribution: ubuntu
     version: 12.04
-  - distribution: alpine
-    version: 3.4
+#  - distribution: alpine
+#    version: 3.4
 
 before_install:
   - env
