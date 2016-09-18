@@ -118,11 +118,19 @@ ii  python-urllib3                   1.7.1-1ubuntu4                   all       
 ii  python-urllib3-whl               1.7.1-1ubuntu4                   all          HTTP library with thread-safe connection pooling
 ii  python3-urllib3                  1.7.1-1ubuntu4                   all          HTTP library with thread-safe connection pooling for Python3
 ```
-* if using docker and a host with mysql, you might have the following issue
+
+* if using privileged docker and a host with mysql, you might have the following issue
 ```
 mysqld[29176]: /usr/sbin/mysqld: error while loading shared libraries: libaio.so.1: cannot stat shared object: Permission denied
 ```
 https://github.com/docker/docker/issues/7512
+
+* docker and redis can have issue too and it might be necessary to edit systemd config on xenial
+see task 'docker redis workaround ???'
+
+* travis tasks seems to stall in some case like for ubuntu trusty.
+Not identified why...
+
 
 ## FAQ
 
