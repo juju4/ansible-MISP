@@ -264,6 +264,7 @@
 - name: validate worker start.sh permissions
   file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
 
+- debug: var=redis_svc
 - name: ensure redis is active before launching worker
   service: name={{ redis_svc }} state=started
 
