@@ -264,6 +264,14 @@
 - name: validate worker start.sh permissions
   file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
 
+- block:
+    - name: docker redis workaround ???
+      replace: "dest=/etc/systemd/system/redis.service regexp={{ item.re }} replace={{ item.rep }} backup=yes"
+      with_items:
+        - { re: '^PrivateTmp=yes', rep: 'PrivateTmp=no' }
+        - { re: '^PrivateDevices=yes', rep: 'PrivateDevices=no' }
+#        - { re: '^', rep: '' }
+  when: ansible_virtualization_type is defined and ansible_virtualization_type == "docker" and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
 - name: ensure redis is active before launching worker
   service: name={{ redis_svc }} state=started
 

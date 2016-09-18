@@ -10,9 +10,9 @@ env:
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
-    run_opts: "--cap-add net_admin"
-#    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 #    run_opts: "--cap-add SYS_ADMIN"
+#    run_opts: "--cap-add net_admin"
 ## FIXME! travis: 'No output has been received in the last 10m0s, this potentially indicates a stalled build or something wrong with the build itself.'
 #  - distribution: ubuntu
 #    version: 14.04
