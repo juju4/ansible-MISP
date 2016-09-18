@@ -265,7 +265,7 @@
   file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
 
 - name: ensure redis is active before launching worker
-  service: name=redis state=started
+  service: name={{ redis_svc }} state=started
 
 - name: check if worker active
   command: "ps axu"

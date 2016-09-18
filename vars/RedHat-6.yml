@@ -49,6 +49,7 @@ misp_webserver_nginx:
 
 mysql_svc: mysqld
 rng_svc: rngd
+redis_svc: redis
 misp_services:
     - "{{ apache_svc }}"
     - "{{ mysql_svc }}"
