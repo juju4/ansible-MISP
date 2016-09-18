@@ -3,20 +3,22 @@
 sudo: required
 
 env:
-  - distribution: centos
-    version: 7
-    init: /usr/lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+#  - distribution: centos
+#    version: 7
+#    init: /usr/lib/systemd/systemd
+#    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    run_opts: "--cap-add net_admin"
+#    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 #    run_opts: "--cap-add SYS_ADMIN"
-  - distribution: ubuntu
-    version: 14.04
-    init: /sbin/init
-#    run_opts: ""
-    run_opts: "--privileged"
+## FIXME! travis: 'No output has been received in the last 10m0s, this potentially indicates a stalled build or something wrong with the build itself.'
+#  - distribution: ubuntu
+#    version: 14.04
+#    init: /sbin/init
+##    run_opts: ""
+#    run_opts: "--privileged"
 #  - distribution: alpine
 #    version: 3.4
 #    init: /sbin/init
@@ -67,6 +69,8 @@ script:
 #  - 'sudo docker exec --tty "$(cat ${container_id})" /etc/ansible/roles/MISP/test/integration/default/serverspec/run-local-tests.sh'
 
 # debug
+  - 'sudo docker exec "$(cat ${container_id})" ls /var/log/redis/ || true'
+  - 'sudo docker exec "$(cat ${container_id})" cat /var/log/redis/redis.log || true'
   - 'sudo docker exec "$(cat ${container_id})" cat /var/log/redis/redis-server.log || true'
   - 'sudo docker exec "$(cat ${container_id})" journalctl -xe || true'
 
