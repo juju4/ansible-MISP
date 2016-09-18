@@ -43,10 +43,12 @@
   pip: name="{{ item }}" extra_args='--exists-action=w'
   with_items:
     - pyzmq
-    - git+https://github.com/CybOXProject/python-cybox.git@v2.1.0.12#egg=Package
+#    - git+https://github.com/CybOXProject/python-cybox.git@v2.1.0.12#egg=Package
 ## FIXME! ValueError: ("Missing 'Version:' header and/or PKG-INFO file", cybox [unknown version] (/tmp/src/package))
 #    - git+https://github.com/stixproject/python-stix.git@v1.2.0.0#egg=Package
     - git+https://github.com/MISP/PyMISP.git#egg=Package
+    - cybox
+    - stix
 
 - stat: path={{ misp_rootdir }}/INSTALL
   register: m
@@ -115,10 +117,16 @@
   register: rsync_result
   changed_when: 'rsync_result.stdout != ""'
 
-- file: "dest={{ misp_rootdir }} mode=0755 owner={{ www_user }} group={{ www_user }} state=directory"
-- file: "dest={{ misp_rootdir }}/app/tmp mode=2775 owner={{ www_user }} group={{ www_user }} state=directory"
-- file: "dest={{ misp_rootdir }}/app/files mode=2775 owner={{ www_user }} group={{ www_user }} state=directory"
-- file: "dest={{ misp_rootdir }}/app/files/scripts/tmp mode=2775 owner={{ www_user }} group={{ www_user }} state=directory"
+- name: validate permissions
+  file: "dest={{ item.f }} mode={{ item.m }} owner={{ www_user }} group={{ www_user }} state=directory"
+  with_items:
+    - { f: "{{ misp_rootdir }}", m: '0755' }
+    - { f: "{{ misp_rootdir }}/app/files", m: '2775' }
+    - { f: "{{ misp_rootdir }}/app/files/scripts/tmp", m: '2775' }
+    - { f: "{{ misp_rootdir }}/app/Plugin/CakeResque/tmp", m: '0775' }
+    - { f: "{{ misp_rootdir }}/app/Config", m: '0750' }
+    - { f: "{{ misp_rootdir }}/.gnupg", m: '0700' }
+    - { f: "{{ misp_rootdir }}/app/webroot", m: '0700' }
 - name: check owner/group for multiple MISP folders
   file: "dest={{ item }} owner={{ www_user }} group={{ www_user }} state=directory mode=2755"
 #  with_fileglob:
@@ -145,30 +153,14 @@
     - "{{ misp_rootdir }}/app/tmp/cached_exports/csv_all"
     - "{{ misp_rootdir }}/app/tmp/cached_exports/xml"
     - "{{ misp_rootdir }}/app/tmp/cached_exports/rpz"
-- file: "dest={{ misp_rootdir }}/app/Plugin/CakeResque/tmp mode=0775 owner={{ www_user }} group={{ www_user }} state=directory"
-- file: "dest={{ misp_rootdir }}/app/tmp/debug.log mode=0644 owner={{ www_user }} group={{ www_user }} state=touch"
+- stat: path="{{ misp_rootdir }}/app/tmp/debug.log"
+  register: debuglog
+- name: touch debug.log
+  file: "dest={{ misp_rootdir }}/app/tmp/debug.log mode=0644 owner={{ www_user }} group={{ www_user }} state=touch"
+  when: not debuglog.stat.exists
 
 
-## not idempotent but above is not recursive
-#- command: "{{ item }}"
-#  with_items:
-#    - chown -R www-data:www-data {{ misp_rootdir }}
-#    - chmod -R 750 {{ misp_rootdir }}
-#    - chmod -R g+ws {{ misp_rootdir }}/app/tmp
-#    - chmod -R g+ws {{ misp_rootdir }}/app/files
-#    - chmod -R g+ws {{ misp_rootdir }}/app/files/scripts/tmp
-
-- name: creating mysql misp db
-  mysql_db: name=misp state=present
-- stat: path=/root/.mysql_misp_imported
-  register: mispdbloaded
-- name: importing mysql misp db template
-  mysql_db: name=misp state=import target={{ misp_rootdir }}/INSTALL/MYSQL.sql
-  when: not mispdbloaded.stat.exists
-- file: dest=/root/.mysql_misp_imported state=touch
-  when: not mispdbloaded.stat.exists
-- name: creating mysql misp db user
-  mysql_user: name="{{ misp_db_user }}" password="{{ misp_db_pass }}" priv=*.*:USAGE/misp.*:ALL state=present
+- include: mysql-configure.yml
 
 - name: extra php settings
   template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.{{ php_confext }} mode=0644"
@@ -178,7 +170,7 @@
   file: "src={{ php_confdir }}/misp-php.ini dest={{ php_confenable }}/99-misp.ini state=link"
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and (misp_webserver is not defined or misp_webserver == 'apache2')
 
-- stat: path={{ misp_rootdir }}/app/Config/config.php
+- stat: path={{ misp_rootdir }}/app/Config/bootstrap.php
   register: conffiles
 - name: create config files from default
   command: "rsync -ci --chown={{ www_user }} {{ misp_rootdir }}/app/Config/{{ item }}.default.php {{ misp_rootdir }}/app/Config/{{ item }}.php"
@@ -188,7 +180,8 @@
     - bootstrap
     - database
     - core
-    - config
+## done later
+#    - config
   when: not conffiles.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 - name: create config files from default
   command: "rsync -ci {{ misp_rootdir }}/app/Config/{{ item }}.default.php {{ misp_rootdir }}/app/Config/{{ item }}.php"
@@ -198,15 +191,15 @@
     - bootstrap
     - database
     - core
-    - config
+#    - config
   when: not conffiles.stat.exists and not (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
-- name: ensure right owner for conf file
-  file: "dest={{ misp_rootdir }}/app/Config/{{ item }}.php owner={{ www_user }}"
+- name: ensure right permissions for conf files
+  file: "dest={{ misp_rootdir }}/app/Config/{{ item }}.php owner={{ www_user }} mode=0600"
   with_items:
     - bootstrap
     - database
     - core
-    - config
+#    - config
 
 - name: update database settings
   replace: dest={{ misp_rootdir }}/app/Config/database.php regexp="{{ item.regexp }}" replace="{{ item.replace }}"
@@ -220,35 +213,31 @@
   with_items:
     - "require_once dirname(__DIR__) . '/Vendor/autoload.php';"
 
-- name: check some permissions
-  file: "dest={{ misp_rootdir }}/app/Config/{{ item }}.php mode=0600 owner={{ www_user }}"
-  with_items:
-    - bootstrap
-    - database
-    - core
-    - config
 
 - name: Generating salt
-  shell: "openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;'"
-  register: salt
+  shell: "openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;' | tee {{ misp_rootdir }}/.salt creates={{ misp_rootdir }}/.salt"
+  register: salt1
   changed_when: false
   tags:
     - salt
-- name: add a salt to MISP config
-  replace: dest={{ misp_rootdir }}/app/Config/config.php regexp="'salt' => 'Rooraenietu8Eeyo<Qu2eeNfterd-dd\+'," replace="'salt' => '{{ salt.stdout }}',"
+- stat: path="{{ misp_rootdir }}/.salt"
+  register: s
+- name: Recover existing salt
+  command: "cat {{ misp_rootdir }}/.salt"
+  changed_when: false
+  register: salt2
+  when: s.stat.exists
+- set_fact:
+    salt: "{{ salt1.stdout }}"
+  when: salt1.changed
+- set_fact:
+    salt: "{{ salt2.stdout }}"
+  when: s.stat.exists
+- name: updating MISP config
+  template: src=config.php.j2 dest="{{ misp_rootdir }}/app/Config/config.php" mode=0600 backup=yes owner="{{ www_user }}"
   tags:
     - salt
-- name: updating MISP config
-  template: src=config.php.j2 dest="{{ misp_rootdir }}/app/Config/config.php" mode=0600 backup=yes
 
-- file: "dest={{ misp_rootdir }}/app/Config mode=0750 owner={{ www_user }} group={{ www_user }} state=directory"
-#- command: "{{ item }}"
-#  with_items:
-#    - chown -R {{ www_user }}:{{ www_user }} {{ misp_rootdir }}/app/Config
-#    - chmod -R 750 {{ misp_rootdir }}/app/Config
-
-- file: "dest={{ misp_rootdir }}/.gnupg mode=0700 owner={{ www_user }} group={{ www_user }} state=directory"
-- file: "dest={{ misp_rootdir }}/app/webroot mode=0700 owner={{ www_user }} group={{ www_user }} state=directory"
 - stat: "path={{ misp_rootdir }}/app/webroot/gpg.asc"
   register: gkey
 - name: create gpg configuration template
@@ -272,10 +261,25 @@
 #- command: wipe -q -y /var/tmp/gpg-template
 #  when: not gkey.stat.exists
 
-- file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
+- name: validate worker start.sh permissions
+  file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
 
+- name: ensure redis is active before launching worker
+  service: name=redis state=started
+
+- name: check if worker active
+  command: "ps axu"
+  register: ps
+  changed_when: false
+#- debug: var=ps.stdout_lines
 - name: start MISP worker
-  lineinfile: dest={{ misp_rootdir }}/app/Console/worker/start.sh line="su {{ www_user }} -c 'bash {{ misp_rootdir }}/app/Console/worker/start.sh'"
+  command: "bash {{ misp_rootdir }}/app/Console/worker/start.sh"
+  become: yes
+  become_user: "{{ www_user }}"
+  when: ps.stdout.find("{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex") == -1
+
+- name: add MISP worker script for boot
+  lineinfile: dest=/etc/rc.local line="sudo -H -u www-data bash {{ misp_rootdir }}/app/Console/worker/start.sh" insertbefore="exit 0"
 
 - stat: path={{ mispmodules_rootdir }}/misp-modules
   register: mm
@@ -292,12 +296,20 @@
 - include: testing.yml
   when: misp_testing is defined and misp_testing
 
+## FIXME! how to do it once only!
 ## Note: more a reset as next login, will ask to change password...
+- stat: path="{{ misp_rootdir }}/.admin_pass_set"
+  register: ap
 - name: set admin password
-  command: " {{ misp_rootdir }}/app/Console/cake Password admin@admin.test \"{{ misp_web_pass }}\""
+  command: "{{ misp_rootdir }}/app/Console/cake Password admin@admin.test \"{{ misp_web_pass }}\""
+  when: not ap.stat.exists
+- name: Admin pass set market
+  file: dest="{{ misp_rootdir }}/.admin_pass_set" state=touch
+  when: not ap.stat.exists
+
 - block:
     - name: set extra users
-      command: " {{ misp_rootdir }}/app/Console/cake Password {{ item.u }} \"{{ item.p }}\""
+      command: "{{ misp_rootdir }}/app/Console/cake Password {{ item.u }} \"{{ item.p }}\""
       with_items: "{{ misp_webusers_list }}"
   when: misp_webusers_list is defined and misp_webusers_list != ""
 

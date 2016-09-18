@@ -30,6 +30,7 @@ misp_pkg_list:
  - python3
  - python3-pip
  - libjpeg-dev
+ - acl
 
 mysql_svc: mysql
 rng_svc: rng-tools

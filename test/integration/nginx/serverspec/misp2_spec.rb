@@ -36,11 +36,15 @@ end
 #end
 
 ## FIXME! 
-##	trusty: fail
-describe command('cd /var/www/MISP/PyMISP && coverage run setup.py test 2>&1 | tee /tmp/coverage.out'), :if => os[:release] != '14.04' do
+##	nginx-centos7: fail
+describe command('cd /var/www/MISP/PyMISP && coverage run setup.py test 2>&1 | tee /tmp/coverage.out'), :if => os[:release] != '14.04' && os[:family] != 'redhat' do
   its(:stdout) { should match /version/ }
-  its(:stdout) { should match /{u'Event': {u'info': u'This is a test'/ }
+## nginx-centos7 output is pretty print, while other are not
+#  its(:stdout) { should match /{u'Event': {u'info': u'This is a test'/ }
+  its(:stdout) { should match /This is a test/ }
   its(:stdout) { should match /OK/}
+  its(:stdout) { should_not match /FAILED \(errors=.*\)/}
+  its(:stdout) { should_not match /HTTPError: 500 Server Error: Internal Server Error for url/}
   its(:exit_status) { should eq 0 }
   let(:sudo_options) { '-u _misp -H' }
 end

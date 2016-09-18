@@ -11,5 +11,6 @@
         - { u: dupont@admin.test, p: dupont_passphrase. }
         - { u: dupond@admin.test, p: dupond_passphrase. }
   roles:
+#    - geerlingguy.apache
     - MISP
 

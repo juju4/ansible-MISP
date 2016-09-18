@@ -3,8 +3,8 @@
 misp_pkg_list:
     - openssh-server
     - httpd
-    - mariadb
-    - mariadb-server
+    - mysql
+    - mysql-server
     - MySQL-python
     - php
     - php-mysql
@@ -34,9 +34,10 @@ misp_pkg_list:
     - rng-tools
     - wget
 # misp-modules
-    - python34
+#    - python34
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 #    - python3-pip
+    - acl
 
 misp_webserver_apache2:
     - httpd
@@ -45,7 +46,7 @@ misp_webserver_nginx:
   - nginx
   - php-fpm
 
-mysql_svc: mariadb
+mysql_svc: mysqld
 rng_svc: rngd
 misp_services:
     - "{{ apache_svc }}"

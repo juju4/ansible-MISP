@@ -38,6 +38,7 @@ misp_pkg_list:
     - python34
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 #    - python3-pip
+    - acl
 
 misp_webserver_apache2:
     - httpd

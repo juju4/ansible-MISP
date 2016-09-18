@@ -1,13 +1,15 @@
 [![Build Status](https://travis-ci.org/juju4/ansible-MISP.svg?branch=master)](https://travis-ci.org/juju4/ansible-MISP)
 # MISP ansible role
 
-A simple ansible role to setup MISP, Malware Information Sharing Platform & Threat Sharing
+Ansible role to setup MISP, Malware Information Sharing Platform & Threat Sharing
 http://www.misp-project.org/
 https://github.com/MISP/MISP
 
-Alternative
-https://blog.rootshell.be/2016/03/03/running-misp-in-a-docker-container/
+Alternatives
+* docker: https://blog.rootshell.be/2016/03/03/running-misp-in-a-docker-container/
 https://github.com/xme/misp-docker
+* ansible role: https://github.com/MISP/MISP/pull/1413
+* ansible role: https://github.com/MISP/MISP/pull/1495
 
 ## Requirements & Dependencies
 
@@ -17,7 +19,7 @@ It was tested on the following versions:
 
 ### Operating systems
 
-Tested with vagrant on Ubuntu 14.04, Kitchen test with trusty and centos7 (less for the latter)
+Tested with vagrant on Ubuntu 14.04, Kitchen test with xenial, trusty and centos7
 
 ## Example Playbook
 
@@ -39,12 +41,15 @@ Nothing specific for now.
 ## Continuous integration
 
 This role has a travis basic test (for github), more advanced with kitchen and also a Vagrantfile (test/vagrant).
+Default kitchen config (.kitchen.yml) is lxd-based, while (.kitchen.vagrant.yml) is vagrant/virtualbox based.
 
 Once you ensured all necessary roles are present, You can test with:
 ```
+$ gem install kitchen-ansible kitchen-lxd_cli kitchen-sync kitchen-vagrant
 $ cd /path/to/roles/MISP
 $ kitchen verify
 $ kitchen login
+$ KITCHEN_YAML=".kitchen.vagrant.yml" kitchen verify
 ```
 or
 ```
@@ -52,6 +57,26 @@ $ cd /path/to/roles/MISP/test/vagrant
 $ vagrant up
 $ vagrant ssh
 ```
+
+Role has also a packer config which allows to create image for virtualbox, vmware, eventually digitalocean, lxc and others.
+When building it, it's advise to do it outside of roles directory as all the directory is upload to the box during building 
+and it's currently not possible to exclude packer directory from it (https://github.com/mitchellh/packer/issues/1811)
+```
+$ cd /path/to/packer-build
+$ cp -Rd /path/to/MISP/packer .
+## update packer-*.json with your current absolute ansible role path for the main role
+## you can add additional role dependencies inside setup-roles.sh
+$ cd packer
+$ packer build packer-*.json
+$ packer build -only=virtualbox packer-*.json
+## if you want to enable extra log
+$ PACKER_LOG=1 packer build packer-*.json
+## for digitalocean build, you need to export TOKEN in environment.
+##  update json config on your setup and region.
+$ export DO_TOKEN=xxx
+$ packer build -only=digitalocean packer-*.json
+```
+
 
 ## Troubleshooting & Known issues
 
@@ -94,11 +119,15 @@ ii  python-urllib3-whl               1.7.1-1ubuntu4                   all       
 ii  python3-urllib3                  1.7.1-1ubuntu4                   all          HTTP library with thread-safe connection pooling for Python3
 ```
 
+## FAQ
 
-TODO
+* usage of roles dependencies like geerlinguy.{mysql,nginx,apache} are not required but allow more fine-tuning.
+
+
+## TODO
 * role is not managing upgrade
-* monitoring
-* hardening
+* monitoring unless using serverspec
+* hardening: apache & nginx hardening is done in separate roles (harden-webserver)
 +Viper
 https://asciinema.org/a/28808
 https://asciinema.org/a/28845

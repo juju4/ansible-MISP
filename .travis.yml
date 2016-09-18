@@ -10,7 +10,8 @@ env:
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
-    run_opts: "--cap-add SYS_ADMIN"
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+#    run_opts: "--cap-add SYS_ADMIN"
   - distribution: ubuntu
     version: 14.04
     init: /sbin/init
@@ -62,8 +63,6 @@ script:
     || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 0)
 
 # serverspec
-## FIXME! LoadError: cannot load such file -- rspec/core/rake_task
-#  - 'sudo docker exec --tty "$(cat ${container_id})" cd /etc/ansible/roles/MISP/ && rake2.0 --trace spec; exit 0'
   - 'sudo docker exec --tty "$(cat ${container_id})" cd /etc/ansible/roles/MISP/test/integration/default/serverspec/ && bundle exec rake spec; exit 0'
 
   # Clean up

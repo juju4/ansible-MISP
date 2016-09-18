@@ -32,6 +32,10 @@ provisioner:
 
 platforms:
   - name: ubuntu-16.04
+## FIXME! not sure if lxd backend support port forwarding...
+    driver_config:
+      network:
+        - ["forwarded_port", {guest: 80, host: 8587}]
   - name: ubuntu-14.04
     driver_config:
       network:
@@ -39,8 +43,6 @@ platforms:
 #  - name: ubuntu-12.04
   - name: centos-7
 #  - name: centos-6
-## "Failed to complete #create action: [Broken pipe] on default-alpine-34"
-## do we have python2 in default image?
 #  - name: alpine-3.4
 
 suites:
@@ -49,9 +51,6 @@ suites:
     attributes:
   - name: nginx
     run_list:
-## NOK
-#    attributes:
-#        misp_webserver: 'nginx'
     includes:
       - ubuntu-16.04
       - ubuntu-14.04
@@ -59,6 +58,4 @@ suites:
     provisioner:
       name: ansible_playbook
       playbook: test/integration/nginx/default.yml
-
-
 

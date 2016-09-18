@@ -49,6 +49,7 @@ suites:
     attributes:
         misp_webserver: 'nginx'
     includes:
+      - ubuntu-16.04
       - ubuntu-14.04
       - centos-7.1
     provisioner:
