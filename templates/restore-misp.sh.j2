@@ -1,0 +1,23 @@
+#!/bin/sh
+## restore script for misp
+
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+umask 022
+
+if [ $# -gt 1 -a -r "$1" ]; then
+    backupfile=$1
+else
+    backupfile={{ backupdir }}/backup-misp.tar.gz
+fi
+
+tmpdir=`mktemp -d /tmp/restore.XXXXXX || exit 1`
+dirs="{{ misp_rootdir }}/app/files {{ misp_rootdir }}/app/Config"
+
+tar xzf $backupfile -C $tmpdir
+
+mysql -u misp < $tmpdir{{ backupdir }}/mysqldump-misqp.sql
+
+for d in $dirs; do
+    rsync -rvl $tmpdir/$d $d
+done
+

@@ -39,6 +39,7 @@ misp_pkg_list:
 #    - python3-pip
     - acl
     - sudo
+    - crontabs
 
 misp_webserver_apache2:
     - httpd

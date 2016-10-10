@@ -321,3 +321,14 @@
       with_items: "{{ misp_webusers_list }}"
   when: misp_webusers_list is defined and misp_webusers_list != ""
 
+- file: path={{ scriptsdir }} state=directory mode=0755
+- name: add backup script
+  template: src=backup-misp.sh.j2 dest={{ scriptsdir }}/backup-misp.sh mode=0755
+- name: add restore script
+  template: src=restore-misp.sh.j2 dest={{ scriptsdir }}/restore-misp.sh mode=0755
+- name: setup cron backup
+  cron: name="misp-backup" minute="30" hour="3" weekday="0"
+    job="{{ scriptsdir }}/backup-misp.sh > /dev/null 2>&1"
+    user=root
+    cron_file=ansible_misp-backup
+
