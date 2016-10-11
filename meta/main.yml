@@ -17,8 +17,6 @@ galaxy_info:
     versions:
     - xenial
     - trusty
-  - name: Debian
-    versions:
   #
   # Below are all categories currently available. Just as with
   # the platforms above, uncomment those that apply to your role.
@@ -27,7 +25,7 @@ galaxy_info:
   - system
   - security
 dependencies:
-  - redhat-epel
+  - juju4.redhat-epel
 ## eventual dependencies for fine tuning but integration needed
 #  - geerlingguy.mysql
 ## one or the other?
