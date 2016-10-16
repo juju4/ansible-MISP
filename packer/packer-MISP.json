@@ -22,7 +22,7 @@
       "type": "ansible-local",
       "playbook_file": "../test/integration/default/default.yml",
       "role_paths": [
-        "/etc/ansible/roles/MISP"
+        "/etc/ansible/roles/juju4.MISP"
       ],
       "extra_arguments": [ "--become" ]
     },
