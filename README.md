@@ -68,7 +68,7 @@ $ cp -Rd /path/to/MISP/packer .
 ## you can add additional role dependencies inside setup-roles.sh
 $ cd packer
 $ packer build packer-*.json
-$ packer build -only=virtualbox packer-*.json
+$ packer build -only=virtualbox-iso packer-*.json
 ## if you want to enable extra log
 $ PACKER_LOG=1 packer build packer-*.json
 ## for digitalocean build, you need to export TOKEN in environment.

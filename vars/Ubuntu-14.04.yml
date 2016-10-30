@@ -32,6 +32,11 @@ misp_pkg_list:
  - libjpeg-dev
  - acl
  - sudo
+## pillow? not needed
+# - libtiff4-dev
+# - libjpeg8-dev
+# - zlib1g-dev
+# - libfreetype6-dev
 
 mysql_svc: mysql
 rng_svc: rng-tools

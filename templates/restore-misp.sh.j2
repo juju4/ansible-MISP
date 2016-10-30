@@ -15,7 +15,7 @@ dirs="{{ misp_rootdir }}/app/files {{ misp_rootdir }}/app/Config"
 
 tar xzf $backupfile -C $tmpdir
 
-mysql -u misp < $tmpdir{{ backupdir }}/mysqldump-misqp.sql
+mysql -u misp < $tmpdir{{ backupdir }}/mysqldump-misp.sql
 
 for d in $dirs; do
     rsync -rvl $tmpdir/$d $d

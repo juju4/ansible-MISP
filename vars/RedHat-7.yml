@@ -40,6 +40,8 @@ misp_pkg_list:
     - acl
     - sudo
     - crontabs
+## pillow? not needed
+#    - libjpeg-turbo-devel
 
 misp_webserver_apache2:
     - httpd
