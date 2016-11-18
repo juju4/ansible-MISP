@@ -19,4 +19,12 @@ server {
             ## https://httpoxy.org/, 201607
             fastcgi_param HTTP_PROXY "";
     }
+
+## just in case
+    location ~* /PyMISP {
+            deny all;
+    }
+    location ~* /keys.(py|txt)$ {
+            deny all;
+    }
 }

@@ -50,6 +50,16 @@
     - cybox
     - stix
 
+- name: install python dependencies with pip - python3
+  pip: name="{{ item }}" extra_args='--exists-action=w' executable=pip3
+  with_items:
+    - pyzmq
+    - git+https://github.com/MISP/PyMISP.git#egg=Package
+    - cybox
+    - stix
+## required for users API
+#  when: ansible_distribution_release == 'xenial'
+
 - stat: path={{ misp_rootdir }}/INSTALL
   register: m
 - name: git clone MISP
@@ -85,21 +95,7 @@
   command: "python setup.py install chdir={{ misp_rootdir }}/app/files/scripts/python-stix"
   when: not psegg.stat.exists
 
-- name: define composer.json to use composer install module
-  copy: src=composer.json dest={{ misp_rootdir }}/app/composer.json mode=0644
-## FIXME! no better way to do that?
-- name: Download Composer installer.
-  get_url:
-    url: https://getcomposer.org/installer
-    dest: /tmp/composer-installer.php
-    mode: 0755
-    sha256sum: 5af00ed7dbe47d849eca28cd44b6064d34b362ce20ba465652d72b4d121134b1
-- name: install composer
-  shell: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
-  args:
-    creates: /usr/local/bin/composer
-- name: install PHP dependencies via composer (kamisama/cake-resque, Vendor)
-  composer: command=install working_dir={{ misp_rootdir }}/app
+- include: composer.yml
 
 ### https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
 ### FIXME! pecl/redis requires PHP (version >= 7.0.0, version <= 7.1.0, excluded versions: 6.0.0)
@@ -304,23 +300,9 @@
 - include: testing.yml
   when: misp_testing is defined and misp_testing
 
-## FIXME! how to do it once only!
-## Note: more a reset as next login, will ask to change password...
-- stat: path="{{ misp_rootdir }}/.admin_pass_set"
-  register: ap
-- name: set admin password
-  command: "{{ misp_rootdir }}/app/Console/cake Password admin@admin.test \"{{ misp_web_pass }}\""
-  when: not ap.stat.exists
-- name: Admin pass set market
-  file: dest="{{ misp_rootdir }}/.admin_pass_set" state=touch
-  when: not ap.stat.exists
+- include: misp-add-users.yml
 
-- block:
-    - name: set extra users
-      command: "{{ misp_rootdir }}/app/Console/cake Password {{ item.u }} \"{{ item.p }}\""
-      with_items: "{{ misp_webusers_list }}"
-  when: misp_webusers_list is defined and misp_webusers_list != ""
-
+## or use tools/misp-backup/misp-backup.sh ?
 - file: path={{ scriptsdir }} state=directory mode=0755
 - name: add backup script
   template: src=backup-misp.sh.j2 dest={{ scriptsdir }}/backup-misp.sh mode=0755

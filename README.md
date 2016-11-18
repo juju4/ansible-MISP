@@ -70,7 +70,7 @@ $ cd packer
 $ packer build packer-*.json
 $ packer build -only=virtualbox-iso packer-*.json
 ## if you want to enable extra log
-$ PACKER_LOG=1 packer build packer-*.json
+$ PACKER_LOG_PATH="packerlog.txt" PACKER_LOG=1 packer build packer-*.json
 ## for digitalocean build, you need to export TOKEN in environment.
 ##  update json config on your setup and region.
 $ export DO_TOKEN=xxx

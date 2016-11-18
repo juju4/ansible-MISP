@@ -5,11 +5,13 @@
     - misp_testing: true
     - misp_testing_user: _misp
     - misp_testing_user_home: "/home/{{ misp_testing_user }}"
-    - misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
+    - misp_testing_key_file: "{{ misp_key_file }}"
+#    - misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
     - misp_base_url: http://localhost
     - misp_webusers_list:
-        - { u: dupont@admin.test, p: dupont_passphrase. }
-        - { u: dupond@admin.test, p: dupond_passphrase. }
+        - { p: 'dupont_passphrase.', email: dupont@localhost.local, org: 1, role: 2 }
+        - { p: 'dupond_passphrase.', email: dupond@localhost.local, org: 1, role: 4 }
+#        - { p: 'dupond_passphrase.', email: dupona@localhost.local, org: 1, role: 4 }
   roles:
 #    - geerlingguy.apache
     - MISP

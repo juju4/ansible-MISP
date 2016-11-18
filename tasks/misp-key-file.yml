@@ -1,0 +1,31 @@
+---
+
+- name: check if existing key file
+  stat: "path={{ misp_key_file }}"
+  register: skey
+#- debug: var=skey
+- block:
+    - name: generate key file - cake userInit
+      shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
+      become: yes
+#      become_user: "{{ user }}"
+      register: userInit
+#    - debug: var=userInit
+    - set_fact:
+        userkey: "{{ userInit.stdout }}"
+  when: not skey.stat.exists
+- block:
+    - name: get existing key file
+      command: "cat {{ misp_key_file }}"
+      changed_when: false
+      register: userInit2
+    - set_fact:
+        userkey: "{{ userInit2.stdout }}"
+  when: skey.stat.exists
+- debug: var=userkey
+
+## FIXME! fail if returns 'Script aborted: MISP instance already initialised.'
+- name: check no script error
+  fail: msg="Fatal! error retrieving user key"
+  when: userkey.find("Script aborted{{ ':' }} MISP instance already initialised.") != -1
+

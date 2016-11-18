@@ -45,31 +45,8 @@
 - name: use MISP travis bootstrap
   copy: "src={{ misp_rootdir }}/travis/bootstrap.php dest={{ misp_rootdir }}/app/Config/bootstrap.php backup=yes force=yes"
 
-- name: check if existing key file
-  stat: "path={{ misp_testing_key_file }}"
-  register: skey
-- debug: var=skey
-- block:
-    - name: generate key file - cake userInit
-      shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_testing_key_file }}"
-      become: yes
-    #      become_user: "{{ user }}"
-      register: userInit
-    - set_fact:
-        userkey: "{{ userInit.stdout }}"
-  when: not skey.stat.exists
-- block:
-    - name: get existing key file
-      command: "cat {{ misp_testing_key_file }}"
-      changed_when: false
-      register: userInit2
-    - set_fact:
-        userkey: "{{ userInit2.stdout }}"
-  when: skey.stat.exists
-- debug: var=userkey
+- include: misp-key-file.yml
 
-- file: "dest={{ misp_testing_key_file }} mode=777"
-  become: yes
 - name: MISP tree permissions
   file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755 recurse=yes"
   become: yes
@@ -89,6 +66,7 @@
   with_items:
     - "url = \"{{ misp_base_url }}\""
     - "key = \"{{ userkey }}\""
-- name: symlink key file in example/events
+  no_log: true
+- name: symlink key file in examples/events
   file: "src={{ misp_rootdir }}/PyMISP/tests/keys.py dest={{ misp_rootdir }}/PyMISP/examples/events/keys.py state=link force=yes owner={{ misp_testing_user }}"
 

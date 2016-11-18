@@ -5,11 +5,14 @@ scriptsdir: /usr/local/bin
 backupdir: /var/_backup
 
 ## branch or tags to use
-misp_version: '2.4'
+misp_version: 'HEAD'
 misp_rootdir: /var/www/MISP
 mispmodules_rootdir: /opt
 misp_webserver: 'apache2'
 #misp_webserver: 'nginx'
+
+## for automation of users creation and testing
+misp_key_file: "{{ misp_rootdir }}/.ht_key"
 
 misp_testing: false
 
@@ -35,9 +38,11 @@ misp_db_pass: mispdb_pass_to_change_fast
 misp_web_user: admin@admin.test
 misp_web_pass: admin
 ## extra users, the password is only valid once. user will be asked to update
+## orgid (default): 1/ORGNAME
+## roleid (default): 1/admin, 2/OrgAdmin, 3/user, 4/publisher, 5/sync user, 6/readonly
 #misp_webusers_list:
-# - { u: dupont@admin.test, p: dupont_passphrase. }
-# - { u: dupond@admin.test, p: dupond_passphrase. }
+# - { u: dupont@admin.test, p: 'dupont_passphrase.', email: dupont@localhost, org: 1, role: 2 }
+# - { u: dupond@admin.test, p: 'dupond_passphrase.', email: dupond@localhost, org: 1, role: 4 }
 ## TODO: either fixed for serverspec test, either random if not defined/empty
 #misp_web_apikey:
 

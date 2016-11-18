@@ -16,12 +16,6 @@
   poll: 300
 
 - block:
-    - set_fact:
-        fpm_user: nobody
-    - set_fact:
-        fpm_user: nginx
-      when: misp_webserver is defined and misp_webserver == 'nginx'
-
     - name: set php-fpm to use socket file
       replace: "dest=/etc/php-fpm.d/www.conf regexp={{ item.re }} replace={{ item.rep }} backup=yes"
       with_items:
@@ -44,4 +38,8 @@
       notify:
         - restart php-fpm
   when: misp_webserver is defined and misp_webserver == 'nginx'
+
+## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
+- name: redhat | install missing pip3 command
+  command: "easy_install-3.4 pip creates=/usr/bin/pip3"
 

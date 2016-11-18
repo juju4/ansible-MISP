@@ -37,6 +37,7 @@ misp_pkg_list:
     - python34
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 #    - python3-pip
+    - python34-setuptools
     - acl
     - sudo
     - crontabs
@@ -66,4 +67,5 @@ nginx_sock: /var/run/php-fpm/php-fpm.sock
 php_confdir: /etc/php.d
 php_confext: conf
 php_ini: /etc/php.ini
+fpm_user: nobody
 

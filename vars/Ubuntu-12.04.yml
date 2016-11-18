@@ -70,3 +70,5 @@ php_ini: /etc/php5/apache2/php.ini
 php_ini_nginx: /etc/php5/fpm/php.ini
 php_confenable: /etc/php5/apache2/conf.d
 nginx_sock: /var/run/php5-fpm.sock
+fpm_user: www-data
+
