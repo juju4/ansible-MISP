@@ -302,6 +302,8 @@
 
 - include: misp-add-users.yml
 
+- include: misp-feeds.yml
+
 ## or use tools/misp-backup/misp-backup.sh ?
 - file: path={{ scriptsdir }} state=directory mode=0755
 - name: add backup script

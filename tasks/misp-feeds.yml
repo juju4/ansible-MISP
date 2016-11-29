@@ -1,0 +1,18 @@
+---
+
+- name: flush handlers as we need service up for API call
+  meta: flush_handlers
+
+## FIXME! not idempotent, no way to list feeds with their status
+- name: enable feeds
+  command: "curl -X POST -H 'Authorization: {{ userkey }}' -H 'Content-Type: application/json' -H 'Accept: application/json' {{ misp_base_url }}/feeds/enable/{{ item }}"
+  with_items: "{{ misp_enable_feeds }}"
+  register: enableresults
+- debug: var=enableresults
+
+- name: disable feeds
+  command: "curl -X POST -H 'Authorization: {{ userkey }}' -H 'Content-Type: application/json' -H 'Accept: application/json' {{ misp_base_url }}/feeds/disable/{{ item }}"
+  with_items: "{{ misp_disable_feeds }}"
+  register: disableresults
+- debug: var=disableresults
+
