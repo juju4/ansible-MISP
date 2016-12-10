@@ -35,6 +35,7 @@ misp_pkg_list:
     - wget
 # misp-modules
     - python34
+    - python34-devel
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 #    - python3-pip
     - python34-setuptools

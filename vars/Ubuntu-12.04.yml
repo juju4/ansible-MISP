@@ -39,6 +39,8 @@ misp_pkg_list:
 # - libjpeg8-dev
 # - zlib1g-dev
 # - libfreetype6-dev
+## if pyzmq?
+# - libczmq-dev
 
 mysql_svc: mysql
 rng_svc: rng-tools

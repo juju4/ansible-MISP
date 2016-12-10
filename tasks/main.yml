@@ -43,7 +43,7 @@
   pip: "name={{ item.n }} version={{ item.v }} extra_args='--exists-action=w'"
   with_items:
     - { n: redis, v: '2.10.5' }
-    - { n: pyzmq, v: '16.0.2' }
+#    - { n: pyzmq, v: '16.0.2' }
     - { n: 'git+https://github.com/MISP/PyMISP.git#egg=Package', v: "{{ misp_version }}" }
 ## processed later inside misp_root. not sure if it changes anything
     - { n: cybox, v: "{{ misp_pip_cybox_version }}" }
@@ -54,7 +54,7 @@
   pip: "name={{ item.n }} version={{ item.v }} extra_args='--exists-action=w' executable=pip3"
   with_items:
     - { n: redis, v: '2.10.5' }
-    - { n: pyzmq, v: '16.0.2' }
+#    - { n: pyzmq, v: '16.0.2' }
     - { n: 'git+https://github.com/MISP/PyMISP.git#egg=Package', v: "{{ misp_version }}" }
     - { n: cybox, v: "{{ misp_pip_cybox_version }}" }
     - { n: stix, v: "{{ misp_pip_stix_version }}" }
