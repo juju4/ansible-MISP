@@ -48,7 +48,20 @@
 - include: misp-key-file.yml
 
 - name: MISP tree permissions
-  file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755 recurse=yes"
+## break .gnupg if applied to whole tree
+#  file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755 recurse=yes"
+  file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755"
+  become: yes
+- name: MISP tree permissions
+  file: "dest={{ item }} owner={{ www_user }} mode=755 recurse=yes"
+## Note: recurse is only valid if directory and can't select them from fileglob
+#  with_fileglob:
+#    - "{{ misp_rootdir }}/*"
+## Not doing root files, build/tests/PyMISP addressed in their own tasks, INSTALL/travis ignored
+  with_items:
+    - "{{ misp_rootdir }}/app"
+    - "{{ misp_rootdir }}/format"
+    - "{{ misp_rootdir }}/tools"
   become: yes
 - name: PyMISP world-writeable permissions
   file: "dest={{ misp_rootdir }}/PyMISP mode=777 owner={{ misp_testing_user }} recurse=yes"

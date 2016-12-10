@@ -40,34 +40,46 @@
 ## https://github.com/ansible/ansible-modules-core/issues/2697
 - name: install python dependencies with pip
 #  pip: name="{{ item }}" extra_args='--no-input'
-  pip: name="{{ item }}" extra_args='--exists-action=w'
+  pip: "name={{ item.n }} version={{ item.v }} extra_args='--exists-action=w'"
   with_items:
-    - pyzmq
-#    - git+https://github.com/CybOXProject/python-cybox.git@v2.1.0.12#egg=Package
-## FIXME! ValueError: ("Missing 'Version:' header and/or PKG-INFO file", cybox [unknown version] (/tmp/src/package))
-#    - git+https://github.com/stixproject/python-stix.git@v1.2.0.0#egg=Package
-    - git+https://github.com/MISP/PyMISP.git#egg=Package
-    - cybox
-    - stix
+    - { n: redis, v: '2.10.5' }
+    - { n: pyzmq, v: '16.0.2' }
+    - { n: 'git+https://github.com/MISP/PyMISP.git#egg=Package', v: "{{ misp_version }}" }
+## processed later inside misp_root. not sure if it changes anything
+    - { n: cybox, v: "{{ misp_pip_cybox_version }}" }
+    - { n: stix, v: "{{ misp_pip_stix_version }}" }
 
+## TODO duplicate from misp-modules/requirements?
 - name: install python dependencies with pip - python3
-  pip: name="{{ item }}" extra_args='--exists-action=w' executable=pip3
+  pip: "name={{ item.n }} version={{ item.v }} extra_args='--exists-action=w' executable=pip3"
   with_items:
-    - pyzmq
-    - git+https://github.com/MISP/PyMISP.git#egg=Package
-    - cybox
-    - stix
+    - { n: redis, v: '2.10.5' }
+    - { n: pyzmq, v: '16.0.2' }
+    - { n: 'git+https://github.com/MISP/PyMISP.git#egg=Package', v: "{{ misp_version }}" }
+    - { n: cybox, v: "{{ misp_pip_cybox_version }}" }
+    - { n: stix, v: "{{ misp_pip_stix_version }}" }
 ## required for users API
 #  when: ansible_distribution_release == 'xenial'
 
+## FIXME! doing update?
 - stat: path={{ misp_rootdir }}/INSTALL
   register: m
 - name: git clone MISP
-  git: repo=https://github.com/MISP/MISP.git
-       dest={{ misp_rootdir }}
-       version={{ misp_version }}
-#       track_submodules=yes
-  when: not m.stat.exists
+  git:
+    repo: https://github.com/MISP/MISP.git
+    dest: "{{ misp_rootdir }}"
+    version: "{{ misp_version }}"
+    update: no
+    force: no
+#    track_submodules: yes
+#  when: not m.stat.exists
+
+## FIXME! is it the right way to do minor update?
+- name: updating existing MISP
+  command: "git pull chdir={{ misp_rootdir }}"
+  when: m.stat.exists
+  register: gitpull_result
+  changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
 
 ## must be after git cloning MISP
 - include: apache2.yml
@@ -81,19 +93,6 @@
 - name: setting core.filemode for git
   command: "git config core.filemode false chdir={{ misp_rootdir }}"
   when: gc.stdout != 'false'
-
-- stat: path={{ misp_rootdir }}/app/files/scripts/python-stix/setup.py
-  register: ps
-- name: git clone python-stix
-  git: repo=https://github.com/STIXProject/python-stix.git
-       dest={{ misp_rootdir }}/app/files/scripts/python-stix
-       version=v1.2.0.0
-  when: not ps.stat.exists
-- stat: path=/usr/local/lib/python2.7/dist-packages/stix-1.2.0.0-py2.7.egg
-  register: psegg
-- name: setup python-stix
-  command: "python setup.py install chdir={{ misp_rootdir }}/app/files/scripts/python-stix"
-  when: not psegg.stat.exists
 
 - include: composer.yml
 
@@ -202,6 +201,7 @@
   with_items:
     - { regexp: 'db login', replace: "{{ misp_db_user }}" }
     - { regexp: 'db password', replace: "{{ misp_db_pass }}" }
+  no_log: true
 - name: set CakeResque bootstrap to true
   lineinfile: dest={{ misp_rootdir }}/app/Config/bootstrap.php line="CakePlugin::loadAll(array( 'CakeResque' => array('bootstrap' => true) ));"
 - name: add vendor/autoload.php to core
@@ -246,16 +246,24 @@
   when: not gkey.stat.exists and (ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux') and misp_webserver == 'nginx'
   ignore_errors: true
 - name: create gnupg key for {{ misp_email }}
-  shell: "{{ item }} chdir={{ misp_rootdir }}/.gnupg"
+  shell: "{{ item.s }} chdir={{ misp_rootdir }}/.gnupg creates={{ item.c }}"
   with_items:
-    - "gpg --homedir {{ misp_rootdir }}/.gnupg --gen-key --batch /var/tmp/gpg-template"
-    - "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc"
+    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --gen-key --batch /var/tmp/gpg-template", c: "{{ misp_rootdir }}/.gnupg/misp.sec" }
+    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ misp_rootdir }}/.gnupg/misp.pub", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
+    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ misp_rootdir }}/.gnupg/misp.sec", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
+    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
   become: yes
   become_user: "{{ www_user }}"
-  when: not gkey.stat.exists
 ## it seems to be done by gpg
 #- command: wipe -q -y /var/tmp/gpg-template
 #  when: not gkey.stat.exists
+- name: check permissions of gpg files
+  file: "dest={{ item.d }} mode={{ item.m }}"
+  with_items:
+    - { d: "{{ misp_rootdir }}/.gnupg/misp.pub", m: '0400' }
+    - { d: "{{ misp_rootdir }}/.gnupg/misp.sec", m: '0400' }
+    - { d: "{{ misp_rootdir }}/.gnupg/pubring.gpg", m: '0600' }
+    - { d: "{{ misp_rootdir }}/.gnupg/secring.gpg", m: '0600' }
 
 - name: validate worker start.sh permissions
   file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
@@ -283,19 +291,13 @@
   when: ps.stdout.find("{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex") == -1
 
 - name: add MISP worker script for boot
-  lineinfile: dest=/etc/rc.local line="sudo -H -u www-data bash {{ misp_rootdir }}/app/Console/worker/start.sh" insertbefore="exit 0"
+  lineinfile:
+    dest: /etc/rc.local
+    line: "sudo -H -u www-data bash {{ misp_rootdir }}/app/Console/worker/start.sh"
+    insertbefore: "^exit 0"
+    backup: yes
 
-- stat: path={{ mispmodules_rootdir }}/misp-modules
-  register: mm
-- name: git clone MISP modules
-  git: repo=https://github.com/MISP/misp-modules.git
-       dest={{ mispmodules_rootdir }}/misp-modules
-  when: not mm.stat.exists
-
-## FIXME! pip3 bug in centos7
-- name: install pip3 dependencies for MISP modules
-  pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip3
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- include: misp-modules.yml
 
 - include: testing.yml
   when: misp_testing is defined and misp_testing

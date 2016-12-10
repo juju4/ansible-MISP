@@ -136,6 +136,10 @@ Not identified why...
 
 * usage of roles dependencies like geerlinguy.{mysql,nginx,apache} are not required but allow more fine-tuning.
 
+* To debug gpg issues (as per Server Settings: Diagnostics), refer to
+https://github.com/MISP/MISP/issues/413
+Target file has changed and is now MISP/app/Model/Server.php
+
 
 ## TODO
 * role is not managing upgrade

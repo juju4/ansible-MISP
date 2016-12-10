@@ -5,11 +5,15 @@ scriptsdir: /usr/local/bin
 backupdir: /var/_backup
 
 ## branch or tags to use
-misp_version: 'HEAD'
+#misp_version: 'HEAD'
+misp_version: '2.4'
 misp_rootdir: /var/www/MISP
 mispmodules_rootdir: /opt
 misp_webserver: 'apache2'
 #misp_webserver: 'nginx'
+
+misp_pip_cybox_version: '2.1.0.12'
+misp_pip_stix_version: '1.1.1.4'
 
 ## for automation of users creation and testing
 misp_key_file: "{{ misp_rootdir }}/.ht_key"
@@ -23,7 +27,7 @@ userkey: ''
 misp_base_url: http://127.0.0.1:8888
 misp_email: root@localhost
 misp_gpg_email: "{{ misp_email }}"
-misp_gpg_homedir: "{{ misp_rootdir }}"
+misp_gpg_homedir: "{{ misp_rootdir }}/.gnupg"
 misp_gpg_pass: gpg_pass_to_change_fast
 misp_SecureAuth_expire: 300
 misp_passreq_lenth: 8

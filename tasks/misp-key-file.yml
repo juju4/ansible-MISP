@@ -10,6 +10,7 @@
       become: yes
 #      become_user: "{{ user }}"
       register: userInit
+      no_log: true
 #    - debug: var=userInit
     - set_fact:
         userkey: "{{ userInit.stdout }}"
@@ -19,10 +20,11 @@
       command: "cat {{ misp_key_file }}"
       changed_when: false
       register: userInit2
+      no_log: true
     - set_fact:
         userkey: "{{ userInit2.stdout }}"
   when: skey.stat.exists
-- debug: var=userkey
+#- debug: var=userkey
 
 ## FIXME! fail if returns 'Script aborted: MISP instance already initialised.'
 - name: check no script error

@@ -1,0 +1,38 @@
+---
+## https://github.com/MISP/misp-modules
+
+- stat: path={{ mispmodules_rootdir }}/misp-modules
+  register: mm
+- name: git clone MISP modules
+  git: repo=https://github.com/MISP/misp-modules.git
+       dest={{ mispmodules_rootdir }}/misp-modules
+  when: not mm.stat.exists
+
+## FIXME! pip3 bug in centos7
+- name: install dependencies for MISP modules (pip3)
+  pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip3
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: install MISP modules (pip3)
+  pip: name=file://{{ mispmodules_rootdir }}/misp-modules executable=pip3
+#  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: add MISP modules script for boot
+  lineinfile:
+    dest: /etc/rc.local
+    regexp: "sudo -H -u www-data misp-modules .* &"
+    line: "sudo -H -u www-data misp-modules -s > /tmp/misp-modules.boot 2>&1 &"
+    insertbefore: "^exit 0"
+    backup: yes
+
+- name: check if misp modules is running
+  shell: "ps axu |grep misp-modules"
+  register: ps
+  changed_when: false
+  ignore_errors: true
+- name: start MISP modules app
+  shell: "misp-modules -s > /tmp/misp-modules.start 2>&1 &"
+  become: yes
+  become_user: www-data
+  when: "'misp-modules' not in ps.stdout"
+

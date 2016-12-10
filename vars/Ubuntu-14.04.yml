@@ -16,6 +16,7 @@ misp_pkg_list:
  - python-dev
  - python-pip
  - python-virtualenv
+ - python-setuptools
  - libxml2-dev
  - libxslt1-dev
  - zlib1g-dev
@@ -29,6 +30,7 @@ misp_pkg_list:
 # misp-modules
  - python3
  - python3-pip
+ - libpq5
  - libjpeg-dev
  - acl
  - sudo

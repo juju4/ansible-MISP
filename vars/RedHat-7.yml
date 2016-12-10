@@ -38,6 +38,9 @@ misp_pkg_list:
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 #    - python3-pip
     - python34-setuptools
+# FIXME! not available
+#    - libpq5
+## misc
     - acl
     - sudo
     - crontabs
