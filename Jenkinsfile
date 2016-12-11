@@ -5,10 +5,8 @@ node {
     try{
         currentBuild.result = "SUCCESS"
         def workspace = pwd()
-        def directory = sh (
-            script: "echo ${GIT_URL##*/}",
-            returnStdout: true
-            ).trim()
+        def git_url = env.GIT_URL
+        def directory = git_url.substring(input.lastIndexOf("/") + 1)
 
         stage("Download source and capture commit ID") {
             sh "mkdir $directory"
