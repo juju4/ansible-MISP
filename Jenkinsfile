@@ -6,7 +6,7 @@ node {
         currentBuild.result = "SUCCESS"
         def workspace = pwd()
         def directory = sh (
-            script: 'echo ${GIT_URL##*/}',
+            script: "echo ${GIT_URL##*/}",
             returnStdout: true
             ).trim()
 
