@@ -8,14 +8,16 @@
        dest={{ mispmodules_rootdir }}/misp-modules
   when: not mm.stat.exists
 
-## FIXME! pip3 bug in centos7
-- name: install dependencies for MISP modules (pip3)
+- name: debian | install dependencies for MISP modules (pip3)
   pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip3
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_os_family == 'Debian'
+## centos7: pip points to python34
+- name: redhat | install dependencies for MISP modules (pip3)
+  pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip
+  when: ansible_os_family == 'RedHat'
 
 - name: install MISP modules (pip3)
   pip: name=file://{{ mispmodules_rootdir }}/misp-modules executable=pip3
-#  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: add MISP modules script for boot
   lineinfile:

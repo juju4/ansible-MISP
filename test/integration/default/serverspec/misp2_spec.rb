@@ -40,7 +40,8 @@ end
 ##	centos6: fail
 describe command('cd /var/www/MISP/PyMISP && coverage run setup.py test 2>&1 | tee /tmp/coverage.out'), :if => os[:release] != '14.04' && os[:release] != '6' do
   its(:stdout) { should match /version/ }
-  its(:stdout) { should match /{u'Event': {u'info': u'This is a test'/ }
+#  its(:stdout) { should match /{u'Event': {u'info': u'This is a test'/ }
+  its(:stdout) { should match /This is a test/ }
   its(:stdout) { should match /OK/}
   its(:stdout) { should_not match /FAILED \(errors=.*\)/}
   its(:stdout) { should_not match /HTTPError: 500 Server Error: Internal Server Error for url/}
