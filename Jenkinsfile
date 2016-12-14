@@ -23,6 +23,10 @@ node {
 
                 echo "Current Git url: ${git_url}"
 
+//                sh 'git config --get remote.origin.url > GIT_REMOTE_ORIGIN_URL'
+//                git_url2 = readFile('GIT_REMOTE_ORIGIN_URL')
+//                echo "Current Git url2: ${git_url2}"
+
             }
         }
 
@@ -32,18 +36,15 @@ node {
                 sh "sh -x get-dependencies.sh"
             }
             stage("Build and verify 1"){
-                sh 'git config --get remote.origin.url > GIT_REMOTE_ORIGIN_URL'
-                git_url2 = readFile('GIT_REMOTE_ORIGIN_URL')
-                echo "Current Git url2: ${git_url2}"
-
                 defaultplatform = sh (
-                    script: 'kitchen list | awk \\"!/Instance/ {print \\\\\$1; exit}\\"',
+//                    script: 'kitchen list | awk \\"!/Instance/ {print \\\\\$1; exit}\\"',
+                    script: 'kitchen list | awk \\"!/Instance/ {print; exit}\\"',
                     returnStdout: true
                     ).trim()
-                sh 'kitchen list | awk \\"!/Instance/ {print \\\\\$1; exit}\\" > KITCHEN_DEFAULT_PLATFORM'
-                defaultplatform2 = readFile('KITCHEN_DEFAULT_PLATFORM')
                 echo "default platform: ${defaultplatform}"
-                echo "default platform2: ${defaultplatform2}"
+//                sh 'kitchen list | awk \\"!/Instance/ {print \\\\\$1; exit}\\" > KITCHEN_DEFAULT_PLATFORM'
+//                defaultplatform2 = readFile('KITCHEN_DEFAULT_PLATFORM')
+//                echo "default platform2: ${defaultplatform2}"
 
                 sh "kitchen test ${defaultplatform}"
             }
