@@ -5,7 +5,7 @@ node {
     try{
         currentBuild.result = "SUCCESS"
         def workspace = pwd()
-        def git_url = build.getEnvironment(listener).get('GIT_URL')
+        //def git_url = build.getEnvironment(listener).get('GIT_URL')
         //def directory = git_url.substring(input.lastIndexOf("/") + 1)
         def directory = "MISP"
 
@@ -23,6 +23,15 @@ node {
 
                 echo "Current Git url: ${git_url}"
 
+            }
+        }
+
+        dir("$directory") {
+
+            stage("Get dependencies"){
+                sh "sh -x get-dependencies.sh"
+            }
+            stage("Build and verify 1"){
                 sh 'git config --get remote.origin.url > GIT_REMOTE_ORIGIN_URL'
                 git_url2 = readFile('GIT_REMOTE_ORIGIN_URL')
                 echo "Current Git url2: ${git_url2}"
@@ -35,15 +44,7 @@ node {
                 defaultplatform2 = readFile('KITCHEN_DEFAULT_PLATFORM')
                 echo "default platform: ${defaultplatform}"
                 echo "default platform2: ${defaultplatform2}"
-            }
-        }
 
-        dir("$directory") {
-
-            stage("Get dependencies"){
-                sh "sh -x get-dependencies.sh"
-            }
-            stage("Build and verify 1"){
                 sh "kitchen test ${defaultplatform}"
             }
             stage("Build and verify all platforms"){
