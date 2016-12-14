@@ -4,6 +4,16 @@
   mysql_db: name=misp state=present
 - stat: path=/root/.mysql_misp_imported
   register: mispdbloaded
+
+## trusty: mysql 5.5, centos7: mariadb 5.5
+- name: pre-mysql5.6 | force MyISAM mysql engine to support FULLTEXT indexes
+  replace:
+    dest: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
+    regexp: "ENGINE=\\w+"
+    replace: "ENGINE=MyISAM"
+    backup: yes
+  when: ansible_distribution_release == 'trusty' or ansible_distribution_major_version == '7'
+
 - name: importing mysql misp db template
   mysql_db: name=misp state=import target={{ misp_rootdir }}/INSTALL/MYSQL.sql
   when: not mispdbloaded.stat.exists
