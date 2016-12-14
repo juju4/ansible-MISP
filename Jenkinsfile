@@ -6,7 +6,9 @@ node {
         currentBuild.result = "SUCCESS"
         def workspace = pwd()
         def git_url = env.GIT_URL
-        def directory = git_url.substring(input.lastIndexOf("/") + 1)
+        //def git_url = build.getEnvironment(listener).get('GIT_URL')
+        //def directory = git_url.substring(input.lastIndexOf("/") + 1)
+        def directory = "MISP"
 
         stage("Download source and capture commit ID") {
             sh "mkdir $directory"
@@ -16,6 +18,7 @@ node {
                 sh 'git rev-parse --verify HEAD > GIT_COMMIT'
                 git_commit = readFile('GIT_COMMIT').take(7)
                 echo "Current commit ID: ${git_commit}"
+                echo "Current Git url: ${git_url}"
             }
         }
 
