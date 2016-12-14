@@ -40,7 +40,7 @@ node {
 //                    script: 'kitchen list | awk \\"!/Instance/ {print \\\\\$1; exit}\\"',
 //                    script: 'kitchen list | awk \\"!/Instance/ {print; exit}\\"',
                     script: '''#!/bin/bash
-kitchen list | awk "!/Instance/ {print \$1; exit}"
+kitchen list | awk "!/Instance/ {print \\$1; exit}"
                         ''',
                     returnStdout: true
                     ).trim()
