@@ -38,7 +38,10 @@ node {
             stage("Build and verify 1"){
                 defaultplatform = sh (
 //                    script: 'kitchen list | awk \\"!/Instance/ {print \\\\\$1; exit}\\"',
-                    script: 'kitchen list | awk \\"!/Instance/ {print; exit}\\"',
+//                    script: 'kitchen list | awk \\"!/Instance/ {print; exit}\\"',
+                    script: '''#!/bin/bash
+kitchen list | awk "!/Instance/ {print \$1; exit}"
+                        ''',
                     returnStdout: true
                     ).trim()
                 echo "default platform: ${defaultplatform}"
