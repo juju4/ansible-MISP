@@ -21,7 +21,7 @@ node {
                 git_commit = readFile('GIT_COMMIT').take(7)
                 echo "Current commit ID: ${git_commit}"
 
-                echo "Current Git url: ${git_url}"
+//                echo "Current Git url: ${git_url}"
 
 //                sh 'git config --get remote.origin.url > GIT_REMOTE_ORIGIN_URL'
 //                git_url2 = readFile('GIT_REMOTE_ORIGIN_URL')
