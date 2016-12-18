@@ -92,7 +92,7 @@ if [ -f $f ]; then
     . /tmp/sshvars.$$
     SSH_ARGS="-t ssh://${username}@${hostname}"
     [ -z "${ssh_key}" ] && ssh_key=$HOME/.ssh/id_rsa
-    SSH_ARGS="$SSH_ARGS -i ${ssh_key/$HOME/\/share}"
+    SSH_ARGS="$SSH_ARGS -i ${ssh_key/$HOME/\\/share}"
     DOCKER_ARGS="-v $HOME/.ssh:/share/.ssh:ro --read-only --tmpfs /run --tmpfs /tmp --tmpfs /root/.inspec"
 
 ## +user+readonly+tmpfs?
