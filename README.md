@@ -140,9 +140,13 @@ Not identified why...
 https://github.com/MISP/MISP/issues/413
 Target file has changed and is now MISP/app/Model/Server.php
 
+* role is serving MISP as http.
+They are other roles to handle certificates like letsencrypt (ex: thefinn93.letsencrypt)
+New ansible v2.2 letsencrypt module allow certificate creation but no renewal of task without rerunning role.
+
 
 ## TODO
-* role is not managing upgrade
+* role is not managing upgrade (Work in progress/git pull between minor releases)
 * monitoring unless using serverspec
 * hardening: apache & nginx hardening is done in separate roles (harden-webserver)
 +Viper
