@@ -9,7 +9,7 @@
     url: https://getcomposer.org/installer
     dest: /tmp/composer-installer.php
     mode: 0755
-    sha256sum: 3e6e491aebaec0fc7f33d2aec904d5f3b7eeea3a31f9b2ef36ba95db9c6e13ba
+    sha256sum: 2d24e7ceb1144fa60b6ad4e78f572a07f676868036730e1de86135abd0783398
 
 - name: install composer
   shell: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"

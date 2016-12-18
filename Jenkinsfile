@@ -58,7 +58,7 @@ kitchen list | awk "!/Instance/ {print \\$1; exit}"
 /// Work in progress, parallel build and not previously tested nodes
 
 // org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
-// WorkflowScript: 59: unable to resolve class string 
+// WorkflowScript: 59: unable to resolve class string
 // @ line 59, column 63.
 //   platforms.split("\n").collect{it as stri
 
@@ -123,7 +123,7 @@ if [ -f $f ]; then
 ## Error while reading plugin options: "Invalid file option "~/output-w3af.csv"
     #DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp --tmpfs /home/w3af/.w3af -v $HOME/w3af-shared:/home/w3af/w3af/scripts:ro"
     DOCKER_ARGS="--tmpfs /run --tmpfs /tmp --tmpfs /home/w3af/.w3af -v $HOME/w3af-shared:/home/w3af/w3af/scripts:ro"
-    docker pull andresriancho/w3af 
+    docker pull andresriancho/w3af
     mkdir ~/w3af-shared
     wget -q -O ~/w3af-shared/all.w3af https://github.com/andresriancho/w3af/raw/master/scripts/all.w3af
     perl -pi.bak -e "s@http://moth/w3af/@http://${hostname}@;s@output-w3af.txt@/home/w3af/w3af/scripts/output-w3af.txt@;" ~/w3af-shared/all.w3af
