@@ -46,10 +46,22 @@ kitchen list | awk "!/Instance/ {print \\$1; exit}"
                     ).trim()
                 echo "default platform: ${defaultplatform}"
 
-                sh "kitchen test ${defaultplatform}"
+//                sh "kitchen test ${defaultplatform}"
+                // must keep instance for security testing after
+                sh "kitchen verify ${defaultplatform}"
             }
 
+/*
             stage("Build and verify all platforms"){
+                sh "kitchen test"
+/// OR
+/// Work in progress, parallel build and not previously tested nodes
+
+// org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
+// WorkflowScript: 59: unable to resolve class string 
+// @ line 59, column 63.
+//   platforms.split("\n").collect{it as stri
+
                 platforms = sh (
                     script: '''#!/bin/bash
 kitchen list | awk "!/Instance/ && FNR>2 {print \\$1}"
@@ -73,6 +85,7 @@ kitchen list | awk "!/Instance/ && FNR>2 {print \\$1}"
                 }
                 parallel builders
             }
+*/
 
             stage("Run security tests"){
                 defaultplatform = sh (
@@ -135,6 +148,11 @@ fi
 //                }
             }
 */
+
+            stage("Cleanup if no errors"){
+                sh "kitchen destroy"
+            }
+
         }
 
     }
