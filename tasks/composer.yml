@@ -3,13 +3,32 @@
 - name: define composer.json to use composer install module
   copy: src=composer.json dest={{ misp_rootdir }}/app/composer.json mode=0644
 
-## FIXME! no better way to do that?
+## No gpg signature: https://github.com/composer/composer/issues/38
+## https://composer.github.io/pubkeys.html
+## https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
 - name: Download Composer installer.
   get_url:
-    url: https://getcomposer.org/installer
-    dest: /tmp/composer-installer.php
+    url: "{{ item.u }}"
+    dest: "{{ item.d }}"
     mode: 0755
-    sha256sum: 2d24e7ceb1144fa60b6ad4e78f572a07f676868036730e1de86135abd0783398
+  with_items:
+    - { u: 'https://getcomposer.org/installer', d: '/tmp/composer-installer.php', m: '0755' }
+    - { u: 'https://composer.github.io/installer.sig', d: '/tmp/installer.sig', m: '0400' }
+
+- name: get installer checksum
+  stat:
+    path: /tmp/composer-installer.php
+    checksum_algorithm: sha384
+  register: installer
+- name: get signature hash
+  command: cat /tmp/installer.sig
+  register: installersig
+  changed_when: false
+  ignore_errors: true
+
+- name: check composer signature
+  fail: msg="FATAL! composer signature not matching. ({{ installer.stat.checksum }} vs {{ installersig.stdout }})"
+  when: installer.stat.checksum != installersig.stdout
 
 - name: install composer
   shell: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"

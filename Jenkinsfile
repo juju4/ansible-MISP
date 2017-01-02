@@ -96,17 +96,21 @@ kitchen list | awk "!/Instance/ {print \\$1; exit}"
                     ).trim()
                 echo "default platform: ${defaultplatform}"
 
-                sh '''#!/bin/bash
+                def out = sh (
+                    script: '''#!/bin/bash
 ## read ssh config from json .kitchen/{platform}.yml
 f=.kitchen/${defaultplatform}.yml
 if [ -f $f ]; then
 
+    reportsdir=$(pwd)/reports
+    [ ! -d ${reportsdir} ] && mkdir ${reportsdir}
     awk -F'[: ]' '/(hostname|username|ssh_key)/ { OFS=""; print $1,"=",$3 }' ${f} > /tmp/sshvars.$$
     . /tmp/sshvars.$$
     SSH_ARGS="-t ssh://${username}@${hostname}"
     [ -z "${ssh_key}" ] && ssh_key=$HOME/.ssh/id_rsa
     SSH_ARGS="$SSH_ARGS -i ${ssh_key/$HOME/\\/share}"
-    DOCKER_ARGS="-v $HOME/.ssh:/share/.ssh:ro --read-only --tmpfs /run --tmpfs /tmp --tmpfs /root/.inspec"
+    DOCKER_ARGS="-v $HOME/.ssh:/share/.ssh:ro --read-only --tmpfs /run --tmpfs /tmp --tmpfs /root/.inspec -u jenkins"
+    targeturl="http://${hostname}"
 
 ## +user+readonly+tmpfs?
     docker pull chef/inspec
@@ -115,33 +119,82 @@ if [ -f $f ]; then
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-apache-hardening $SSH_ARGS
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-mysql-hardening
 
-    DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp"
+    DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp v ${reportsdir}:/home/nmap/reports -u jenkins"
     docker pull uzyexe/nmap
-    docker run --rm uzyexe/nmap -A ${hostname}
+    docker run --rm uzyexe/nmap -oA /home/nmap/reports/nmap -A ${hostname}
 
 ## https://github.com/andresriancho/w3af/commit/305e1670c9403d5f8265f11cc4c0813f768dc811
 ## Error while reading plugin options: "Invalid file option "~/output-w3af.csv"
     #DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp --tmpfs /home/w3af/.w3af -v $HOME/w3af-shared:/home/w3af/w3af/scripts:ro"
-    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp --tmpfs /home/w3af/.w3af -v $HOME/w3af-shared:/home/w3af/w3af/scripts:ro"
+    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp --tmpfs /home/w3af/.w3af -v ${reportsdir}:/home/w3af/w3af/scripts:rw -u jenkins"
     docker pull andresriancho/w3af
-    mkdir ~/w3af-shared
-    wget -q -O ~/w3af-shared/all.w3af https://github.com/andresriancho/w3af/raw/master/scripts/all.w3af
-    perl -pi.bak -e "s@http://moth/w3af/@http://${hostname}@;s@output-w3af.txt@/home/w3af/w3af/scripts/output-w3af.txt@;" ~/w3af-shared/all.w3af
-    echo 'exit' >> ~/w3af-shared/all.w3af
+    wget -q -O ${reportsdir}/all.w3af https://github.com/andresriancho/w3af/raw/master/scripts/all.w3af
+    perl -pi.bak -e "s@http://moth/w3af/@${targeturl}@;s@output-w3af.txt@/home/w3af/w3af/scripts/output-w3af.txt@;" ${reportsdir}/all.w3af
+    echo 'exit' >> ${reportsdir}/all.w3af
     echo y | docker run $DOCKER_ARGS -i --rm andresriancho/w3af /home/w3af/w3af/w3af_console --no-update -s scripts/all.w3af
     grep -i vulnerability  ~/w3af-shared/output-w3af.txt
 
+
+    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp -v $(pwd)/reports:/home/arachni/reports:rw -u jenkins"
+    docker pull arachni/arachni
+    docker run $DOCKER_ARGS --rm arachni/arachni --checks=*,-emails --scope-include-subdomains --timeout 00:05:00 --report-save-path=/home/arachni/reports/report-arachni ${targeturl}
+    docker run $DOCKER_ARGS --rm arachni/arachni_reporter /home/arachni/reports/report-arachni --reporter=html:outfile=/home/arachni/reports/report-arachni.html
+    
+## ?zap
+## https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan
+## https://blog.mozilla.org/webqa/2016/05/11/docker-owasp-zap-part-one/
+    docker run -i owasp/zap2docker-stable zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' ${targeturl}
+## passive scan
+    docker run -t owasp/zap2docker-stable zap-baseline.py -t ${targeturl} -r testreport.html
+    docker run -u zap -i owasp/zap2docker-stable zapr --debug --summary ${targeturl}
+
+## ?http://126kr.com/article/16y567o86y, https://github.com/DanMcInerney/xsscrapy
+### BDD security? Gauntlt?
+
 fi
-                '''
+                    ''',
+                    returnStdout: true
+                )
+                echo "security test output:\n${out}"
             }
 
+            stage("Run security tests - BDD-security"){
+                defaultplatform = sh (
+                    script: '''#!/bin/bash
+kitchen list | awk "!/Instance/ {print \\$1; exit}"
+                        ''',
+                    returnStdout: true
+                    ).trim()
+                echo "default platform: ${defaultplatform}"
+
+## https://github.com/continuumsecurity/bdd-security/wiki/2-Getting-Started
+## https://github.com/continuumsecurity/bdd-security/wiki/3-Configuration
+## Archive build/reports
+                def out = sh (
+                    script: '''#!/bin/bash
+apt-get -y install gradle
+git clone https://github.com/continuumsecurity/bdd-security.git
+cd bdd-security
+perl -pi.bak -e "s@http://localhost:8080/@${targeturl}@; config.xml
+./gradlew -Dcucumber.options="--tags @authentication --tags ~@skip"
+                    ''',
+                    returnStdout: true
+                )
+                echo "security test output:\n${out}"
 /*
             stage("Run performance tests"){
             }
+*/
 
-            stage("Create packer images"){
+            stage("Test packer images creation"){
+// packer lxc: can be done inside kitchen
+// packer vmware, virtualbox - NOK digitalocean droplet, ?OK 32bits only google cloud
+                dir("$directory/packer") {
+                    sh "packer build -only=virtualbox-iso packer-*.json"
+                }
+
             }
-
+/*
             stage("Deploy"){
 //                timeout(time:5, unit:'DAYS') {
 //                    input message:'Approve deployment?', submitter: 'it-ops'
