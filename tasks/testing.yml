@@ -82,4 +82,6 @@
   no_log: true
 - name: symlink key file in examples/events
   file: "src={{ misp_rootdir }}/PyMISP/tests/keys.py dest={{ misp_rootdir }}/PyMISP/examples/events/keys.py state=link force=yes owner={{ misp_testing_user }}"
+- name: symlink key file in PyMISP
+  file: "src={{ misp_rootdir }}/PyMISP/tests/keys.py dest={{ misp_rootdir }}/PyMISP/keys.py state=link force=yes owner={{ misp_testing_user }}"
 
