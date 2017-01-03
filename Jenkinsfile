@@ -7,7 +7,7 @@ node {
         def workspace = pwd()
         //def git_url = build.getEnvironment(listener).get('GIT_URL')
         //def directory = git_url.substring(input.lastIndexOf("/") + 1)
-        def directory = "MISP"
+        def directory = "juju4.MISP"
 
         stage 'Clean Workspace'
             deleteDir()
@@ -167,9 +167,9 @@ kitchen list | awk "!/Instance/ {print \\$1; exit}"
                     ).trim()
                 echo "default platform: ${defaultplatform}"
 
-## https://github.com/continuumsecurity/bdd-security/wiki/2-Getting-Started
-## https://github.com/continuumsecurity/bdd-security/wiki/3-Configuration
-## Archive build/reports
+// https://github.com/continuumsecurity/bdd-security/wiki/2-Getting-Started
+// https://github.com/continuumsecurity/bdd-security/wiki/3-Configuration
+// Archive build/reports
                 def out = sh (
                     script: '''#!/bin/bash
 apt-get -y install gradle

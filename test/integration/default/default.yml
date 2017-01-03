@@ -14,5 +14,5 @@
 #        - { p: 'dupond_passphrase.', email: dupona@localhost.local, org: 1, role: 4 }
   roles:
 #    - geerlingguy.apache
-    - MISP
+    - juju4.MISP
 
