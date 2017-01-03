@@ -49,15 +49,15 @@ script:
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --connection=local -m setup localhost'
 
   # Ansible syntax check.
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/MISP/test/integration/default/default.yml --syntax-check'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/juju4.MISP/test/integration/default/default.yml --syntax-check'
 
   # Test role.
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook -vvv /etc/ansible/roles/MISP/test/integration/default/default.yml'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook -vvv /etc/ansible/roles/juju4.MISP/test/integration/default/default.yml'
 
   # Test role idempotence.
 ## FIXME! known fail
   - >
-    sudo docker exec "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/MISP/test/integration/default/default.yml
+    sudo docker exec "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/juju4.MISP/test/integration/default/default.yml
     | tee /tmp/idempotency.log
     | grep -q 'changed=0.*failed=0'
     && (echo 'Idempotence test: pass' && exit 0)
@@ -65,7 +65,7 @@ script:
 
 # serverspec
 ## travis/docker: Errno::EROFS: Read-only file system @ dir_s_mkdir - /etc/ansible/roles/ansible-MISP/test/integration/default/serverspec/.bundle
-#  - 'sudo docker exec --tty "$(cat ${container_id})" /etc/ansible/roles/MISP/test/integration/default/serverspec/run-local-tests.sh'
+#  - 'sudo docker exec --tty "$(cat ${container_id})" /etc/ansible/roles/juju4.MISP/test/integration/default/serverspec/run-local-tests.sh'
 
 # debug
 #  - 'sudo docker exec "$(cat ${container_id})" ls /var/log/redis/ || true'
