@@ -14,4 +14,6 @@ fi
 [ ! -d $rolesdir/geerlingguy.apache ] && git clone https://github.com/geerlingguy/ansible-role-apache.git $rolesdir/geerlingguy.apache
 #[ ! -d $rolesdir/geerlingguy.mysql ] && git clone https://github.com/geerlingguy/ansible-role-mysql.git $rolesdir/geerlingguy.mysql
 #[ ! -d $rolesdir/w3af ] && git clone https://github.com/juju4/ansible-w3af $rolesdir/w3af
+## galaxy naming
+[ ! -e $rolesdir/juju4.MISP ] && ln -s ansible-MISP $rolesdir/juju4.MISP
 
