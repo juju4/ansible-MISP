@@ -13,5 +13,5 @@
         - { u: dupond@admin.test, p: dupond_passphrase. }
   roles:
 #    - geerlingguy.nginx
-    - MISP
+    - juju4.MISP
 
