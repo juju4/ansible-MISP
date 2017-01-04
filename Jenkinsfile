@@ -139,7 +139,7 @@ if [ -f $f ]; then
     docker pull arachni/arachni
     docker run $DOCKER_ARGS --rm arachni/arachni --checks=*,-emails --scope-include-subdomains --timeout 00:05:00 --report-save-path=/home/arachni/reports/report-arachni ${targeturl}
     docker run $DOCKER_ARGS --rm arachni/arachni_reporter /home/arachni/reports/report-arachni --reporter=html:outfile=/home/arachni/reports/report-arachni.html
-    
+
 ## ?zap
 ## https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan
 ## https://blog.mozilla.org/webqa/2016/05/11/docker-owasp-zap-part-one/
@@ -181,6 +181,7 @@ perl -pi.bak -e "s@http://localhost:8080/@${targeturl}@; config.xml
                     returnStdout: true
                 )
                 echo "security test output:\n${out}"
+            }
 /*
             stage("Run performance tests"){
             }
