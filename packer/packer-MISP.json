@@ -126,7 +126,7 @@
       "image": "ubuntu-14-04-x64",
       "region": "nyc2",
       "size": "512mb",
-      "droplet_name": "adduser",
+      "droplet_name": "MISP",
       "snapshot_name": "MISP-packer-{{isotime \"2006-01-02\"}}"
     }
   ],

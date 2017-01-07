@@ -24,8 +24,7 @@ before_install:
   - pwd
   - find -ls
 ## use appropriate role path and not github name
-  - ln -s ansible-MISP ../MISP && cd ../MISP
-  - ./get-dependencies.sh
+  - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
 ## No Xenial, https://github.com/travis-ci/travis-ci/issues/5821
 #  - sudo apt install lxd
   - echo "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/trusty-backports.list

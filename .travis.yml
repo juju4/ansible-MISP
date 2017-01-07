@@ -34,8 +34,8 @@ before_install:
   - env
   - pwd
   - find -ls
-  - cp test/travis/initctl_faker test/
   - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
+  - cp test/travis/initctl_faker test/
   # Customize container
   - 'sudo docker build --rm=true --file=test/travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible test'
 

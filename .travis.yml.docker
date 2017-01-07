@@ -32,9 +32,8 @@ before_install:
   - env
   - pwd
   - find -ls
+  - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
   - cp test/travis/initctl_faker test/
-  - ln -s ansible-MISP ../MISP
-  - ./get-dependencies.sh
   # Customize container
   - 'sudo docker build --rm=true --file=test/travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible test'
 
