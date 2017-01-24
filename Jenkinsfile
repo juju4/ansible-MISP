@@ -98,6 +98,7 @@ kitchen list | awk "!/Instance/ {print \\$1; exit}"
 
                 out = sh (
                     script: '''#!/bin/bash
+defaultplatform=`kitchen list | awk "!/Instance/ {print \\$1; exit}"`
 ## read ssh config from json .kitchen/{platform}.yml
 f=.kitchen/${defaultplatform}.yml
 if [ -f $f ]; then
@@ -194,6 +195,7 @@ perl -pi.bak -e "s@http://localhost:8080/@${targeturl}@; config.xml
             }
 */
 
+/*
             stage("Test packer images creation"){
 // packer lxc: can be done inside kitchen
 // packer vmware, virtualbox - NOK digitalocean droplet, ?OK 32bits only google cloud
@@ -202,6 +204,8 @@ perl -pi.bak -e "s@http://localhost:8080/@${targeturl}@; config.xml
                 }
 
             }
+*/
+
 /*
             stage("Deploy"){
 //                timeout(time:5, unit:'DAYS') {
