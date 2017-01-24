@@ -22,3 +22,15 @@
 - name: creating mysql misp db user
   mysql_user: name="{{ misp_db_user }}" password="{{ misp_db_pass }}" priv=*.*:USAGE/misp.*:ALL state=present
 
+- block:
+    - name: Temporary workaround - mysql57 disable strict mode
+      copy:
+        src: disable_strict_mode.cnf
+        dest: /etc/mysql/conf.d/disable_strict_mode.cnf
+        mode: 0644
+      register: mysqlstrict
+    - name: restart mysql
+      service: name=mysql state=restarted
+      when: mysqlstrict.changed
+  when: ansible_distribution_release == 'xenial'
+
