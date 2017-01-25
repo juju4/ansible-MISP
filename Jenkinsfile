@@ -98,7 +98,7 @@ kitchen list | awk "!/Instance/ {print \\$1; exit}"
 
                 out = sh (
                     script: '''#!/bin/bash
-defaultplatform=`kitchen list | awk "!/Instance/ {print \\$1; exit}"`
+defaultplatform=`kitchen list | awk '!/Instance/ {print $1; exit}'`
 ## read ssh config from json .kitchen/{platform}.yml
 f=.kitchen/${defaultplatform}.yml
 if [ -f $f ]; then
