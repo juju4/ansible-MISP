@@ -97,7 +97,7 @@ kitchen list | awk "!/Instance/ {print \\$1; exit}"
                 echo "default platform: ${defaultplatform}"
 
                 out = sh (
-                    script: '''#!/bin/bash
+                    script: '''#!/bin/bash -x
 defaultplatform=`kitchen list | awk '!/Instance/ {print $1; exit}'`
 ## read ssh config from json .kitchen/{platform}.yml
 f=.kitchen/${defaultplatform}.yml
@@ -112,6 +112,8 @@ if [ -f $f ]; then
     SSH_ARGS="$SSH_ARGS -i ${ssh_key/$HOME/\\/share}"
     DOCKER_ARGS="-v $HOME/.ssh:/share/.ssh:ro --read-only --tmpfs /run --tmpfs /tmp --tmpfs /root/.inspec -u jenkins"
     targeturl="http://${hostname}"
+
+    docker info
 
     echo "Check: Inspec"
 ## +user+readonly+tmpfs?
