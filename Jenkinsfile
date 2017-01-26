@@ -137,7 +137,7 @@ fi
 
     . /tmp/sshvars.${BUILD_TAG}
     echo "Check: Nmap"
-    DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp v ${reportsdir}:/home/nmap/reports"
+    DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp -v ${reportsdir}:/home/nmap/reports"
     docker pull uzyexe/nmap | cat
     docker run $DOCKER_ARGS --rm uzyexe/nmap -oA /home/nmap/reports/nmap -A ${hostname}
                     ''',
