@@ -123,6 +123,10 @@ if [ -f $f ]; then
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/juju4/tests-os-hardening $SSH_ARGS
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-apache-hardening $SSH_ARGS
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-mysql-hardening
+
+else
+    echo "Missing kitchen configuration file $f (current path "`pwd`")"
+fi
                     ''',
                     returnStdout: true
                 )
@@ -190,9 +194,6 @@ if [ -f $f ]; then
 ## ?http://126kr.com/article/16y567o86y, https://github.com/DanMcInerney/xsscrapy
 ### BDD security? Gauntlt? Mozilla Minion?
 
-else
-    echo "Missing kitchen configuration file $f (current path "`pwd`")"
-fi
                     ''',
                     returnStdout: true
                 )
