@@ -113,16 +113,17 @@ if [ -f $f ]; then
     DOCKER_ARGS="-v $HOME/.ssh:/share/.ssh:ro --read-only --tmpfs /run --tmpfs /tmp --tmpfs /root/.inspec"
     targeturl="http://${hostname}"
     echo "targeturl=\"http://${hostname}\"" >> /tmp/sshvars.${BUILD_TAG}
+    echo "reportsdir=\"${reportsdir}\"" >> /tmp/sshvars.${BUILD_TAG}
 
     docker info
 
     echo "Check: Inspec"
 ## +user+readonly+tmpfs?
     docker pull chef/inspec | cat
-    docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-ssh-hardening $SSH_ARGS
-    docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/juju4/tests-os-hardening $SSH_ARGS
-    docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-apache-hardening $SSH_ARGS
-    docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-mysql-hardening
+    docker run $DOCKER_ARGS --rm chef/inspec exec https://github.com/dev-sec/tests-ssh-hardening $SSH_ARGS | tee ${reportsdir}/inspec-ssh.txt
+    docker run $DOCKER_ARGS --rm chef/inspec exec https://github.com/juju4/tests-os-hardening $SSH_ARGS | tee ${reportsdir}/inspec-os.txt
+    docker run $DOCKER_ARGS --rm chef/inspec exec https://github.com/dev-sec/tests-apache-hardening $SSH_ARGS | tee ${reportsdir}/inspec-apache.txt
+    docker run $DOCKER_ARGS --rm chef/inspec exec https://github.com/dev-sec/tests-mysql-hardening | tee ${reportsdir}/inspec-mysql.txt
 
 else
     echo "Missing kitchen configuration file $f (current path "`pwd`")"
@@ -156,7 +157,7 @@ fi
     wget -q -O ${reportsdir}/all.w3af https://github.com/andresriancho/w3af/raw/master/scripts/all.w3af
     perl -pi.bak -e "s@http://moth/w3af/@${targeturl}@;s@output-w3af.txt@/home/w3af/w3af/scripts/output-w3af.txt@;" ${reportsdir}/all.w3af
     echo 'exit' >> ${reportsdir}/all.w3af
-    echo y | docker run $DOCKER_ARGS -i --rm andresriancho/w3af /home/w3af/w3af/w3af_console --no-update -s scripts/all.w3af
+    echo y | docker run $DOCKER_ARGS --rm andresriancho/w3af /home/w3af/w3af/w3af_console --no-update -s scripts/all.w3af
     grep -i vulnerability  ~/w3af-shared/output-w3af.txt
                     ''',
                     returnStdout: true
@@ -186,10 +187,10 @@ fi
 ## https://blog.mozilla.org/security/2017/01/25/setting-a-baseline-for-web-security-controls/
     DOCKER_ARGS="--tmpfs /run --tmpfs /tmp -v $(pwd)/reports:/zak/wrk/:rw"
     docker pull owasp/zap2docker-stable | cat
-    docker run $DOCKER_ARGS -i owasp/zap2docker-stable zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' ${targeturl}
+    docker run $DOCKER_ARGS owasp/zap2docker-stable zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' ${targeturl}
 ## passive scan
-    docker run $DOCKER_ARGS -t owasp/zap2docker-stable zap-baseline.py -t ${targeturl} -r testreport.html
-#    docker run $DOCKER_ARGS -i owasp/zap2docker-stable zapr --debug --summary ${targeturl}
+    docker run $DOCKER_ARGS owasp/zap2docker-stable zap-baseline.py -t ${targeturl} -r testreport.html
+#    docker run $DOCKER_ARGS owasp/zap2docker-stable zapr --debug --summary ${targeturl}
 
 ## ?http://126kr.com/article/16y567o86y, https://github.com/DanMcInerney/xsscrapy
 ### BDD security? Gauntlt? Mozilla Minion?
