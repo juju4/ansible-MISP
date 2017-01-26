@@ -96,7 +96,7 @@ kitchen list | awk "!/Instance/ {print \\$1; exit}"
                     ).trim()
                 echo "default platform: ${defaultplatform}"
 
-                out = sh (
+                out1 = sh (
                     script: '''#!/bin/bash -x
 defaultplatform=`kitchen list | awk '!/Instance/ {print $1; exit}'`
 ## read ssh config from json .kitchen/{platform}.yml
@@ -105,13 +105,14 @@ if [ -f $f ]; then
 
     reportsdir=$(pwd)/reports
     [ ! -d ${reportsdir} ] && mkdir ${reportsdir}
-    awk -F'[: ]' '/(hostname|username|ssh_key)/ { OFS=""; print $1,"=",$3 }' ${f} > /tmp/sshvars.$$
-    . /tmp/sshvars.$$
+    awk -F'[: ]' '/(hostname|username|ssh_key)/ { OFS=""; print $1,"=",$3 }' ${f} > /tmp/sshvars.${BUILD_TAG}
+    . /tmp/sshvars.${BUILD_TAG}
     SSH_ARGS="-t ssh://${username}@${hostname}"
     [ -z "${ssh_key}" ] && ssh_key=$HOME/.ssh/id_rsa
     SSH_ARGS="$SSH_ARGS -i ${ssh_key/$HOME/\\/share}"
     DOCKER_ARGS="-v $HOME/.ssh:/share/.ssh:ro --read-only --tmpfs /run --tmpfs /tmp --tmpfs /root/.inspec"
     targeturl="http://${hostname}"
+    echo "targeturl=\"http://${hostname}\"" >> /tmp/sshvars.${BUILD_TAG}
 
     docker info
 
@@ -122,12 +123,26 @@ if [ -f $f ]; then
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/juju4/tests-os-hardening $SSH_ARGS
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-apache-hardening $SSH_ARGS
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-mysql-hardening
+                    ''',
+                    returnStdout: true
+                )
 
+                out2 = sh (
+                    script: '''#!/bin/bash -x
+
+    . /tmp/sshvars.${BUILD_TAG}
     echo "Check: Nmap"
     DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp v ${reportsdir}:/home/nmap/reports"
     docker pull uzyexe/nmap | cat
     docker run --rm uzyexe/nmap -oA /home/nmap/reports/nmap -A ${hostname}
+                    ''',
+                    returnStdout: true
+                )
 
+                out3 = sh (
+                    script: '''#!/bin/bash -x
+
+    . /tmp/sshvars.${BUILD_TAG}
     echo "Check: W3af"
 ## https://github.com/andresriancho/w3af/commit/305e1670c9403d5f8265f11cc4c0813f768dc811
 ## Error while reading plugin options: "Invalid file option "~/output-w3af.csv"
@@ -139,25 +154,41 @@ if [ -f $f ]; then
     echo 'exit' >> ${reportsdir}/all.w3af
     echo y | docker run $DOCKER_ARGS -i --rm andresriancho/w3af /home/w3af/w3af/w3af_console --no-update -s scripts/all.w3af
     grep -i vulnerability  ~/w3af-shared/output-w3af.txt
+                    ''',
+                    returnStdout: true
+                )
 
+                out4 = sh (
+                    script: '''#!/bin/bash -x
+
+    . /tmp/sshvars.${BUILD_TAG}
+    echo "Check: W3af"
     echo "Check: Arachni"
     DOCKER_ARGS="--tmpfs /run --tmpfs /tmp -v $(pwd)/reports:/home/arachni/reports:rw"
     docker pull arachni/arachni | cat
     docker run $DOCKER_ARGS --rm arachni/arachni --checks=*,-emails --scope-include-subdomains --timeout 00:05:00 --report-save-path=/home/arachni/reports/report-arachni ${targeturl}
     docker run $DOCKER_ARGS --rm arachni/arachni_reporter /home/arachni/reports/report-arachni --reporter=html:outfile=/home/arachni/reports/report-arachni.html
+                    ''',
+                    returnStdout: true
+                )
 
+                out5 = sh (
+                    script: '''#!/bin/bash -x
+
+    . /tmp/sshvars.${BUILD_TAG}
     echo "Check: ZAP"
-## ?zap
 ## https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan
 ## https://blog.mozilla.org/webqa/2016/05/11/docker-owasp-zap-part-one/
+## https://blog.mozilla.org/security/2017/01/25/setting-a-baseline-for-web-security-controls/
+    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp -v $(pwd)/reports:/zak/wrk/:rw"
     docker pull owasp/zap2docker-stable | cat
-    docker run -i owasp/zap2docker-stable zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' ${targeturl}
+    docker run $DOCKER_ARGS -i owasp/zap2docker-stable zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' ${targeturl}
 ## passive scan
-    docker run -t owasp/zap2docker-stable zap-baseline.py -t ${targeturl} -r testreport.html
-    docker run -u zap -i owasp/zap2docker-stable zapr --debug --summary ${targeturl}
+    docker run $DOCKER_ARGS -t owasp/zap2docker-stable zap-baseline.py -t ${targeturl} -r testreport.html
+#    docker run $DOCKER_ARGS -i owasp/zap2docker-stable zapr --debug --summary ${targeturl}
 
 ## ?http://126kr.com/article/16y567o86y, https://github.com/DanMcInerney/xsscrapy
-### BDD security? Gauntlt?
+### BDD security? Gauntlt? Mozilla Minion?
 
 else
     echo "Missing kitchen configuration file $f (current path "`pwd`")"
