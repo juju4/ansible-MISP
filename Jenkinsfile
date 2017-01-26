@@ -157,8 +157,8 @@ fi
     wget -q -O ${reportsdir}/all.w3af https://github.com/andresriancho/w3af/raw/master/scripts/all.w3af
     perl -pi.bak -e "s@http://moth/w3af/@${targeturl}@;s@output-w3af.txt@/home/w3af/w3af/scripts/output-w3af.txt@;" ${reportsdir}/all.w3af
     echo 'exit' >> ${reportsdir}/all.w3af
-    echo y | docker run $DOCKER_ARGS --rm andresriancho/w3af /home/w3af/w3af/w3af_console --no-update -s scripts/all.w3af
-    grep -i vulnerability  ~/w3af-shared/output-w3af.txt
+    echo y | docker run -i $DOCKER_ARGS --rm andresriancho/w3af /home/w3af/w3af/w3af_console --no-update -s scripts/all.w3af
+    grep -i vulnerability  ${reportsdir}/output-w3af.txt
                     ''',
                     returnStdout: true
                 )
