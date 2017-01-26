@@ -110,30 +110,30 @@ if [ -f $f ]; then
     SSH_ARGS="-t ssh://${username}@${hostname}"
     [ -z "${ssh_key}" ] && ssh_key=$HOME/.ssh/id_rsa
     SSH_ARGS="$SSH_ARGS -i ${ssh_key/$HOME/\\/share}"
-    DOCKER_ARGS="-v $HOME/.ssh:/share/.ssh:ro --read-only --tmpfs /run --tmpfs /tmp --tmpfs /root/.inspec -u jenkins"
+    DOCKER_ARGS="-v $HOME/.ssh:/share/.ssh:ro --read-only --tmpfs /run --tmpfs /tmp --tmpfs /root/.inspec"
     targeturl="http://${hostname}"
 
     docker info
 
     echo "Check: Inspec"
 ## +user+readonly+tmpfs?
-    docker pull chef/inspec
+    docker pull chef/inspec | cat
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-ssh-hardening $SSH_ARGS
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/juju4/tests-os-hardening $SSH_ARGS
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-apache-hardening $SSH_ARGS
     docker run $DOCKER_ARGS -it --rm chef/inspec exec https://github.com/dev-sec/tests-mysql-hardening
 
     echo "Check: Nmap"
-    DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp v ${reportsdir}:/home/nmap/reports -u jenkins"
-    docker pull uzyexe/nmap
+    DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp v ${reportsdir}:/home/nmap/reports"
+    docker pull uzyexe/nmap | cat
     docker run --rm uzyexe/nmap -oA /home/nmap/reports/nmap -A ${hostname}
 
     echo "Check: W3af"
 ## https://github.com/andresriancho/w3af/commit/305e1670c9403d5f8265f11cc4c0813f768dc811
 ## Error while reading plugin options: "Invalid file option "~/output-w3af.csv"
     #DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp --tmpfs /home/w3af/.w3af -v $HOME/w3af-shared:/home/w3af/w3af/scripts:ro"
-    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp --tmpfs /home/w3af/.w3af -v ${reportsdir}:/home/w3af/w3af/scripts:rw -u jenkins"
-    docker pull andresriancho/w3af
+    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp --tmpfs /home/w3af/.w3af -v ${reportsdir}:/home/w3af/w3af/scripts:rw"
+    docker pull andresriancho/w3af | cat
     wget -q -O ${reportsdir}/all.w3af https://github.com/andresriancho/w3af/raw/master/scripts/all.w3af
     perl -pi.bak -e "s@http://moth/w3af/@${targeturl}@;s@output-w3af.txt@/home/w3af/w3af/scripts/output-w3af.txt@;" ${reportsdir}/all.w3af
     echo 'exit' >> ${reportsdir}/all.w3af
@@ -141,8 +141,8 @@ if [ -f $f ]; then
     grep -i vulnerability  ~/w3af-shared/output-w3af.txt
 
     echo "Check: Arachni"
-    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp -v $(pwd)/reports:/home/arachni/reports:rw -u jenkins"
-    docker pull arachni/arachni
+    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp -v $(pwd)/reports:/home/arachni/reports:rw"
+    docker pull arachni/arachni | cat
     docker run $DOCKER_ARGS --rm arachni/arachni --checks=*,-emails --scope-include-subdomains --timeout 00:05:00 --report-save-path=/home/arachni/reports/report-arachni ${targeturl}
     docker run $DOCKER_ARGS --rm arachni/arachni_reporter /home/arachni/reports/report-arachni --reporter=html:outfile=/home/arachni/reports/report-arachni.html
 
@@ -150,6 +150,7 @@ if [ -f $f ]; then
 ## ?zap
 ## https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan
 ## https://blog.mozilla.org/webqa/2016/05/11/docker-owasp-zap-part-one/
+    docker pull owasp/zap2docker-stable | cat
     docker run -i owasp/zap2docker-stable zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' ${targeturl}
 ## passive scan
     docker run -t owasp/zap2docker-stable zap-baseline.py -t ${targeturl} -r testreport.html
