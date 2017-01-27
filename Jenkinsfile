@@ -192,6 +192,8 @@ fi
     docker run $DOCKER_ARGS --rm owasp/zap2docker-stable zap-baseline.py -t ${targeturl} -r testreport.html
 #    docker run $DOCKER_ARGS owasp/zap2docker-stable zapr --debug --summary ${targeturl}
 
+    true
+
 ## ?http://126kr.com/article/16y567o86y, https://github.com/DanMcInerney/xsscrapy
 ### BDD security? Gauntlt? Mozilla Minion?
 
