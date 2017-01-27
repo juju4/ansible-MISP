@@ -185,11 +185,11 @@ fi
 ## https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan
 ## https://blog.mozilla.org/webqa/2016/05/11/docker-owasp-zap-part-one/
 ## https://blog.mozilla.org/security/2017/01/25/setting-a-baseline-for-web-security-controls/
-    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp -v $(pwd)/reports:/zak/wrk/:rw"
+    DOCKER_ARGS="--tmpfs /run --tmpfs /tmp -v $(pwd)/reports:/zap/wrk/:rw"
     docker pull owasp/zap2docker-stable | cat
-    docker run $DOCKER_ARGS owasp/zap2docker-stable zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' ${targeturl}
+    docker run $DOCKER_ARGS --rm owasp/zap2docker-stable zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' ${targeturl} | tee ${reportsdir}/zap-cli-quickscan.txt
 ## passive scan
-    docker run $DOCKER_ARGS owasp/zap2docker-stable zap-baseline.py -t ${targeturl} -r testreport.html
+    docker run $DOCKER_ARGS --rm owasp/zap2docker-stable zap-baseline.py -t ${targeturl} -r testreport.html
 #    docker run $DOCKER_ARGS owasp/zap2docker-stable zapr --debug --summary ${targeturl}
 
 ## ?http://126kr.com/article/16y567o86y, https://github.com/DanMcInerney/xsscrapy
