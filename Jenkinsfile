@@ -117,7 +117,7 @@ if [ -f $f ]; then
 
     docker info
 
-    echo "Check: Inspec"
+    echo `date`": Check: Inspec"
 ## +user+readonly+tmpfs?
     docker pull chef/inspec | cat
     docker run $DOCKER_ARGS --rm chef/inspec exec https://github.com/dev-sec/tests-ssh-hardening $SSH_ARGS | tee ${reportsdir}/inspec-ssh.txt
@@ -136,7 +136,7 @@ fi
                     script: '''#!/bin/bash -x
 
     . /tmp/sshvars.${BUILD_TAG}
-    echo "Check: Nmap"
+    echo `date`": Check: Nmap"
     DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp -v ${reportsdir}:/home/nmap/reports"
     docker pull uzyexe/nmap | cat
     docker run $DOCKER_ARGS --rm uzyexe/nmap -oA /home/nmap/reports/nmap -A ${hostname}
@@ -144,11 +144,12 @@ fi
                     returnStdout: true
                 )
 
+/*
                 out3 = sh (
                     script: '''#!/bin/bash -x
 
     . /tmp/sshvars.${BUILD_TAG}
-    echo "Check: W3af"
+    echo `date`": Check: W3af"
 ## https://github.com/andresriancho/w3af/commit/305e1670c9403d5f8265f11cc4c0813f768dc811
 ## Error while reading plugin options: "Invalid file option "~/output-w3af.csv"
     #DOCKER_ARGS="--read-only --tmpfs /run --tmpfs /tmp --tmpfs /home/w3af/.w3af -v $HOME/w3af-shared:/home/w3af/w3af/scripts:ro"
@@ -162,17 +163,16 @@ fi
                     ''',
                     returnStdout: true
                 )
-
+*/
                 out4 = sh (
                     script: '''#!/bin/bash -x
 
     . /tmp/sshvars.${BUILD_TAG}
-    echo "Check: W3af"
-    echo "Check: Arachni"
+    echo `date`": Check: Arachni"
     DOCKER_ARGS="--tmpfs /run --tmpfs /tmp -v $(pwd)/reports:/home/arachni/reports:rw"
     docker pull arachni/arachni | cat
-    docker run $DOCKER_ARGS --rm arachni/arachni --checks=*,-emails --scope-include-subdomains --timeout 00:05:00 --report-save-path=/home/arachni/reports/report-arachni ${targeturl}
-    docker run $DOCKER_ARGS --rm arachni/arachni_reporter /home/arachni/reports/report-arachni --reporter=html:outfile=/home/arachni/reports/report-arachni.html
+    docker run $DOCKER_ARGS --rm arachni/arachni /usr/local/arachni/bin/arachni --checks=*,-emails --scope-include-subdomains --timeout 00:05:00 --report-save-path=/home/arachni/reports/report-arachni ${targeturl}
+    docker run $DOCKER_ARGS --rm arachni/arachni /usr/local/arachni/bin/arachni_reporter /home/arachni/reports/report-arachni --reporter=html:outfile=/home/arachni/reports/report-arachni-html.zip
                     ''',
                     returnStdout: true
                 )
@@ -181,7 +181,7 @@ fi
                     script: '''#!/bin/bash -x
 
     . /tmp/sshvars.${BUILD_TAG}
-    echo "Check: ZAP"
+    echo `date`": Check: ZAP"
 ## https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan
 ## https://blog.mozilla.org/webqa/2016/05/11/docker-owasp-zap-part-one/
 ## https://blog.mozilla.org/security/2017/01/25/setting-a-baseline-for-web-security-controls/
@@ -198,7 +198,9 @@ fi
                     ''',
                     returnStdout: true
                 )
+
                 echo "security test output:\n${out}"
+                archiveArtifacts artifacts: '**/reports/*', fingerprint: true
             }
 /*
             stage("Run security tests - BDD-security"){
@@ -262,4 +264,9 @@ perl -pi.bak -e "s@http://localhost:8080/@${targeturl}@; config.xml
         currentBuild.result = "FAILURE"
         throw err
     }
+    finally {
+        // metrics?
+        //junit '**/target/*.xml'
+    }
+
 }
