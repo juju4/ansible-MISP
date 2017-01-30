@@ -65,3 +65,7 @@ misp_enable_feeds:
 
 misp_disable_feeds: []
 
+## Note: don't put hex code as ansible misinterpreted them
+misp_git_signing_keys:
+  - '09E2CD4944E6CBCD'
+

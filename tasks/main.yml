@@ -61,6 +61,12 @@
 ## required for users API
 #  when: ansible_distribution_release == 'xenial'
 
+- name: recover gpg key to check git signed commit
+  command: "gpg --keyserver pgp.uni-mainz.de --recv-keys {{ item }}"
+  with_items: "{{ misp_git_signing_keys }}"
+  register: import
+  changed_when: "'imported: [1-9]+' in import.stdout"
+
 ## FIXME! doing update?
 - stat: path={{ misp_rootdir }}/INSTALL
   register: m
@@ -71,12 +77,15 @@
     version: "{{ misp_version }}"
     update: no
     force: no
+## check if commit signed. only partially the case at Jan 2017. require git 2.1.0+ + import key
+#    verify_commit: yes
 #    track_submodules: yes
 #  when: not m.stat.exists
 
 ## FIXME! is it the right way to do minor update?
 - name: updating existing MISP
   command: "git pull chdir={{ misp_rootdir }}"
+#  command: "git pull --verify-signatures chdir={{ misp_rootdir }}"
   when: m.stat.exists
   register: gitpull_result
   changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")

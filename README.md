@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/juju4/ansible-MISP.svg?branch=master)](https://travis-ci.org/juju4/ansible-MISP)
+[![Build Status - Master](https://travis-ci.org/juju4/ansible-MISP.svg?branch=master)](https://travis-ci.org/juju4/ansible-MISP)
+[![Build Status - Devel](https://travis-ci.org/juju4/ansible-MISP.svg?branch=devel)](https://travis-ci.org/juju4/ansible-MISP/branches)
 # MISP ansible role
 
 Ansible role to setup MISP, Malware Information Sharing Platform & Threat Sharing
@@ -16,6 +17,7 @@ https://github.com/xme/misp-docker
 ### Ansible
 It was tested on the following versions:
  * 2.0
+ * 2.2
 
 ### Operating systems
 
@@ -29,7 +31,7 @@ For example
 ```
 - host: all
   roles:
-    - MISP
+    - juju4.MISP
 ```
 
 default admin credentials (admin@admin.test / admin)
@@ -46,14 +48,14 @@ Default kitchen config (.kitchen.yml) is lxd-based, while (.kitchen.vagrant.yml)
 Once you ensured all necessary roles are present, You can test with:
 ```
 $ gem install kitchen-ansible kitchen-lxd_cli kitchen-sync kitchen-vagrant
-$ cd /path/to/roles/MISP
+$ cd /path/to/roles/juju4.MISP
 $ kitchen verify
 $ kitchen login
 $ KITCHEN_YAML=".kitchen.vagrant.yml" kitchen verify
 ```
 or
 ```
-$ cd /path/to/roles/MISP/test/vagrant
+$ cd /path/to/roles/juju4.MISP/test/vagrant
 $ vagrant up
 $ vagrant ssh
 ```
@@ -63,7 +65,7 @@ When building it, it's advise to do it outside of roles directory as all the dir
 and it's currently not possible to exclude packer directory from it (https://github.com/mitchellh/packer/issues/1811)
 ```
 $ cd /path/to/packer-build
-$ cp -Rd /path/to/MISP/packer .
+$ cp -Rd /path/to/juju4.MISP/packer .
 ## update packer-*.json with your current absolute ansible role path for the main role
 ## you can add additional role dependencies inside setup-roles.sh
 $ cd packer

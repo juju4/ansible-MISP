@@ -202,7 +202,7 @@ fi
                 )
 
                 echo "security test output:\n${out}"
-                archiveArtifacts artifacts: '**/reports/*', fingerprint: true
+//                archiveArtifacts artifacts: '**/reports/*', fingerprint: true
             }
 /*
             stage("Run security tests - BDD-security"){
