@@ -60,7 +60,7 @@ before_install:
   - which kitchen
 #  - which chef
 #  - find /var/lib/gems $HOME/.gem /usr/local/rvm/gems /opt/chefdk/embedded/lib/ruby/gem -iname '*lxd_cli*' || true
-  - wget -q https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5_x86_64.deb && sudo dpkg -i vagrant_1.8.5_x86_64.deb
+  - wget -q https://releases.hashicorp.com/vagrant/1.9.2/vagrant_1.9.2_x86_64.deb && sudo dpkg -i vagrant_1.9.2_x86_64.deb
 ## ssh key for lxd_cli ?
   - ls ~/.ssh
   - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
