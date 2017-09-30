@@ -8,11 +8,13 @@ env:
     init: /usr/lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
+    ansible_version: 2.4.0.0
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
+    ansible_version: 2.4.0.0
 ## FIXME! travis: 'No output has been received in the last 10m0s, this potentially indicates a stalled build or something wrong with the build itself.'
 #  - distribution: ubuntu
 #    version: 14.04
@@ -24,6 +26,19 @@ env:
 #    init: /sbin/init
 #    run_opts: ""
 #    suite: default
+## past ansible versions
+  - distribution: ubuntu
+    version: 16.04
+    init: /lib/systemd/systemd
+    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
+    suite: default
+    ansible_version: 2.3.0.0
+  - distribution: ubuntu
+    version: 16.04
+    init: /lib/systemd/systemd
+    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
+    suite: default
+    ansible_version: 2.2.1.0
 
 services:
   - docker
@@ -46,6 +61,8 @@ script:
 ## ## Note: mapping urandom/random to accelerate gpg key generation. Normally, have rng-tools or haveged to handle that but not running inside docker images we have
   - 'sudo docker run --detach -v /dev/urandom:/dev/random --volume="${PWD%/*}":/etc/ansible/roles:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
 
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm pip install --upgrade pip'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm pip install ansible==${ansible_version}'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --version'
 
   # Ansible syntax check.
