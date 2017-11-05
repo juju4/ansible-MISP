@@ -10,21 +10,35 @@
 
 - name: redhat | update log path
   replace: "dest={{ apache_sitedir }}/misp.conf regexp='/var/log/apache2/' replace='{{ apache_logs }}/'"
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
-- file: dest="{{ apache_sitedir }}/misp.conf" mode=0644
-- file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
+- name: Ensure misp apache config has correct permissions
+  file: dest="{{ apache_sitedir }}/misp.conf" mode=0644
+
+- name: Debian | Disable default apache config
+  file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
   notify:
     - restart webserver
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-- file: "src={{ apache_sitedir }}/misp.conf dest=/etc/apache2/sites-enabled/misp.conf state=link"
+  when: ansible_os_family == 'Debian'
+
+- name: debian | ensure required modules are present
+  apache2_module:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - headers
+    - rewrite
   notify:
     - restart webserver
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-- name: debian | ensure mod_rewrite is present
-  apache2_module: state=present name=rewrite
+- name: Debian | Enable misp apache config
+  file:
+    src: "{{ apache_sitedir }}/misp.conf"
+    dest: /etc/apache2/sites-enabled/misp.conf
+    state: link
+    validate: 'apachectl -t -f %s'
   notify:
     - restart webserver
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_os_family == 'Debian'
 
