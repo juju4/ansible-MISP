@@ -10,7 +10,7 @@
       become: yes
 #      become_user: "{{ user }}"
       register: userInit
-      no_log: true
+#      no_log: true
       failed_when: "'Error' in userInit.stderr"
 #    - debug: var=userInit
     - set_fact:
