@@ -15,7 +15,7 @@
 #    - debug: var=userInit
     - set_fact:
         userkey: "{{ userInit.stdout }}"
-  when: not skey.stat.exists
+  when: not skey.stat.exists or skey.stat.size == 0
 - block:
     - name: get existing key file
       command: "cat {{ misp_key_file }}"
