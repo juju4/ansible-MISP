@@ -16,3 +16,15 @@
        state=present
   when: ansible_distribution_major_version == "7" and rpmremi.rc != 0
 
+- name: check if remi-php repo is enabled
+  command: "grep '^enabled=' /etc/yum.repos.d/remi-php72.repo"
+  register: remistate
+  changed_when: false
+
+# https://github.com/ansible/ansible-modules-extras/issues/2384
+- name: enable remi repository for php72
+  command: "yum-config-manager --enable remi-php72"
+#  yum_repository:
+#    name: remi-php56
+#    enable: yes
+  when: not ('enabled=1' in remistate.stdout)
