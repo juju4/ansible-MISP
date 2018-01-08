@@ -11,6 +11,7 @@ misp_pkg_list:
     - php-mbstring
     - php-devel
     - php-redis
+    - php-opcache
 #    - php56
 #    - php56-php-mysqlnd
 #    - php56-php-mbstring
