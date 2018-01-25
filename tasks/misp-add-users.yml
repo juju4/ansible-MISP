@@ -28,6 +28,7 @@
   with_items:
     - { re: "^misp_url = .*", l: "misp_url = \"{{ misp_base_url }}\"" }
     - { re: "^misp_key = .*", l: "misp_key = \"{{ userkey }}\"" }
+    - { re: '^misp_verifycert = .*', l: "misp_verifycert = {{ misp_pymisp_verifycert }}" }
   no_log: true
 
 - name: flush handlers as we need service up for API call

@@ -72,3 +72,4 @@ misp_disable_feeds: []
 misp_git_signing_keys:
   - '09E2CD4944E6CBCD'
 
+misp_pymisp_verifycert: False
