@@ -30,9 +30,24 @@
     - { re: "^misp_key = .*", l: "misp_key = \"{{ userkey }}\"" }
   no_log: true
 
-
 - name: flush handlers as we need service up for API call
   meta: flush_handlers
+
+- name: wait for MISP port to be opened
+  wait_for:
+    host: "{{ misp_base_ip }}"
+    port: "{{ misp_base_port }}"
+    timeout: 300
+
+- name: ensure PyMISP API working
+  command: "python3 ./last.py -l 10"
+  args:
+    chdir: "{{ misp_rootdir }}/PyMISP/examples"
+  environment:
+    debug: True
+  register: test
+  changed_when: false
+  ignore_errors: true
 
 - name: list current users
   command: "python3 ./users_list.py chdir={{ misp_rootdir }}/PyMISP/examples"
