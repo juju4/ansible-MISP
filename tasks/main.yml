@@ -259,6 +259,7 @@
 - set_fact:
     salt: "{{ salt2.stdout }}"
   when: s.stat.exists
+# FIXME! idempotence. MISP is rewriting this file regularly
 - name: updating MISP config
   template: src=config.php.j2 dest="{{ misp_rootdir }}/app/Config/config.php" mode=0600 backup=yes owner="{{ www_user }}"
   tags:
