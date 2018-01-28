@@ -48,6 +48,7 @@ misp_pkg_list:
     - crontabs
 ## pillow? not needed
 #    - libjpeg-turbo-devel
+    - openssl
 
 misp_webserver_apache2:
     - httpd
