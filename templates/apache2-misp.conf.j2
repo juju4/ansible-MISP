@@ -9,7 +9,7 @@
         allow from all
     </Directory>
 
-{% if ansible_os_family == "RedHat" and ansible_distribution_major_version == "7" %}
+{% if misp_fcgi_enable %}
     <IfModule !mod_php5.c>
         SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
         DirectoryIndex /index.php index.php

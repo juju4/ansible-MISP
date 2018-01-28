@@ -11,6 +11,7 @@ misp_rootdir: /var/www/MISP
 mispmodules_rootdir: /opt
 misp_webserver: 'apache2'
 #misp_webserver: 'nginx'
+misp_fcgi_enable: false
 
 misp_pip_cybox_version: '2.1.0.12'
 misp_pip_stix_version: '1.1.1.4'
