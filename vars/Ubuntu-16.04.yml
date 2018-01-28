@@ -40,7 +40,7 @@ misp_pkg_list:
  - libfreetype6-dev
 ## if pyzmq?
 # - libczmq-dev
-  - openssl
+ - openssl
 
 mysql_svc: mysql
 rng_svc: rng-tools
