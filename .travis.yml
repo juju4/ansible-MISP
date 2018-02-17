@@ -45,7 +45,16 @@ env:
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
-    ansible_version: 2.2.1.0
+    ansible_version: 2.3.3.0
+    ansible_extra_vars: "'-e misp_pymisp_use=false'"
+# upcoming ansible version
+  - distribution: ubuntu
+    version: 16.04
+    init: /lib/systemd/systemd
+    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
+    suite: default
+    ansible_version: 2.5.0b2
+    ansible_extra_vars: "'-e misp_pymisp_use=false'"
 
 services:
   - docker
