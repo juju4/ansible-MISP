@@ -1,0 +1,80 @@
+---
+
+misp_pkg_list:
+ - openssh-server
+ - mysql-server
+ - php
+ - php-mysql
+ - php-mbstring
+ - postfix
+ - gcc
+ - zip
+ - php-pear
+ - git
+ - redis-server
+ - make
+ - python-dev
+ - python-pip
+ - python-virtualenv
+ - python-setuptools
+ - libxml2-dev
+ - libxslt1-dev
+ - zlib1g-dev
+ - php-dev
+ - curl
+ - gnupg
+#
+ - php-redis
+ - python-mysqldb
+ - rng-tools
+# misp-modules
+ - python3
+ - python3-pip
+ - libpq5
+ - acl
+ - sudo
+## pillow
+ - libtiff5-dev
+ - libjpeg8-dev
+ - zlib1g-dev
+ - libfreetype6-dev
+## if pyzmq?
+# - libczmq-dev
+ - openssl
+
+mysql_svc: mysql
+rng_svc: rng-tools
+redis_svc: redis
+misp_services:
+    - "{{ apache_svc }}"
+    - "{{ mysql_svc }}"
+    - "{{ rng_svc }}"
+
+misp_services_nginx:
+    - "{{ apache_svc }}"
+    - "{{ mysql_svc }}"
+    - "{{ rng_svc }}"
+    - php7.0-fpm
+
+misp_testing_pkg:
+    - ruby2.3
+    - rake
+
+misp_webserver_apache2:
+    - apache2
+    - libapache2-mod-php
+## travis: "No package matching 'libapache2-mod-fastcgi' is available"
+# - libapache2-mod-fastcgi
+
+misp_webserver_nginx:
+  - nginx
+  - php-fpm
+
+php_confdir: /etc/php/7.0/mods-available
+php_confext: ini
+php_ini: /etc/php/7.0/apache2/php.ini
+php_ini_nginx: /etc/php/7.0/fpm/php.ini
+php_confenable: /etc/php/7.0/apache2/conf.d
+nginx_sock: /run/php/php7.0-fpm.sock
+fpm_user: www-data
+
