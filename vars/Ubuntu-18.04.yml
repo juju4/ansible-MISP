@@ -54,10 +54,10 @@ misp_services_nginx:
     - "{{ apache_svc }}"
     - "{{ mysql_svc }}"
     - "{{ rng_svc }}"
-    - php7.0-fpm
+    - php7.2-fpm
 
 misp_testing_pkg:
-    - ruby2.3
+    - ruby2.5
     - rake
 
 misp_webserver_apache2:
@@ -70,11 +70,11 @@ misp_webserver_nginx:
   - nginx
   - php-fpm
 
-php_confdir: /etc/php/7.0/mods-available
+php_confdir: /etc/php/7.2/mods-available
 php_confext: ini
-php_ini: /etc/php/7.0/apache2/php.ini
-php_ini_nginx: /etc/php/7.0/fpm/php.ini
-php_confenable: /etc/php/7.0/apache2/conf.d
-nginx_sock: /run/php/php7.0-fpm.sock
+php_ini: /etc/php/7.2/apache2/php.ini
+php_ini_nginx: /etc/php/7.2/fpm/php.ini
+php_confenable: /etc/php/7.2/apache2/conf.d
+nginx_sock: /run/php/php7.2-fpm.sock
 fpm_user: www-data
 
