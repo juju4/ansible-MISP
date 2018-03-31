@@ -185,9 +185,11 @@
 - stat: path={{ misp_rootdir }}/app/Config/bootstrap.php
   register: conffiles
 - name: create config files from default
-  command: "rsync -ci --chown={{ www_user }} {{ misp_rootdir }}/app/Config/{{ item }}.default.php {{ misp_rootdir }}/app/Config/{{ item }}.php"
-  register: rsync_result
-  changed_when: 'rsync_result.stdout != ""'
+  copy:
+    src: "{{ misp_rootdir }}/app/Config/{{ item }}.default.php"
+    dest: "{{ misp_rootdir }}/app/Config/{{ item }}.php"
+    owner: "{{ www_user }}"
+    remote_src: true
   with_items:
     - bootstrap
     - database
@@ -196,9 +198,10 @@
 #    - config
   when: not conffiles.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 - name: create config files from default
-  command: "rsync -ci {{ misp_rootdir }}/app/Config/{{ item }}.default.php {{ misp_rootdir }}/app/Config/{{ item }}.php"
-  register: rsync_result
-  changed_when: 'rsync_result.stdout != ""'
+  copy:
+    src: "{{ misp_rootdir }}/app/Config/{{ item }}.default.php"
+    dest: "{{ misp_rootdir }}/app/Config/{{ item }}.php"
+    remote_src: true
   with_items:
     - bootstrap
     - database
