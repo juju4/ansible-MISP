@@ -12,10 +12,16 @@ env:
 #    version: 7
   - distribution: ubuntu
     version: 18.04
+    ansible_version: 2.5.2.0
+    cryptography_version: 2.2.2
   - distribution: ubuntu
     version: 16.04
+    ansible_version: 2.4.4.0
+    cryptography_version: 2.2.2
   - distribution: ubuntu
     version: 14.04
+    ansible_version: 2.4.4.0
+    cryptography_version: 2.0.3
 #  - distribution: ubuntu
 #    version: 12.04
 #  - distribution: alpine
@@ -61,7 +67,8 @@ before_install:
   - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X7" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm" || true'
   - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- yum update" || true'
   - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- yum -y install python python-pip openssl-devel python-devel libffi-devel \"@Development tools\"" || true'
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pip install ansible"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pip install cryptography==${cryptography_version}"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pip install ansible==${ansible_version}"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible --version"
   - "echo localhost > inventory"
 ## enable ansible profiling (https://github.com/jlafon/ansible-profile)
@@ -82,11 +89,11 @@ before_install:
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pwd"
 
 script:
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --syntax-check /etc/ansible/roles/MISP/test/integration/default/default.yml"
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --connection=local --sudo -vvvv /etc/ansible/roles/MISP/test/integration/default/default.yml"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --syntax-check /etc/ansible/roles/juju4.MISP/test/integration/default/default.yml"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --connection=local --become -vvvv /etc/ansible/roles/juju4.MISP/test/integration/default/default.yml"
 ## FIXME! Travis request: Build config file had a parse error: "mapping values are not allowed in this context at line 72 column 321".
-#  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory /etc/ansible/roles/MISP/test/integration/default/default.yml --connection=local --sudo | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)"
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time sh -x /etc/ansible/roles/MISP/test/integration/default/serverspec/run-local-tests.sh"
+#  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory /etc/ansible/roles/juju4.MISP/test/integration/default/default.yml --connection=local --become | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time sh -x /etc/ansible/roles/juju4.MISP/test/integration/default/serverspec/run-local-tests.sh"
   - sudo -E su $USER -c "lxc stop run-${distribution}-${version//./}"
 
 notifications:
