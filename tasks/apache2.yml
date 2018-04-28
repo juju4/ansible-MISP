@@ -2,9 +2,11 @@
 
 ## FIXME! or ssl ?
 #- command: "rsync -ci {{ misp_rootdir }}/INSTALL/apache.misp.ssl {{ apache_sitedir }}/misp-ssl.conf"
-- command: "rsync -ci {{ misp_rootdir }}/INSTALL/apache.misp.ubuntu {{ apache_sitedir }}/misp.conf"
-  register: rsync_result
-  changed_when: 'rsync_result.stdout != ""'
+- name: Configure MISP with Apache
+  copy:
+    src: "{{ misp_rootdir }}/INSTALL/apache.misp.ubuntu"
+    dest: "{{ apache_sitedir }}/misp.conf"
+    mode: '0644'
   notify:
     - restart webserver
 
