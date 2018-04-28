@@ -1,119 +1,94 @@
 ---
-## from https://github.com/geerlingguy/ansible-role-apache/blob/master/.travis.yml
+dist: trusty
 sudo: required
+rvm:
+  - 2.4
 
 env:
-  - distribution: centos
-    version: 7
-    init: /usr/lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.4.4.0
+## those images need pre-configuration before being usable (openssh...) + privileged/httpd
+#  - distribution: centos
+#    version: 6
+#  - distribution: centos
+#    version: 7
   - distribution: ubuntu
     version: 18.04
-    init: /lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.4.4.0
-    ansible_extra_vars: "'-e misp_pymisp_use=false'"
   - distribution: ubuntu
     version: 16.04
-    init: /lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.4.4.0
-## FIXME! travis: 'No output has been received in the last 10m0s, this potentially indicates a stalled build or something wrong with the build itself.'
+  - distribution: ubuntu
+    version: 14.04
 #  - distribution: ubuntu
-#    version: 14.04
-#    init: /sbin/init
-#    run_opts: ""
-#    suite: default
+#    version: 12.04
 #  - distribution: alpine
-#    version: 3.6
-#    init: /sbin/init
-#    run_opts: ""
-#    suite: default
-## past ansible versions
-  - distribution: ubuntu
-    version: 16.04
-    init: /lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.3.3.0
-  - distribution: ubuntu
-    version: 16.04
-    init: /lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.3.3.0
-    ansible_extra_vars: "'-e misp_pymisp_use=false'"
-# upcoming ansible version
-  - distribution: ubuntu
-    version: 16.04
-    init: /lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.5.2
-    ansible_extra_vars: "'-e misp_pymisp_use=false'"
-
-services:
-  - docker
+#    version: 3.4
 
 before_install:
-  # - sudo apt-get update
-  # Pull container
-  - 'sudo docker pull ${distribution}:${version}'
   - env
   - pwd
   - find -ls
+## use appropriate role path and not github name
   - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
-  - cp test/travis/initctl_faker test/
-  # Customize container
-  - 'sudo docker build --rm=true --file=test/travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible test'
+## No Xenial, https://github.com/travis-ci/travis-ci/issues/5821
+#  - sudo apt install lxd
+  - echo "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/trusty-backports.list
+  - sudo apt-get update -qq
+  - sudo apt -t trusty-backports -y install lxd acl -q
+## change of group implies logout+login to apply... can't do with travis = run as root (sic)
+## https://github.com/travis-ci/travis-ci/issues/1839   or chain: sudo -E su $USER -c "..."
+  - sudo usermod -G lxd travis
+  # Pull container
+  - sudo -E su $USER -c "lxc remote list"
+  - sudo -E su $USER -c "lxc image list"
+## pre-download base images
+  - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] || lxc image copy images:${distribution}/${version}/amd64 local: --alias=${distribution}-${version}"'
+  - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] && lxc image copy ubuntu:${version} local: --alias=${distribution}-${version}" || true'
+## configure lxd-bridge
+  - sudo perl -pi -e 's@^LXD_IPV4_ADDR=""@LXD_IPV4_ADDR="10.252.116.1"@;s@^LXD_IPV4_NETMASK=""@LXD_IPV4_NETMASK="255.255.255.0"@;s@^LXD_IPV4_NETWORK=""@LXD_IPV4_NETWORK="10.252.116.1/24"@;s@^LXD_IPV4_DHCP_RANGE=""@LXD_IPV4_DHCP_RANGE="10.252.116.2,10.252.116.254"@;s@^LXD_IPV4_DHCP_MAX=""@LXD_IPV4_DHCP_MAX="252"@;s@LXD_IPV6_PROXY="true"@LXD_IPV6_PROXY="false"@' /etc/default/lxd-bridge
+#  - cat /etc/default/lxd-bridge
+#  - service --status-all
+  - sudo service lxd restart
+## ssh key for lxd_cli ?
+  - ls ~/.ssh
+  - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
+## sudo/su get us a non-usual PATH ...
+  - sudo -E su $USER -c "lxc launch ${distribution}-${version} run-${distribution}-${version//./}"
+#  - sudo -E su $USER -c "lxc start run-${distribution}-${version//./}"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env"
+  - '[ "X${distribution}" != "Xalpine" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- dhclient eth0" || true'
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ping -c 1 8.8.8.8"
+  - '[ "X${distribution}" == "Xubuntu" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- apt-get update" || true'
+  - '[ "X${distribution}" == "Xubuntu" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- apt-get -y install python python-apt aptitude python-pip libssl-dev python-dev libffi-dev" || true'
+  - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X6" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- rpm -iUvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm" || true'
+  - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X7" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm" || true'
+  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- yum update" || true'
+  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- yum -y install python python-pip openssl-devel python-devel libffi-devel \"@Development tools\"" || true'
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pip install ansible"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible --version"
+  - "echo localhost > inventory"
+## enable ansible profiling (https://github.com/jlafon/ansible-profile)
+#  - "printf '[defaults]\ncallback_whitelist = profile_tasks' > ansible.cfg"
+#  - sudo -E su $USER -c "lxc file push inventory ansible.cfg run-${distribution}-${version//./}/root/"
+  - sudo -E su $USER -c "lxc file push inventory run-${distribution}-${version//./}/root/"
+## these lines are necessary so lxc mount is read-write, https://github.com/lxc/lxd/issues/1879
+  - chmod -R go+w $PWD
+## OR
+  - sudo -E su $USER -c "lxc config show run-${distribution}-${version//./}"
+## FIXME! awk extraction is working in shell but not in travis... relying on global chmod as test ephemeral environment. DON'T USE IN PRODUCTION!
+  - sudo -E su $USER -c "lxc config show run-${distribution}-${version//./} | awk -F'[\":,]' '/Hostid/ { print $13 }'"
+  - CUID=`sudo -E su $USER -c "lxc config show run-${distribution}-${version//./} | awk -F'[\":,]' '/Hostid/ { print $13 }'"`
+  - "echo setfacl -Rm user:$CUID:rwx ${PWD%/*}"
+  - "setfacl -Rm user:$CUID:rwx ${PWD%/*}"
+  - sudo -E su $USER -c "lxc config device add run-${distribution}-${version//./} sharedroles disk path=/etc/ansible/roles source=${PWD%/*}"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- mount"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pwd"
 
 script:
-  - container_id=$(mktemp)
-    # Run container in detached state
-## ## Note: mapping urandom/random to accelerate gpg key generation. Normally, have rng-tools or haveged to handle that but not running inside docker images we have
-  - 'sudo docker run --detach -v /dev/urandom:/dev/random --volume="${PWD%/*}":/etc/ansible/roles:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
-
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm pip install --upgrade pip'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm pip install ansible==${ansible_version}'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --version'
-
-  # Ansible syntax check.
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/juju4.MISP/test/integration/${suite}/default.yml --syntax-check'
-
-  # Test role.
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook -vvv /etc/ansible/roles/juju4.MISP/test/integration/${suite}/default.yml'
-
-  # Test role idempotence.
-## FIXME! known fail
-  - >
-    sudo docker exec "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/juju4.MISP/test/integration/${suite}/default.yml
-    | tee /tmp/idempotency.log
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: pass' && exit 0)
-    || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 0)
-
-# serverspec
-## travis/docker: Errno::EROFS: Read-only file system @ dir_s_mkdir - /etc/ansible/roles/ansible-MISP/test/integration/${suite}/serverspec/.bundle
-#  - 'sudo docker exec --tty "$(cat ${container_id})" /etc/ansible/roles/juju4.MISP/test/integration/${suite}/serverspec/run-local-tests.sh'
-
-after_failure:
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --connection=local -m setup localhost'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm systemctl -l --no-pager status apache2.service'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm systemctl -l --no-pager status nginx.service'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm systemctl -l --no-pager status redis.service'
-  - 'docker exec "$(cat ${container_id})" journalctl -xe --no-pager'
-  - 'docker exec "$(cat ${container_id})" ls /var/log/redis/'
-  - 'docker exec "$(cat ${container_id})" cat /var/log/redis/redis.log'
-  - 'docker exec "$(cat ${container_id})" cat /var/log/redis/redis-server.log'
-  - 'docker exec "$(cat ${container_id})" egrep "(www-data|apache|nginx)" /etc/passwd '
-
-after_script:
-  # Clean up
-  - 'sudo docker stop "$(cat ${container_id})"'
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --syntax-check /etc/ansible/roles/MISP/test/integration/default/default.yml"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --connection=local --sudo -vvvv /etc/ansible/roles/MISP/test/integration/default/default.yml"
+## FIXME! Travis request: Build config file had a parse error: "mapping values are not allowed in this context at line 72 column 321".
+#  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory /etc/ansible/roles/MISP/test/integration/default/default.yml --connection=local --sudo | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time sh -x /etc/ansible/roles/MISP/test/integration/default/serverspec/run-local-tests.sh"
+  - sudo -E su $USER -c "lxc stop run-${distribution}-${version//./}"
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
+
