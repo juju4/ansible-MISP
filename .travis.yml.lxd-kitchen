@@ -11,11 +11,13 @@ env:
 #  - distribution: centos
 #    version: 7
   - distribution: ubuntu
+    version: 18.04
+  - distribution: ubuntu
     version: 16.04
   - distribution: ubuntu
     version: 14.04
-  - distribution: ubuntu
-    version: 12.04
+#  - distribution: ubuntu
+#    version: 12.04
 #  - distribution: alpine
 #    version: 3.4
 
@@ -38,7 +40,7 @@ before_install:
   - sudo -E su $USER -c "lxc remote list"
   - sudo -E su $USER -c "lxc image list"
 ## pre-download base images
-  - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] || lxc image copy images:/${distribution}/${version}/amd64 local: --alias=${distribution}-${version}"'
+  - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] || lxc image copy images:${distribution}/${version}/amd64 local: --alias=${distribution}-${version}"'
   - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] && lxc image copy ubuntu:${version} local: --alias=${distribution}-${version}" || true'
 ## configure lxd-bridge
   - sudo perl -pi -e 's@^LXD_IPV4_ADDR=""@LXD_IPV4_ADDR="10.252.116.1"@;s@^LXD_IPV4_NETMASK=""@LXD_IPV4_NETMASK="255.255.255.0"@;s@^LXD_IPV4_NETWORK=""@LXD_IPV4_NETWORK="10.252.116.1/24"@;s@^LXD_IPV4_DHCP_RANGE=""@LXD_IPV4_DHCP_RANGE="10.252.116.2,10.252.116.254"@;s@^LXD_IPV4_DHCP_MAX=""@LXD_IPV4_DHCP_MAX="252"@;s@LXD_IPV6_PROXY="true"@LXD_IPV6_PROXY="false"@' /etc/default/lxd-bridge
@@ -53,21 +55,13 @@ before_install:
   - gem install kitchen-ansible
   - gem install kitchen-sync
   - gem install kitchen-lxd_cli
-## Message: Unable to activate kitchen-ansible-0.45.0, because net-ssh-2.9.2 conflicts with net-ssh (~> 3.0)
-#  - chef gem uninstall net-ssh -v 2.9.2 -q ?-y
-#  - chef gem list
   - gem list
   - which kitchen
-#  - which chef
-#  - find /var/lib/gems $HOME/.gem /usr/local/rvm/gems /opt/chefdk/embedded/lib/ruby/gem -iname '*lxd_cli*' || true
-  - wget -q https://releases.hashicorp.com/vagrant/1.9.7/vagrant_1.9.7_x86_64.deb && sudo dpkg -i vagrant_1.9.7_x86_64.deb
 ## ssh key for lxd_cli ?
   - ls ~/.ssh
   - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
 ## sudo/su get us a non-usual PATH ...
   - sudo -E su $USER -c "env"
-## The command "sudo -E su $USER -c "which kitchen"" failed and exited with 1 during .
-#  - sudo -E su $USER -c "which kitchen"
   - sudo -E su $USER -c "env PATH=$PATH kitchen diagnose --all"
 #  - sudo -E su $USER -c "kitchen diagnose --all"
 #  - sudo -E -u $USER kitchen diagnose --all
