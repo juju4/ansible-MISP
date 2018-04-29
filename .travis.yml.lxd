@@ -103,7 +103,7 @@ after_failure:
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- systemctl -l --no-pager status"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- journalctl -xe --no-pager"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- cat /etc/default/rng-tools"
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ls -l /var/www/MISP/.gnupg/"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ls -lR /var/www/MISP/.gnupg/"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ls -l /var/log/redis"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- cat /var/log/redis/redis.log"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- cat /var/log/redis/redis-server.log"
