@@ -18,6 +18,9 @@ https://github.com/xme/misp-docker
 It was tested on the following versions:
  * 2.0
  * 2.2
+ * 2.3
+ * 2.4
+ * 2.5
 
 ### Operating systems
 
