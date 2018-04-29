@@ -286,6 +286,7 @@
 #    - { d: "{{ gnupg_privdir }}/misp.sec", m: '0400' }
     - { d: "{{ misp_rootdir }}/.gnupg/pubring.gpg", m: '0600' }
     - { d: "{{ misp_rootdir }}/.gnupg/secring.gpg", m: '0600' }
+  when: not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int >= 18)
 
 - name: validate worker start.sh permissions
   file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
