@@ -24,6 +24,15 @@
   service: "name={{ item }} state=started enabled=yes"
   with_items: "{{ misp_services }}"
 
+- name: Ensure Random source is configured
+  lineinfile:
+    dest: /etc/default/rng-tools
+    regex: '^HRNGDEVICE=.*'
+    line: 'HRNGDEVICE=/dev/urandom'
+    backup: yes
+  notify:
+    - restart rng-tools
+
 - name: check installed pear packages
   command: pear list
   register: pearinstalled

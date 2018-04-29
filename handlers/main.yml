@@ -4,3 +4,5 @@
 - name: restart php-fpm
   service: name=php-fpm state=restarted
 
+- name: restart rng-tools
+  service: name=rng-tools state=restarted
