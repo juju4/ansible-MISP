@@ -8,8 +8,8 @@ env:
 ## those images need pre-configuration before being usable (openssh...)
 #  - distribution: centos
 #    version: 6
-#  - distribution: centos
-#    version: 7
+  - distribution: centos
+    version: 7
   - distribution: ubuntu
     version: 18.04
   - distribution: ubuntu
