@@ -28,6 +28,7 @@
     backup: yes
   notify:
     - restart rng-tools
+  when: ansible_os_family == "Debian"
 
 - name: Ensure services are enabled and started
   service: "name={{ item }} state=started enabled=yes"
