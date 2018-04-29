@@ -93,7 +93,7 @@ script:
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --connection=local --become -vvvv /etc/ansible/roles/juju4.MISP/test/integration/default/default.yml"
 ## FIXME! Travis request: Build config file had a parse error: "mapping values are not allowed in this context at line 72 column 321".
 #  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory /etc/ansible/roles/juju4.MISP/test/integration/default/default.yml --connection=local --become | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)"
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time sh -x /etc/ansible/roles/juju4.MISP/test/integration/default/serverspec/run-local-tests.sh"
+#  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time sh -x /etc/ansible/roles/juju4.MISP/test/integration/default/serverspec/run-local-tests.sh"
 
 after_failure:
   # Check what happened on systemd systems.
