@@ -4,7 +4,7 @@ require 'serverspec'
 set :backend, :exec
 
 
-describe file('/var/www/MISP/.gnupg/pubring.gpg') do
+describe file('/var/www/MISP/.gnupg/pubring.gpg'), :if => os[:family] != 'ubuntu' || os[:release] != '18.04' do
   it { should be_file }
   it { should exist }
   it { should be_readable.by('owner') }
@@ -17,14 +17,7 @@ describe file('/var/www/MISP/.gnupg/secring.gpg'), :if => os[:family] != 'ubuntu
   it { should exist }
   it { should be_readable.by('owner') }
   it { should_not be_readable.by('others') }
-  its(:content) { should_not be_empty }
-end
-
-describe file('/var/www/MISP/.gnupg/secring.gpg'), :if => os[:family] == 'ubuntu' && os[:release] == '18.04' do
-  it { should be_file }
-  it { should exist }
-  it { should be_readable.by('owner') }
-  it { should_not be_readable.by('others') }
+#  its(:content) { should_not be_empty }
 end
 
 describe file('/var/www/MISP/app/webroot/gpg.asc') do
