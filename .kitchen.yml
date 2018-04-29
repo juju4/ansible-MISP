@@ -14,8 +14,8 @@ provisioner:
   name: ansible_playbook
   roles_path: ../
   hosts: test-kitchen
-#  ansible_verbose: true
-  ansible_verbose: false
+  ansible_verbose: true
+#  ansible_verbose: false
   ansible_verbosity: 3
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
 #  ansible_yum_repo: http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm
