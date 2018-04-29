@@ -328,6 +328,7 @@
     line: "sudo -H -u www-data bash {{ misp_rootdir }}/app/Console/worker/start.sh"
     insertbefore: "^exit 0"
     backup: yes
+    create: yes
 
 - include: misp-modules.yml
 
