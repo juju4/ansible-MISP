@@ -20,10 +20,6 @@
 - include: nginx.yml
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
-- name: Ensure services are enabled and started
-  service: "name={{ item }} state=started enabled=yes"
-  with_items: "{{ misp_services }}"
-
 - name: Ensure Random source is configured
   lineinfile:
     dest: /etc/default/rng-tools
@@ -32,6 +28,10 @@
     backup: yes
   notify:
     - restart rng-tools
+
+- name: Ensure services are enabled and started
+  service: "name={{ item }} state=started enabled=yes"
+  with_items: "{{ misp_services }}"
 
 - name: check installed pear packages
   command: pear list
