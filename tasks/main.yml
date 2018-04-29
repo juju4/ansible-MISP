@@ -27,7 +27,7 @@
 - name: Ensure Random source is configured
   lineinfile:
     dest: /etc/default/rng-tools
-    regex: '^HRNGDEVICE=.*'
+    regexp: '^HRNGDEVICE=.*'
     line: 'HRNGDEVICE=/dev/urandom'
     backup: yes
   notify:
