@@ -3,7 +3,7 @@
 
 location=`dirname "$0"`
 cd $location
-v=2.3
+v=2.4
 
 ## docker environment in travis missing few utils
 [ -f /etc/debian_version ] && apt-get install -y curl
@@ -23,10 +23,10 @@ bash -l -c "rvm install $v"
 bash -l -c "rvm use $v"
 bash -l -c "rvm use $v --default"
 bash -l -c "gem install bundler"
-bash -l -c "bundle install --path ./gems"
+bash -l -c "sudo -u nobody bundle install --path ./gems"
 if [ "X$USER" != "Xroot" -a "X$USER" != "X" ]; then
     bash -l -c "env rvmsudo_secure_path=1 rvmsudo bundle exec rake spec"
 else
-    bash -l -c "bundle exec rake spec"
+    bash -l -c "sudo -u nobody bundle exec rake spec"
 fi
 
