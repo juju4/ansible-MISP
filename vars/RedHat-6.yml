@@ -69,3 +69,4 @@ php_ini: /etc/php.ini
 
 fpm_user: nobody
 
+gnupg_privdir: "{{ misp_rootdir }}/.gnupg"

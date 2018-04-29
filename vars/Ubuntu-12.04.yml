@@ -77,3 +77,4 @@ php_confenable: /etc/php5/apache2/conf.d
 nginx_sock: /var/run/php5-fpm.sock
 fpm_user: www-data
 
+gnupg_privdir: "{{ misp_rootdir }}/.gnupg"

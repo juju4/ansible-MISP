@@ -268,9 +268,9 @@
 - name: create gnupg key for {{ misp_email }}
   shell: "{{ item.s }} chdir={{ misp_rootdir }}/.gnupg creates={{ item.c }}"
   with_items:
-    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --gen-key --batch /var/tmp/gpg-template", c: "{{ misp_rootdir }}/.gnupg/misp.sec" }
+    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --gen-key --batch /var/tmp/gpg-template", c: "{{ gnupg_privdir }}/misp.sec" }
     - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ misp_rootdir }}/.gnupg/misp.pub", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
-    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ misp_rootdir }}/.gnupg/misp.sec", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
+#    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ gnupg_privdir }}/misp.sec", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
     - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
   become: yes
   become_user: "{{ www_user }}"
@@ -283,7 +283,7 @@
   file: "dest={{ item.d }} mode={{ item.m }}"
   with_items:
     - { d: "{{ misp_rootdir }}/.gnupg/misp.pub", m: '0400' }
-    - { d: "{{ misp_rootdir }}/.gnupg/misp.sec", m: '0400' }
+#    - { d: "{{ gnupg_privdir }}/misp.sec", m: '0400' }
     - { d: "{{ misp_rootdir }}/.gnupg/pubring.gpg", m: '0600' }
     - { d: "{{ misp_rootdir }}/.gnupg/secring.gpg", m: '0600' }
 
