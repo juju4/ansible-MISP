@@ -1,10 +1,11 @@
 ---
 
+- name: yum | remi yum-utils
+  yum: name=yum-utils state=present update_cache=yes
+
 ## for php-redis
 - include: redhat-remi.yml
 
-- name: yum | remi yum-utils
-  yum: name=yum-utils state=present update_cache=yes
 - name: yum | MISP dependencies install
   yum: name={{item}} state=present update_cache=yes
   with_items:
