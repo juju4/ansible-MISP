@@ -7,8 +7,6 @@
     dest: "{{ apache_sitedir }}/misp.conf"
     mode: '0644'
     backup: yes
-  notify:
-    - restart webserver
 
 - name: Debian | Disable default apache config
   file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
