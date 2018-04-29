@@ -61,7 +61,7 @@ before_install:
   - ls ~/.ssh
   - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
 ## sudo/su get us a non-usual PATH ...
-  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "./test/lxd/centos-ssh-image.sh"'
+  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "sh -x ./test/lxd/centos-ssh-image.sh" || true'
   - sudo -E su $USER -c "env"
   - sudo -E su $USER -c "env PATH=$PATH kitchen diagnose --all"
 #  - sudo -E su $USER -c "kitchen diagnose --all"
