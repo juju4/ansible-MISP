@@ -25,6 +25,7 @@ userkey: ''
 
 ## value for kitchen forwarding
 misp_base_url: http://127.0.0.1:8888
+misp_servername: misp.local
 misp_email: root@localhost
 misp_gpg_email: "{{ misp_email }}"
 misp_gpg_homedir: "{{ misp_rootdir }}/.gnupg"
