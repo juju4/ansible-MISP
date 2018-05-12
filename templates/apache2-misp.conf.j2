@@ -1,3 +1,7 @@
+{% if misp_base_port != 80 and misp_base_port != 443 %}
+Listen {{ misp_base_port }}
+
+{% endif %}
 <VirtualHost *:{{ misp_base_port }}>
     ServerAdmin {{ misp_email_contact }}
     ServerName {{ misp_servername }}
