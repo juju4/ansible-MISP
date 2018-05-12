@@ -1,0 +1,168 @@
+{
+  "variables": {
+    "do_api_token": "{{env `DO_TOKEN`}}"
+  },
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "setup.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "ansible.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}' /etc/ansible/roles",
+      "script": "../get-dependencies.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "../test/integration/default/default.yml",
+      "role_paths": [
+        "/etc/ansible/roles/juju4.MISP"
+      ],
+      "extra_arguments": [ "--become" ]
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "cleanup.sh"
+    }
+  ],
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "boot_command": [
+        "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "/install/vmlinuz<wait>",
+        " auto<wait>",
+        " console-setup/ask_detect=false<wait>",
+        " console-setup/layoutcode=us<wait>",
+        " console-setup/modelcode=pc105<wait>",
+        " debconf/frontend=noninteractive<wait>",
+        " debian-installer=en_US<wait>",
+        " fb=false<wait>",
+        " initrd=/install/initrd.gz<wait>",
+        " kbd-chooser/method=us<wait>",
+        " keyboard-configuration/layout=USA<wait>",
+        " keyboard-configuration/variant=USA<wait>",
+        " locale=en_US<wait>",
+        " netcfg/get_domain=vm<wait>",
+        " netcfg/get_hostname=vagrant<wait>",
+        " grub-installer/bootdev=/dev/sda<wait>",
+        " noapic<wait>",
+        " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
+        " -- <wait>",
+        "<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 81920,
+      "guest_os_type": "Ubuntu_64",
+      "headless": true,
+      "http_directory": "http",
+      "iso_urls": [
+        "iso/ubuntu-16.04.4-server-amd64.iso",
+        "http://releases.ubuntu.com/16.04/ubuntu-16.04.4-server-amd64.iso"
+      ],
+      "iso_checksum_type": "sha256",
+      "iso_checksum": "0a03608988cfd2e50567990dc8be96fb3c501e198e2e6efcb846d89efc7b89f2",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+      "virtualbox_version_file": ".vbox_version",
+      "vm_name": "packer-MISP-ubuntu-16.04-amd64",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "512"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "2"
+        ]
+      ]
+    },
+    {
+      "type": "vmware-iso",
+      "boot_command": [
+        "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "/install/vmlinuz<wait>",
+        " auto<wait>",
+        " console-setup/ask_detect=false<wait>",
+        " console-setup/layoutcode=us<wait>",
+        " console-setup/modelcode=pc105<wait>",
+        " debconf/frontend=noninteractive<wait>",
+        " debian-installer=en_US<wait>",
+        " fb=false<wait>",
+        " initrd=/install/initrd.gz<wait>",
+        " kbd-chooser/method=us<wait>",
+        " keyboard-configuration/layout=USA<wait>",
+        " keyboard-configuration/variant=USA<wait>",
+        " locale=en_US<wait>",
+        " netcfg/get_domain=vm<wait>",
+        " netcfg/get_hostname=vagrant<wait>",
+        " grub-installer/bootdev=/dev/sda<wait>",
+        " noapic<wait>",
+        " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
+        " -- <wait>",
+        "<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 81920,
+      "guest_os_type": "ubuntu-64",
+      "headless": true,
+      "http_directory": "http",
+      "iso_urls": [
+        "iso/ubuntu-16.04.4-server-amd64.iso",
+        "http://releases.ubuntu.com/releases/xenial/ubuntu-16.04.4-desktop-amd64.iso"
+      ],
+      "iso_checksum_type": "sha256",
+      "iso_checksum": "3380883b70108793ae589a249cccec88c9ac3106981f995962469744c3cbd46d",
+      "output_directory": "packer-MISP-ubuntu-16.04-amd64-vmware",
+      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_username": "vagrant",
+      "ssh_wait_timeout": "10000s",
+      "tools_upload_flavor": "linux",
+      "vm_name": "packer-siftrem-ubuntu-16.04-amd64",
+      "vmx_data": {
+        "cpuid.coresPerSocket": "1",
+        "memsize": "512",
+        "numvcpus": "2"
+      }
+    },
+    {
+      "type": "digitalocean",
+      "api_token": "{{user `do_api_token`}}",
+      "image": "ubuntu-16-04-x64",
+      "region": "nyc2",
+      "size": "512mb",
+      "droplet_name": "MISP",
+      "snapshot_name": "packer-MISP-{{isotime \"2006-01-02\"}}"
+    }
+  ],
+  "post-processors": [
+    {
+      "output": "builds/{{.Provider}}-MISP-ubuntu1604-{{isotime \"2006-01-02\"}}.box",
+      "type": "vagrant"
+    }
+  ]
+}
+
