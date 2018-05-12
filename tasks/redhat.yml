@@ -84,6 +84,7 @@
     src: "{{ misp_rootdir }}/INSTALL/misp.logrotate"
     dest: "/etc/logrotate.d/misp"
     mode: '0644'
+    remote_src: true
     backup: yes
 
 - name: Ensure misp web logs have right selinux context for rotation
