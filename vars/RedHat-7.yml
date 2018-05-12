@@ -49,6 +49,7 @@ misp_pkg_list:
 ## pillow? not needed
 #    - libjpeg-turbo-devel
     - openssl
+    - policycoreutils-python
 
 misp_webserver_apache2:
     - httpd
