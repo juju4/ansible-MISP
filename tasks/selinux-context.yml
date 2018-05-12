@@ -1,10 +1,12 @@
 ---
 
 - name: RedHat | Ensure selinux context for MISP httpd directories
-  sefcontext:
-    target: "{{ item }}(/.*)?"
-    setype: httpd_sys_rw_content_t
-    state: present
+  command: "chcon -R httpd_sys_rw_content_t {{ item }}"
+# FIXME! sefcontext module not working
+#  sefcontext:
+#    target: "{{ item }}(/.*)?"
+#    setype: httpd_sys_rw_content_t
+#    state: present
   with_items:
     - /var/www/MISP/app/files
     - /var/www/MISP/app/files/terms
