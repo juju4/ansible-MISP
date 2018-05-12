@@ -1,0 +1,16 @@
+---
+
+- name: RedHat | Ensure selinux context for MISP httpd directories
+  sefcontext:
+    target: "{{ item }}(/.*)?"
+    setype: httpd_sys_rw_content_t
+    state: present
+  with_items:
+    - /var/www/MISP/app/files
+    - /var/www/MISP/app/files/terms
+    - /var/www/MISP/app/files/scripts/tmp
+    - /var/www/MISP/app/Plugin/CakeResque/tmp
+    - /var/www/MISP/app/tmp
+    - /var/www/MISP/app/webroot/img/orgs
+    - /var/www/MISP/app/webroot/img/custom
+    - "{{ misp_rootdir }}/.gnupg"

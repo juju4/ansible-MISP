@@ -31,3 +31,8 @@ describe port(80) do
   it { should be_listening }
 end
 
+describe file('/var/log/audit/audit.log'), :if => os[:family] == 'redhat' do
+  its(:size) { should > 0 }
+  its(:content) { should_not match /denied  { write } for .* comm="httpd" / }
+end
+

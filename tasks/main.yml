@@ -181,7 +181,6 @@
   file: "dest={{ misp_rootdir }}/app/tmp/debug.log mode=0644 owner={{ www_user }} group={{ www_user }} state=touch"
   when: not debuglog.stat.exists
 
-
 - include: mysql-configure.yml
 
 - name: extra php settings
@@ -239,7 +238,6 @@
   with_items:
     - "require_once dirname(__DIR__) . '/Vendor/autoload.php';"
 
-
 - name: Generating salt
   shell: "openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;' | tee {{ misp_rootdir }}/.salt creates={{ misp_rootdir }}/.salt"
   register: salt1
@@ -285,6 +283,7 @@
     - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
   become: yes
   become_user: "{{ www_user }}"
+## FIXME! seems become_method/flags is not working in vagrant, ansible 2.5.0
   become_method: su
   become_flags: '-s /bin/sh'
 ## it seems to be done by gpg
@@ -301,6 +300,9 @@
 
 - name: validate worker start.sh permissions
   file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
+
+- include: selinux-context.yml
+  when: ansible_os_family == "RedHat"
 
 - block:
     - name: docker redis workaround ???
@@ -327,7 +329,7 @@
 - name: add MISP worker script for boot
   lineinfile:
     dest: /etc/rc.local
-    line: "sudo -H -u www-data bash {{ misp_rootdir }}/app/Console/worker/start.sh"
+    line: "sudo -H -u {{ www_user }} bash {{ misp_rootdir }}/app/Console/worker/start.sh"
     insertbefore: "^exit 0"
     backup: yes
     create: yes

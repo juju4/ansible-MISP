@@ -22,8 +22,8 @@
 - name: add MISP modules script for boot
   lineinfile:
     dest: /etc/rc.local
-    regexp: "sudo -H -u www-data misp-modules .* &"
-    line: "sudo -H -u www-data misp-modules -s > /tmp/misp-modules.boot 2>&1 &"
+    regexp: "sudo -H -u {{ www_user }} misp-modules .* &"
+    line: "sudo -H -u {{ www_user }} misp-modules -s > /tmp/misp-modules.boot 2>&1 &"
     insertbefore: "^exit 0"
     backup: yes
 
@@ -35,6 +35,6 @@
 - name: start MISP modules app
   shell: "misp-modules -s > /tmp/misp-modules.start 2>&1 &"
   become: yes
-  become_user: www-data
+  become_user: "{{ www_user }}"
   when: "'misp-modules' not in ps.stdout"
 

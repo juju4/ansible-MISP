@@ -42,3 +42,61 @@
 - name: redhat | install missing pip3 command
   command: "easy_install-3.4 pip creates=/usr/bin/pip3"
 
+# https://github.com/ansible/ansible/issues/16612
+- block:
+    - debug: var=ansible_selinux
+    - name: RedHat | Ensure selinux dependencies are present
+      package:
+        name: libselinux-python
+        state: present
+    - action: setup
+    - debug: var=ansible_selinux
+  when: ansible_os_family == "RedHat"
+- block:
+    - name: RedHat | Ensure selinux dependencies are present
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - libselinux-python
+        - libsemanage-python
+        - policycoreutils-python
+
+    - name: RedHat | Allow proxy to network connect in selinux
+      seboolean:
+        name: httpd_can_network_connect
+        state: yes
+        persistent: yes
+
+# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Managing_Confined_Services/sect-Managing_Confined_Services-Configuration_examples-Changing_port_numbers.html
+# https://wiki.centos.org/HowTos/SELinux#head-ad837f60830442ae77a81aedd10c20305a811388
+    - name: RedHat | Allow httpd to listen to unusual ports
+      seport:
+        ports: "{{ misp_base_port }}"
+        proto: tcp
+        setype: http_port_t
+        state: present
+      when: misp_base_port != 80 and misp_base_port != 443
+  when: ansible_os_family == "RedHat" and ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
+
+- name: Ensure misp web logs are rotated
+  copy:
+    src: "{{ misp_rootdir }}/INSTALL/misp.logrotate"
+    dest: "/etc/logrotate.d/misp"
+    mode: '0644'
+    backup: yes
+
+- name: Ensure misp web logs have right selinux context for rotation
+  sefcontext:
+    target: "{{ misp_rootdir }}/app/tmp/logs(/.*)?"
+    setype: httpd_log_t
+    state: present
+
+- name: Allow logrotate to read /var/www
+  command: "{{ item.c }}"
+  args:
+    creates: "{{ item.t }}"
+  with_items:
+    - { c: "checkmodule -M -m -o /root/misplogrotate.mod {{ misp_rootdir }}/INSTALL/misplogrotate.te", t: "/root/misplogrotate.mod" }
+    - { c: "semodule_package -o /root/misplogrotate.pp -m /root/misplogrotate.mod", t: "/root/misplogrotate.pp" }
+    - { c: "semodule -i /root/misplogrotate.pp", t: "/tmp/doesnotexist" }
