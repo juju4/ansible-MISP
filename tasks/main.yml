@@ -301,6 +301,9 @@
 - name: validate worker start.sh permissions
   file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
 
+- include: redhat-logrotate.yml
+  when: ansible_os_family == "RedHat"
+
 - include: selinux-context.yml
   when: ansible_os_family == "RedHat"
 
