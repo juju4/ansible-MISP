@@ -33,6 +33,17 @@
 - name: Ensure services are enabled and started
   service: "name={{ item }} state=started enabled=yes"
   with_items: "{{ misp_services }}"
+  when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+
+- name: Docker | Manually start services
+  shell: "{{ item }}"
+  with_items:
+#    - /sbin/rngd -f
+    - sudo -H -u mysql /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1
+    - cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &
+    - /usr/sbin/httpd -DFOREGROUND > /tmp/httpd.out 2>&1 &
+  ignore_errors: true
+  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: check installed pear packages
   command: pear list
@@ -317,6 +328,15 @@
   when: ansible_virtualization_type is defined and ansible_virtualization_type == "docker" and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
 - name: ensure redis is active before launching worker
   service: name={{ redis_svc }} state=started
+  when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+
+- name: Docker | Manually start redis
+  shell: "{{ item }}"
+  with_items:
+    - sudo -H -u redis /usr/bin/redis-server /etc/redis.conf --daemonize yes
+  ignore_errors: true
+  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+
 
 - name: check if worker active
   command: "ps axu"

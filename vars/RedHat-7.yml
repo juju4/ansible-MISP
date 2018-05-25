@@ -50,6 +50,8 @@ misp_pkg_list:
 #    - libjpeg-turbo-devel
     - openssl
     - policycoreutils-python
+## kitchen/ss
+    - iproute
 
 misp_webserver_apache2:
     - httpd
