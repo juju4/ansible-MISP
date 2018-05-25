@@ -139,7 +139,7 @@
       "ssh_username": "vagrant",
       "ssh_wait_timeout": "10000s",
       "tools_upload_flavor": "linux",
-      "vm_name": "packer-siftrem-ubuntu-18.04-amd64",
+      "vm_name": "packer-MISP-ubuntu-18.04-amd64",
       "vmx_data": {
         "cpuid.coresPerSocket": "1",
         "memsize": "512",
@@ -158,7 +158,7 @@
   ],
   "post-processors": [
     {
-      "output": "builds/{{.Provider}}-MISP-ubuntu1804-{{isotime \"2006-01-02\"}}.box",
+      "output": "builds/{{.Provider}}-MISP-ubuntu18.04-{{isotime \"2006-01-02\"}}.box",
       "type": "vagrant"
     }
   ]
