@@ -359,6 +359,9 @@
 
 - include: misp-modules.yml
 
+- include: lief.yml
+  when: misp_lief_enable
+
 - include: testing.yml
   when: misp_testing is defined and misp_testing
 

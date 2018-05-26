@@ -1,0 +1,32 @@
+---
+# https://github.com/MISP/MISP/blob/2.4/INSTALL/INSTALL.rhel7.txt#L368
+
+- name: Install lief with pip
+  pip:
+    name: lief
+    state: present
+
+#- name: Ensure LIEF build dependencies are present
+#  package:
+#    name: "{{ item }}"
+#    state: present
+#  with_items:
+#    - cmake
+#
+#- stat: path={{ misp_lief_rootdir }}/include/LIEF
+#  register: l
+#- name: git clone LIEF - Library to Instrument Executable Formats
+#  git:
+#    repo: https://github.com/lief-project/LIEF.git
+#    dest: "{{ misp_lief_rootdir }}"
+#    update: no
+#    force: no
+#  when: not l.stat.exists
+#
+#- name: Ensure LIEF build dir present
+#  file:
+#    dest: "{{ misp_lief_rootdir }}/build"
+#    state: directory
+
+- name: Ensure LIEF is working
+  command: "python -c 'import lief'"
