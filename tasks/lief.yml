@@ -5,28 +5,56 @@
   pip:
     name: lief
     state: present
+  when: ansible_os_family == 'Debian'
 
-#- name: Ensure LIEF build dependencies are present
-#  package:
-#    name: "{{ item }}"
-#    state: present
-#  with_items:
-#    - cmake
-#
-#- stat: path={{ misp_lief_rootdir }}/include/LIEF
-#  register: l
-#- name: git clone LIEF - Library to Instrument Executable Formats
-#  git:
-#    repo: https://github.com/lief-project/LIEF.git
-#    dest: "{{ misp_lief_rootdir }}"
-#    update: no
-#    force: no
-#  when: not l.stat.exists
-#
-#- name: Ensure LIEF build dir present
-#  file:
-#    dest: "{{ misp_lief_rootdir }}/build"
-#    state: directory
+- block:
+    - name: Ensure LIEF build dependencies are present
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - centos-release-scl
+        - cmake
+# https://wiki.centos.org/SpecialInterestGroup/SCLo/CollectionsList
+        - devtoolset-7
+        - cmake3
 
+    - stat: path={{ misp_lief_rootdir }}/include/LIEF
+      register: l
+    - name: git clone LIEF - Library to Instrument Executable Formats
+      git:
+        repo: https://github.com/lief-project/LIEF.git
+        dest: "{{ misp_lief_rootdir }}"
+        update: no
+        force: no
+      when: not l.stat.exists
+
+    - name: Ensure LIEF build dir present
+      file:
+        dest: "{{ misp_lief_rootdir }}/build"
+        state: directory
+
+    - name: Build LIEF
+      shell: "{{ item.c }}"
+      args:
+        creates: "{{ item.t }}"
+        chdir: "{{ misp_lief_rootdir }}/build"
+      with_items:
+# FIXME! can stop around 85% with
+#   c++: internal compiler error: Killed (program cc1plus)
+#   => replay and check that you have enough memory
+        - { c: 'scl enable devtoolset-7 "bash -c \"cmake3 -DLIEF_PYTHON_API=on -DLIEF_DOC=off -DCMAKE_INSTALL_PREFIX=$LIEF_INSTALL -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=2.7 ..\""', t: "{{ misp_lief_rootdir }}/build/Makefile" }
+        - { c: 'make -j3', t: "{{ misp_lief_rootdir }}/build/api/python/_pylief.so" }
+        - { c: 'cd api/python && python setup.py install || :', t: '/usr/lib64/python2.7/site-packages/lief-0.8.3-py2.7-linux.egg' }
+        - { c: 'make install', t: '/share/LIEF/examples/c/elf_reader.c' }
+        - { c: 'make package', t: '/var/lief/build/LIEF-0.8.3-Linux.tar.gz' }
+
+  when: ansible_os_family == 'RedHat'
+
+# FIXME! pip install fails on centos7. https://www.centos.org/forums/viewtopic.php?t=66248
+#   ImportError: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.20' not found (required by /usr/lib64/python2.7/site-packages/_pylief.so)
+#   $ strings /usr/lib64/libstdc++.so.6.0.19 | grep GLIBCXX
+#   ? /opt/rh/devtoolset-7/root/usr/lib/gcc/x86_64-redhat-linux/7/libstdc++.so
 - name: Ensure LIEF is working
   command: "python -c 'import lief'"
+  ignore_errors: true
