@@ -48,6 +48,8 @@
         - { c: 'cd api/python && python setup.py install || :', t: '/usr/lib64/python2.7/site-packages/lief-0.8.3-py2.7-linux.egg' }
         - { c: 'make install', t: '/share/LIEF/examples/c/elf_reader.c' }
         - { c: 'make package', t: '/var/lief/build/LIEF-0.8.3-Linux.tar.gz' }
+      async: 1800
+      poll: 60
 
   when: ansible_os_family == 'RedHat'
 
