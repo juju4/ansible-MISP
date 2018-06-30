@@ -77,11 +77,11 @@
 ## required for users API
 #  when: ansible_distribution_release == 'xenial'
 
-- name: install python dependencies with pip - python3, latest
+- name: install python dependencies with pip - python, latest
   pip:
     name: "{{ item }}"
     extra_args: '--exists-action=w'
-    executable: pip3
+#    executable: pip3
   with_items:
     - git+https://github.com/kbandla/pydeep.git
     - python-magic
