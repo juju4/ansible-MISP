@@ -53,6 +53,8 @@ misp_pkg_list:
     - policycoreutils-python
 ## kitchen/ss
     - iproute
+    - ssdeep-devel
+    - ssdeep-libs
 
 misp_webserver_apache2:
     - httpd

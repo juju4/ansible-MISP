@@ -41,6 +41,7 @@ misp_pkg_list:
 ## if pyzmq?
 # - libczmq-dev
  - openssl
+ - libfuzzy-dev
 
 mysql_svc: mysql
 rng_svc: rng-tools
