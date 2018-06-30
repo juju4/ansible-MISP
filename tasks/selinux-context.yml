@@ -16,3 +16,4 @@
     - /var/www/MISP/app/webroot/img/orgs
     - /var/www/MISP/app/webroot/img/custom
     - "{{ misp_rootdir }}/.gnupg"
+    - /var/www/MISP/app/Config/config.php
