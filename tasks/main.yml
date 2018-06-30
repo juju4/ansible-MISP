@@ -142,15 +142,12 @@
 #    - redis
 #  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-- name: check if existing Cakeresque config
-  stat: path="{{ misp_rootdir }}/app/Plugin/CakeResque/Config/config.php"
-  register: cakeconfig
 - name: setup MISP Cake config
   copy:
     src: "{{ misp_rootdir }}/INSTALL/setup/config.php"
     dest: "{{ misp_rootdir }}/app/Plugin/CakeResque/Config/config.php"
     remote_src: true
-  when: not cakeconfig.stat.exists
+    backup: yes
 
 - name: validate permissions
   file: "dest={{ item.f }} mode={{ item.m }} owner={{ www_user }} group={{ www_user }} state=directory"
