@@ -10,7 +10,7 @@
       become: yes
 #      become_user: "{{ user }}"
       register: userInit
-      no_log: true
+      no_log: "{{ misp_no_log }}"
       failed_when: "'Error' in userInit.stderr"
 #    - debug: var=userInit
     - set_fact:
@@ -21,7 +21,7 @@
       command: "cat {{ misp_key_file }}"
       changed_when: false
       register: userInit2
-      no_log: true
+      no_log: "{{ misp_no_log }}"
     - set_fact:
         userkey: "{{ userInit2.stdout }}"
   when: skey.stat.exists

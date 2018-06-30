@@ -243,7 +243,7 @@
   with_items:
     - { regexp: 'db login', replace: "{{ misp_db_user }}" }
     - { regexp: 'db password', replace: "{{ misp_db_pass }}" }
-  no_log: true
+  no_log: "{{ misp_no_log }}"
 - name: set CakeResque bootstrap to true
   lineinfile: dest={{ misp_rootdir }}/app/Config/bootstrap.php line="CakePlugin::loadAll(array( 'CakeResque' => array('bootstrap' => true) ));"
 - name: add vendor/autoload.php to core

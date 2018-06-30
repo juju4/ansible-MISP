@@ -76,6 +76,7 @@ misp_git_signing_keys:
   - '09E2CD4944E6CBCD'
 
 misp_pymisp_verifycert: False
+misp_no_log: true
 
 misp_redis_password: redis_password_to_change
 misp_redis_securecommands:

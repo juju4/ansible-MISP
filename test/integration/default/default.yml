@@ -14,6 +14,7 @@
         - { p: 'dupont_passphrase.', email: dupont@localhost.local, org: 1, role: 2 }
         - { p: 'dupond_passphrase.', email: dupond@localhost.local, org: 1, role: 4 }
 #        - { p: 'dupond_passphrase.', email: dupona@localhost.local, org: 1, role: 4 }
+    - misp_no_log: false
   roles:
 #    - geerlingguy.apache
     - juju4.MISP
