@@ -383,7 +383,7 @@
 - name: fix possible upstream error
   replace:
     dest: "{{ misp_rootdir }}/app/Model/User.php"
-    regexp: 'if \($dataSource =='
+    regexp: 'if \(\$dataSource =='
     replace: 'if ($datasource =='
     backup: yes
 
