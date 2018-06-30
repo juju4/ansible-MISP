@@ -45,9 +45,9 @@
 #   => replay and check that you have enough memory
         - { c: 'scl enable devtoolset-7 "bash -c \"cmake3 -DLIEF_PYTHON_API=on -DLIEF_DOC=off -DCMAKE_INSTALL_PREFIX=$LIEF_INSTALL -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=2.7 ..\""', t: "{{ misp_lief_rootdir }}/build/Makefile" }
         - { c: 'make -j3', t: "{{ misp_lief_rootdir }}/build/api/python/_pylief.so" }
-        - { c: 'cd api/python && python setup.py install || :', t: '/usr/lib64/python2.7/site-packages/lief-0.8.3-py2.7-linux.egg' }
+        - { c: 'cd api/python && python setup.py install || :', t: '/usr/lib64/python2.7/site-packages/lief-0.9.0-py2.7-linux.egg' }
         - { c: 'make install', t: '/share/LIEF/examples/c/elf_reader.c' }
-        - { c: 'make package', t: '/var/lief/build/LIEF-0.8.3-Linux.tar.gz' }
+        - { c: 'make package', t: '/var/lief/build/LIEF-0.9.0-Linux.tar.gz' }
       async: 3600
       poll: 60
 
