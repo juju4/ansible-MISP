@@ -3,8 +3,8 @@
 # MISP ansible role
 
 Ansible role to setup MISP, Malware Information Sharing Platform & Threat Sharing
-http://www.misp-project.org/
-https://github.com/MISP/MISP
+* http://www.misp-project.org/
+* https://github.com/MISP/MISP
 
 Alternatives
 * docker: https://blog.rootshell.be/2016/03/03/running-misp-in-a-docker-container/
