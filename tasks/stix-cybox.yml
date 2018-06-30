@@ -1,0 +1,24 @@
+---
+
+## https://github.com/ansible/ansible-modules-core/issues/2697
+- name: install python dependencies with pip - version enforced
+#  pip: name="{{ item }}" extra_args='--no-input'
+  pip:
+    name: "{{ item.n }}"
+    version: "{{ item.v }}"
+    extra_args: "--exists-action=w"
+    executable: pip3
+  with_items:
+    - { n: cybox, v: "{{ misp_pip_cybox_version }}" }
+    - { n: stix, v: "{{ misp_pip_stix_version }}" }
+
+- name: install python dependencies with pip - latest
+  pip:
+    name: "{{ item }}"
+    extra_args: "--exists-action=w"
+    executable: pip3
+  with_items:
+    - importlib
+    - https://github.com/CybOXProject/mixbox.git
+    - maec
+
