@@ -382,7 +382,7 @@
 # https://github.com/MISP/MISP/blob/2.4/app/Config/database.default.php#L63
 - name: fix possible upstream error
   replace:
-    dest: {{ misp_rootdir }}/app/Model/User.php
+    dest: "{{ misp_rootdir }}/app/Model/User.php"
     regexp: 'if ($dataSource =='
     replace: 'if ($datasource =='
     backup: yes
