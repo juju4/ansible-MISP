@@ -35,6 +35,11 @@ $config = array (
     'live' => true,
     'host_org_id' => 1,
     'proposals_block_attributes' => true,
+    'language' => '{{ misp_language | default('eng') }}',
+    'redis_host' => '{{ misp_redis_host | default('127.0.0.1') }}',
+    'redis_port' => '{{ misp_redis_port | default('6379') }}',
+    'redis_database' => '{{ misp_redis_database | default('13') }}',
+    'redis_password' => '{{ misp_redis_password | default('redis_password') }}',
   ),
   'GnuPG' => 
   array (
@@ -44,6 +49,7 @@ $config = array (
     'password' => '{{ misp_gpg_pass }}',
     'bodyonlyencrypted' => false,
   ),
+  'SMIME' => NULL,
   'Proxy' =>
   array (
     'host' => '{{ misp_proxy_host }}',
@@ -57,6 +63,7 @@ $config = array (
     'amount' => 5,
     'expire' => {{ misp_SecureAuth_expire }},
   ),
+  'CertAuth' => NULL,
   // Uncomment the following to enable client SSL certificate authentication
   /*
   'CertAuth' => 
@@ -86,11 +93,18 @@ $config = array (
     ),
   ),
   */
+  'Session.defaults' => 'php',
+  'Session.timeout' => 60,
+  'Session.cookie_timeout' => 360,
+  'Session.autoRegenerate' => false,
   'Plugin' =>
   array (
     'Enrichment_services_enable' => true,
     'Enrichment_hover_enable' => true,
     'Import_services_enable' => true,
     'Export_services_enable' => true,
+    'Cortex_services_enable' => false,
   ),
+  'ApacheShibbAuth' => NULL,
+  'ApacheSecureAuth' => NULL,
 );
