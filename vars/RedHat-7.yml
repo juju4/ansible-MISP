@@ -74,7 +74,7 @@ misp_testing_pkg:
 
 nginx_sock: /var/run/php-fpm/php-fpm.sock
 php_confdir: /etc/php.d
-php_confext: conf
+php_confext: ini
 php_ini: /etc/php.ini
 fpm_user: nobody
 
