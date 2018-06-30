@@ -149,6 +149,7 @@ Target file has changed and is now MISP/app/Model/Server.php
 They are other roles to handle certificates like letsencrypt (ex: thefinn93.letsencrypt)
 New ansible v2.2 letsencrypt module allow certificate creation but no renewal of task without rerunning role.
 
+* LIEF build can take a while (30-60min) on Centos7. Disable if not needed
 
 ## TODO
 * role is not managing upgrade (Work in progress/git pull between minor releases)
