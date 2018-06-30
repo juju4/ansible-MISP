@@ -16,7 +16,7 @@ misp_lief_enable: true
 misp_lief_rootdir: /var/lief
 misp_config_php_template: config.php.j2
 
-misp_pip_cybox_version: '2.1.0.18.dev0'
+misp_pip_cybox_version: '2.1.0.17'
 misp_pip_stix_version: '1.2.0.6'
 
 ## for automation of users creation and testing
