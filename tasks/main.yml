@@ -195,10 +195,16 @@
 
 - name: extra php settings
   template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.{{ php_confext }} mode=0644"
+  notify:
+    - restart webserver
 - name: Enforce Timezone in php.ini
   replace: "dest={{ php_ini }} regexp='^;date.timezone =' replace='date.timezone = {{ tz }}'"
+  notify:
+    - restart webserver
 - name: enabling MISP php settings
   file: "src={{ php_confdir }}/misp-php.ini dest={{ php_confenable }}/99-misp.ini state=link"
+  notify:
+    - restart webserver
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and (misp_webserver is not defined or misp_webserver == 'apache2')
 
 - stat: path={{ misp_rootdir }}/app/Config/bootstrap.php
