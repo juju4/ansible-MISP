@@ -63,6 +63,7 @@ misp_webserver_nginx:
 mysql_svc: mariadb
 rng_svc: rngd
 redis_svc: redis
+redis_conf: /etc/redis.conf
 misp_services:
     - "{{ apache_svc }}"
     - "{{ mysql_svc }}"

@@ -353,7 +353,7 @@
 - name: Docker | Manually start redis
   shell: "{{ item }}"
   with_items:
-    - sudo -H -u redis /usr/bin/redis-server /etc/redis.conf --daemonize yes
+    - "sudo -H -u redis /usr/bin/redis-server {{ redis_conf }} --daemonize yes"
   ignore_errors: true
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 

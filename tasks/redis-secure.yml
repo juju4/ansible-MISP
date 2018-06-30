@@ -4,14 +4,14 @@
 
 - name: redis | require password
   lineinfile:
-    dest: /etc/redis.conf
+    dest: "{{ redis_conf }}"
     regexp: '^requirepass .*'
     line: "requirepass {{ misp_redis_password }}"
     backup: yes
 
 - name: redis | rename dangerous commands
   lineinfile:
-    dest: /etc/redis.conf
+    dest: "{{ redis_conf }}"
     regexp: "{{ item.re }}"
     line: "{{ item.l }}"
   with_items: "{{ misp_redis_securecommands }}"

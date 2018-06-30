@@ -45,6 +45,7 @@ misp_pkg_list:
 mysql_svc: mysql
 rng_svc: rng-tools
 redis_svc: redis
+redis_conf: /etc/redis/redis.conf
 misp_services:
     - "{{ apache_svc }}"
     - "{{ mysql_svc }}"
