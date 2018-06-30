@@ -12,6 +12,7 @@
       register: userInit
       no_log: "{{ misp_no_log }}"
       failed_when: "'Error' in userInit.stderr"
+      ignore_errors: true
 #    - debug: var=userInit
     - set_fact:
         userkey: "{{ userInit.stdout }}"
