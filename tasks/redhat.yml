@@ -40,7 +40,7 @@
 
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 - name: redhat | install missing pip3 command
-  command: "easy_install-3.4 pip creates=/usr/bin/pip3"
+  command: "{{ easy_install_bin }} pip creates=/usr/bin/pip3"
 
 # https://github.com/ansible/ansible/issues/16612
 - block:
