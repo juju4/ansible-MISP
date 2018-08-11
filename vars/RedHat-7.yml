@@ -35,12 +35,12 @@ misp_pkg_list:
     - rng-tools
     - wget
 # misp-modules
-    - python34
-    - python34-devel
+    - python36
+    - python36-devel
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 #    - python3-pip
-    - python34-setuptools
-    - python34-six
+    - python36-setuptools
+    - python36-six
 # FIXME! not available
 #    - libpq5
 ## misc
