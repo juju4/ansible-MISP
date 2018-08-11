@@ -16,6 +16,18 @@ describe command("curl -s http://127.0.0.1:6666/modules | jq .") do
   its(:stdout) { should_not match /{"name":"Not Found"/ }
 end
 
+describe command("python3 -c 'import yara'") do
+  its(:stderr) { should_not match /Error/ }
+  its(:stderr) { should_not match /Failed/ }
+  its(:exit_status) { should eq 0 }
+end
+
+describe command("python3 -c 'import sigma'") do
+  its(:stderr) { should_not match /Error/ }
+  its(:stderr) { should_not match /Failed/ }
+  its(:exit_status) { should eq 0 }
+end
+
 describe command("misp-modules -t") do
   its(:stdout) { should_not match /ERROR/ }
   its(:stdout) { should_not match /WARNING/ }
