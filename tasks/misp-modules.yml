@@ -38,3 +38,9 @@
   become_user: "{{ www_user }}"
   when: "'misp-modules' not in ps.stdout"
 
+- name: Redhat7 | libpcre symlink for python yara module
+  file:
+    src: /usr/lib64/libpcre.so.1
+    dest: /usr/lib64/libpcre.so.3
+    state: link
+  when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
