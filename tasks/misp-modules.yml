@@ -44,3 +44,10 @@
     dest: /usr/lib64/libpcre.so.3
     state: link
   when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
+
+- name: Bionic | libyara.so symlink for python yara module
+  file:
+    src: /usr/local/lib/python3.6/dist-packages/usr/lib/libyara.so
+    dest: /usr/lib/libyara.so
+    state: link
+  when: ansible_os_family == "Ubuntu" and ansible_distribution_version.split('.')[0] == '18'
