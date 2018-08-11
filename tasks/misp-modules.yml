@@ -50,4 +50,4 @@
     src: "{{ mispmodules_libyarapath }}/libyara.so"
     dest: /usr/lib/libyara.so
     state: link
-  when: ansible_os_family == "Ubuntu"
+  when: ansible_distribution == 'Ubuntu'
