@@ -24,6 +24,8 @@
     - codecov
     - nose
     - requests-mock
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 - name: ensure test user in group of web server
   user: "user={{ misp_testing_user }} groups={{ www_user }} append=yes"
