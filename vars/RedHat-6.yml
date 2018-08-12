@@ -44,6 +44,8 @@ misp_pkg_list:
 #    - libjpeg-turbo-devel
     - openssl
 
+python3_bin: python3?
+
 misp_webserver_apache2:
     - httpd
 

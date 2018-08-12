@@ -41,7 +41,7 @@
     timeout: 300
 
 - name: ensure PyMISP API working
-  command: "python3 ./last.py -l 10"
+  command: "{{ python3_bin }} ./last.py -l 10"
   args:
     chdir: "{{ misp_rootdir }}/PyMISP/examples"
   environment:
@@ -51,7 +51,7 @@
   ignore_errors: true
 
 - name: list current users
-  command: "python3 ./users_list.py chdir={{ misp_rootdir }}/PyMISP/examples"
+  command: "{{ python3_bin }} ./users_list.py chdir={{ misp_rootdir }}/PyMISP/examples"
   register: listusers
   changed_when: false
 

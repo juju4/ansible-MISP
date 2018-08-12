@@ -44,6 +44,8 @@ misp_pkg_list:
  - openssl
  - libfuzzy-dev
 
+python3_bin: python3
+
 mysql_svc: mysql
 rng_svc: rng-tools
 redis_svc: redis-server

@@ -43,6 +43,8 @@ misp_pkg_list:
 # - libczmq-dev
  - openssl
 
+python3_bin: python3
+
 mysql_svc: mysql
 rng_svc: rng-tools
 redis_conf: /etc/redis/redis.conf
