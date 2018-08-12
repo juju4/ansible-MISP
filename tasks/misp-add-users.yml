@@ -46,12 +46,15 @@
     chdir: "{{ misp_rootdir }}/PyMISP/examples"
   environment:
     debug: True
+    PYTHONPATH: /usr/local/lib/python3.6/site-packages
   register: test
   changed_when: false
   ignore_errors: true
 
 - name: list current users
   command: "{{ python3_bin }} ./users_list.py chdir={{ misp_rootdir }}/PyMISP/examples"
+  environment:
+    PYTHONPATH: /usr/local/lib/python3.6/site-packages
   register: listusers
   changed_when: false
 

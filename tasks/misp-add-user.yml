@@ -3,6 +3,8 @@
 #- debug: var=list
 - name: add user {{ user.email }}
   command: "{{ python3_bin }} ./add_user.py -e {{ user.email }} -o {{ user.org }} -r {{ user.role }} chdir={{ misp_rootdir }}/PyMISP/examples"
+  environment:
+    PYTHONPATH: /usr/local/lib/python3.6/site-packages
   when: list.stdout.find(user.email) == -1 and user.email is defined
   register: out
 #- debug: var=out

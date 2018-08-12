@@ -3,6 +3,8 @@ require 'serverspec'
 # Required by serverspec
 set :backend, :exec
 
+set :path, '/usr/local/bin:$PATH'
+
 describe command("pip3 freeze") do
   its(:stdout) { should match /cybox/ }
   its(:stdout) { should match /pymisp/ }
