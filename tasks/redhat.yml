@@ -41,6 +41,8 @@
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 - name: redhat | install missing pip3 command
   command: "{{ easy_install_bin }} pip creates=/usr/bin/pip3"
+ environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # https://github.com/ansible/ansible/issues/16612
 - block:

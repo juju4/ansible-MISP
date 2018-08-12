@@ -11,6 +11,8 @@
   with_items:
     - { n: cybox, v: "{{ misp_pip_cybox_version }}" }
     - { n: stix, v: "{{ misp_pip_stix_version }}" }
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 - name: install python dependencies with pip - latest
   pip:
@@ -20,4 +22,6 @@
   with_items:
     - mixbox
     - maec
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 

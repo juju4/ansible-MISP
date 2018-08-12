@@ -76,6 +76,8 @@
     - { n: 'git+https://github.com/MISP/PyMISP.git#egg=Package', v: "{{ misp_version }}" }
 ## required for users API
 #  when: ansible_distribution_release == 'xenial'
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 - name: install python dependencies with pip - python, latest
   pip:
@@ -85,6 +87,8 @@
   with_items:
     - git+https://github.com/kbandla/pydeep.git
     - python-magic
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 - include: redis-secure.yml
 
