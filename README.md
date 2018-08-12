@@ -80,6 +80,10 @@ $ PACKER_LOG_PATH="packerlog.txt" PACKER_LOG=1 packer build packer-*.json
 ##  update json config on your setup and region.
 $ export DO_TOKEN=xxx
 $ packer build -only=digitalocean packer-*.json
+## for Azure
+$ . ~/.azure/credentials
+$ packer build azure-packer-centos7.json
+$ packer build -var-file=variables.json azure-packer-centos7.json
 ```
 
 

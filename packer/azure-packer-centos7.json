@@ -1,0 +1,49 @@
+{
+ "variables": {
+    "azure_ad_tenant_id": "{{env `az_tenant_id`}}",
+    "azure_subscription_id": "{{env `az_subscription_id`}}",
+    "app_id": "{{env `az_client_id`}}",
+    "client_secret": "{{env `az_client_secret`}}",
+    "resource_group": "Testing",
+    "storage_account": "mylab0packer"
+  },
+  "provisioners": [
+    {
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+      "inline_shebang": "/bin/sh -x",
+      "type": "shell",
+      "inline": [
+        "whoami",
+        "env",
+        "sudo yum -y update"
+      ]
+    },
+    {
+      "type": "ansible",
+      "playbook_file": "../test/integration/default/default.yml"
+    }
+  ],
+  "builders": [
+    {
+      "type": "azure-arm",
+      "subscription_id": "{{user `azure_subscription_id`}}",
+      "tenant_id": "{{user `azure_ad_tenant_id`}}",
+      "object_id": "{{user `object_id`}}",
+      "client_id": "{{user `app_id`}}",
+      "client_secret": "{{user `client_secret`}}",
+
+      "cloud_environment_name": "AzurePublicCloud",
+      "location": "eastus",
+      "vm_size": "Standard_D1",
+
+      "managed_image_resource_group_name": "Testing",
+      "managed_image_name": "packer-centos73-{{isotime \"2006-01-02\"}}-MISP",
+
+      "os_type": "Linux",
+      "image_publisher": "OpenLogic",
+      "image_offer": "CentOS",
+      "image_sku": "7.3",
+      "image_version": "latest"
+    }
+  ]
+}
