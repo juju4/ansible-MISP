@@ -16,13 +16,25 @@ describe command("curl -s http://127.0.0.1:6666/modules | jq .") do
   its(:stdout) { should_not match /{"name":"Not Found"/ }
 end
 
-describe command("python3 -c 'import yara'") do
+describe command("python3 -c 'import yara'"), :if => os[:family] == 'ubuntu' do
   its(:stderr) { should_not match /Error/ }
   its(:stderr) { should_not match /Failed/ }
   its(:exit_status) { should eq 0 }
 end
 
-describe command("python3 -c 'import sigma'") do
+describe command("python3 -c 'import sigma'"), :if => os[:family] == 'ubuntu' do
+  its(:stderr) { should_not match /Error/ }
+  its(:stderr) { should_not match /Failed/ }
+  its(:exit_status) { should eq 0 }
+end
+
+describe command("python36 -c 'import yara'"), :if => os[:family] == 'redhat' && os[:release] == '7' do
+  its(:stderr) { should_not match /Error/ }
+  its(:stderr) { should_not match /Failed/ }
+  its(:exit_status) { should eq 0 }
+end
+
+describe command("python36 -c 'import sigma'"), :if => os[:family] == 'redhat' && os[:release] == '7' do
   its(:stderr) { should_not match /Error/ }
   its(:stderr) { should_not match /Failed/ }
   its(:exit_status) { should eq 0 }
