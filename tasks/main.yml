@@ -98,6 +98,11 @@
   register: import
   changed_when: "'imported: [1-9]+' in import.stdout"
 
+- name: Make Git work with proxies
+  become: yes
+  command: "git config --global http.proxy http://{{misp_proxy_user}}{{misp_proxy_pass}}@{{misp_proxy_host}}:{{misp_proxy_port}}"
+  when: misp_proxy_host is defined
+
 - stat: path={{ misp_rootdir }}/INSTALL
   register: m
 - name: git clone MISP
