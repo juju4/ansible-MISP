@@ -92,12 +92,6 @@
 
 - include: redis-secure.yml
 
-- name: recover gpg key to check git signed commit
-  command: "gpg --keyserver pgp.uni-mainz.de --recv-keys {{ item }}"
-  with_items: "{{ misp_git_signing_keys }}"
-  register: import
-  changed_when: "'imported: [1-9]+' in import.stdout"
-
 - name: Make Git work with proxies
   become: yes
   command: "git config --global http.proxy http://{{misp_proxy_user}}{{misp_proxy_pass}}@{{misp_proxy_host}}:{{misp_proxy_port}}"
@@ -112,10 +106,6 @@
     version: "{{ misp_version }}"
     update: no
     force: no
-## check if commit signed. only partially the case at Jan 2017. require git 2.1.0+ + import key
-#    verify_commit: yes
-#    track_submodules: yes
-#  when: not m.stat.exists
 
 ## https://github.com/MISP/MISP/blob/e763e7646f7bbae5183ab93df840501d88c47119/INSTALL/UPDATE.txt
 - name: updating existing MISP - minor releases
