@@ -3,6 +3,10 @@ driver:
   name: docker
 ## https://github.com/test-kitchen/kitchen-docker/issues/54
   use_sudo: false
+## resources limit
+  cpu: 2
+  memory: 1GB
+  run_options: --cpus=0.8
 
 transport:
   name: sftp
