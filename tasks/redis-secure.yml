@@ -8,6 +8,7 @@
     regexp: '^requirepass .*'
     line: "requirepass {{ misp_redis_password }}"
     backup: yes
+  when: misp_redis_password is defined and misp_redis_password != ''
 
 - name: redis | rename dangerous commands
   lineinfile:
@@ -15,3 +16,4 @@
     regexp: "{{ item.re }}"
     line: "{{ item.l }}"
   with_items: "{{ misp_redis_securecommands }}"
+  when: misp_redis_securecommands is defined and misp_redis_securecommands != []
