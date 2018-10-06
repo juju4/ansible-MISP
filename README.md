@@ -8,6 +8,7 @@ Ansible role to setup MISP, Malware Information Sharing Platform & Threat Sharin
 
 Alternatives
 * docker: https://blog.rootshell.be/2016/03/03/running-misp-in-a-docker-container/
+* rpm: https://github.com/amuehlem/MISP-RPM
 https://github.com/xme/misp-docker
 * ansible role: https://github.com/MISP/MISP/pull/1413
 * ansible role: https://github.com/MISP/MISP/pull/1495
