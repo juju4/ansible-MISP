@@ -89,7 +89,7 @@
   with_items: "{{ misp_git_signing_keys }}"
   register: import
   changed_when: "'imported: [1-9]+' in import.stdout"
-  when: misp_proxy_host is not defined or misp_proxy_host = ''
+  when: misp_proxy_host is not defined or misp_proxy_host == ''
 
 - name: recover gpg key to check git signed commit - proxy
   command: "gpg --keyserver pgp.uni-mainz.de --recv-keys {{ item }} --keyserver-options \"timeout=10 http-proxy={{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}\""
