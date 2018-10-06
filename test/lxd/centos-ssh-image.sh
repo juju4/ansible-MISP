@@ -12,7 +12,6 @@ openssl rand -base64 48 | perl -ne 'print "$_" x2' | lxc exec $guest -- passwd r
 
 lxc exec $guest -- dhclient eth0
 lxc exec $guest -- ping -c 1 8.8.8.8
-lxc exec $guest -- yum update
 lxc exec $guest -- yum -y upgrade
 lxc exec $guest -- yum install -y openssh-server sudo ruby yum-utils
 lxc exec $guest -- systemctl enable sshd
