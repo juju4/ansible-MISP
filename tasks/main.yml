@@ -58,22 +58,17 @@
     - Crypt_GPG
     - Net_GeoIP
 
-## https://github.com/ansible/ansible-modules-core/issues/2697
-- name: install python dependencies with pip
-#  pip: name="{{ item }}" extra_args='--no-input'
-  pip: "name={{ item.n }} version={{ item.v }} extra_args='--exists-action=w'"
-  with_items:
-    - { n: redis, v: '2.10.5' }
-#    - { n: pyzmq, v: '16.0.2' }
-    - { n: 'git+https://github.com/MISP/PyMISP.git#egg=Package', v: "{{ misp_version }}" }
-
 ## TODO duplicate from misp-modules/requirements?
 - name: install python dependencies with pip - python3
-  pip: "name={{ item.n }} version={{ item.v }} extra_args='--exists-action=w' executable=pip3"
+  pip:
+    name: "{{ item.n }}"
+    version: "{{ item.v }}"
+    extra_args: '--exists-action=w'
+    executable: "{{ python3_pip }}"
   with_items:
     - { n: redis, v: '2.10.5' }
 #    - { n: pyzmq, v: '16.0.2' }
-    - { n: 'git+https://github.com/MISP/PyMISP.git#egg=Package', v: "{{ misp_version }}" }
+    - { n: 'pymisp', v: "{{ misp_pymisp_version }}" }
 ## required for users API
 #  when: ansible_distribution_release == 'xenial'
   environment:
@@ -81,12 +76,9 @@
 
 - name: install python dependencies with pip - python, latest
   pip:
-    name: "{{ item }}"
+    name: [ 'git+https://github.com/kbandla/pydeep.git', 'python-magic']
     extra_args: '--exists-action=w'
 #    executable: pip3
-  with_items:
-    - git+https://github.com/kbandla/pydeep.git
-    - python-magic
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 

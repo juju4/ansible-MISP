@@ -44,6 +44,7 @@ misp_pkg_list:
  - libfuzzy-dev
 
 python3_bin: python3
+python3_pip: pip3
 
 mysql_svc: mysql
 rng_svc: rng-tools
