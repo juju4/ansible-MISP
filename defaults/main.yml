@@ -42,6 +42,7 @@ misp_passreq_lenth: 8
 ## not mapped currently
 #misp_passreq_complexity: ''
 ## leave empty when no proxy
+misp_proxy_scheme: ''
 misp_proxy_host: ''
 misp_proxy_port: ''
 misp_proxy_method: ''
