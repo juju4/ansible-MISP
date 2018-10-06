@@ -354,7 +354,10 @@
 #        - { re: '^', rep: '' }
   when: ansible_virtualization_type is defined and ansible_virtualization_type == "docker" and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
 - name: ensure redis is active before launching worker
-  service: name={{ redis_svc }} state=started
+  service:
+    name: "{{ redis_svc }}"
+    state: started
+    enabled: yes
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Docker | Manually start redis
