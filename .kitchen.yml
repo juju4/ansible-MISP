@@ -48,10 +48,5 @@ suites:
   - name: nginx
     run_list:
     includes:
-      - ubuntu-16.04
-      - ubuntu-14.04
+      - ubuntu-18.04
       - centos-7
-    provisioner:
-      name: ansible_playbook
-      playbook: test/integration/nginx/default.yml
-

@@ -50,11 +50,5 @@ suites:
     attributes:
         misp_webserver: 'nginx'
     includes:
-      - ubuntu-16.04
-      - ubuntu-14.04
+      - ubuntu-18.04
       - centos-7.1
-    provisioner:
-      name: ansible_playbook
-      playbook: test/integration/default/default.yml
-
-
