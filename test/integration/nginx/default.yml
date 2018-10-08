@@ -14,4 +14,4 @@
   roles:
 #    - geerlingguy.nginx
     - juju4.MISP
-
+    - juju4.harden-nginx
