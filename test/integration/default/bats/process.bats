@@ -5,7 +5,7 @@ setup() {
 }
 
 @test "MISP url should be accessible" {
-    run curl -sSqL http://localhost/
+    run curl -sSqL http://localhost:8888/
     [ "$status" -eq 0 ]
     [[ "$output" =~ "Users - MISP" ]]
 }
