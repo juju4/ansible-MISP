@@ -32,7 +32,6 @@
     src: "{{ apache_sitedir }}/misp.conf"
     dest: /etc/apache2/sites-enabled/misp.conf
     state: link
-    validate: 'apachectl -t -f %s'
   notify:
     - restart webserver
   when: ansible_os_family == 'Debian'
