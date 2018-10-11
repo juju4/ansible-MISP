@@ -84,15 +84,27 @@
 
 - include: redis-secure.yml
 
+- name: load local gpg key to check git signed commit
+  copy:
+    src: "pgp-{{ item }}.asc"
+    dest: "{{ misp_rootdir }}"
+    mode: '0400'
+  with_items: "{{ misp_git_signing_keys_local }}"
+- name: import local gpg key to check git signed commit
+  command: "gpg --import {{ misp_rootdir }}/pgp-{{ item }}.asc"
+  with_items: "{{ misp_git_signing_keys_local }}"
+  register: import0
+  changed_when: "'imported: [1-9]+' in import0.stdout"
+
 - name: recover gpg key to check git signed commit
-  command: "gpg --keyserver pgp.uni-mainz.de --recv-keys {{ item }}"
+  command: "gpg --keyserver {{ misp_pgp_server }} --recv-keys {{ item }}"
   with_items: "{{ misp_git_signing_keys }}"
   register: import
   changed_when: "'imported: [1-9]+' in import.stdout"
   when: misp_proxy_host is not defined or misp_proxy_host == ''
 
 - name: recover gpg key to check git signed commit - proxy
-  command: "gpg --keyserver pgp.uni-mainz.de --recv-keys {{ item }} --keyserver-options \"timeout=10 http-proxy={{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}\""
+  command: "gpg --keyserver {{ misp_pgp_server }} --recv-keys {{ item }} --keyserver-options \"timeout=10 http-proxy={{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}\""
   with_items: "{{ misp_git_signing_keys }}"
   register: import
   changed_when: "'imported: [1-9]+' in import.stdout"

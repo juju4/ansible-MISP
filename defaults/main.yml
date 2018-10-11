@@ -75,8 +75,15 @@ misp_enable_feeds:
 misp_disable_feeds: []
 
 ## Note: don't put hex code as ansible misinterpreted them
-misp_git_signing_keys:
-  - '09E2CD4944E6CBCD'
+# fetch from pgp server
+misp_pgp_server: 'pgp.uni-mainz.de'
+misp_git_signing_keys: []
+#  - '09E2CD4944E6CBCD'
+# in role repository
+misp_git_signing_keys_local:
+  - '09e2cd4944e6cbcd'
+  - '4aee18f83afdeb23'
+  - '6bbed1b63a6d639f'
 
 misp_pymisp_verifycert: False
 misp_no_log: true
