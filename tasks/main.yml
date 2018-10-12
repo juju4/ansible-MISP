@@ -282,7 +282,14 @@
     - { regexp: 'db password', replace: "{{ misp_db_pass }}" }
   no_log: "{{ misp_no_log }}"
 - name: set CakeResque bootstrap to true
-  lineinfile: dest={{ misp_rootdir }}/app/Config/bootstrap.php line="CakePlugin::loadAll(array( 'CakeResque' => array('bootstrap' => true) ));"
+  lineinfile:
+    dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
+    line: "CakePlugin::loadAll(array( 'CakeResque' => array('bootstrap' => true) ));"
+- name: set Cache::Config - mask acceptable for snuffleupagus
+  lineinfile:
+    dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
+    regexp: "^Cache::config('default', .*"
+    line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
 - name: add vendor/autoload.php to core
   lineinfile: 'dest={{ misp_rootdir }}/app/Config/core.php line="{{ item }}"'
   with_items:

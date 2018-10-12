@@ -24,6 +24,7 @@ sp.eval_whitelist.list("strlen,strcmp").simulation();
 sp.cookie.name("PHPSESSID").samesite("lax");
 
 # Harden the `chmod` function
+# Note: checked against Cake Cache::config mask
 sp.disable_function.function("chmod").param("mode").value_r("^[0-9]{2}[67]$").drop();
 
 # Prevent various `mail`-related vulnerabilities
