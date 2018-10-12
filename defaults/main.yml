@@ -3,6 +3,7 @@
 tz: UTC
 scriptsdir: /usr/local/bin
 backupdir: /var/_backup
+install_archives: /var/_install
 
 ## branch or tags to use
 #misp_version: 'HEAD'

@@ -84,14 +84,20 @@
 
 - include: redis-secure.yml
 
+- name: ensure archives folder exists
+  file:
+    dest: "{{ install_archives }}"
+    state: directory
+    mode: '0755'
+
 - name: load local gpg key to check git signed commit
   copy:
     src: "pgp-{{ item }}.asc"
-    dest: "{{ misp_rootdir }}"
+    dest: "{{ install_archives }}"
     mode: '0400'
   with_items: "{{ misp_git_signing_keys_local }}"
 - name: import local gpg key to check git signed commit
-  command: "gpg --import {{ misp_rootdir }}/pgp-{{ item }}.asc"
+  command: "gpg --import {{ install_archives }}/pgp-{{ item }}.asc"
   with_items: "{{ misp_git_signing_keys_local }}"
   register: import0
   changed_when: "'imported: [1-9]+' in import0.stdout"
