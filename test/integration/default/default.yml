@@ -22,7 +22,3 @@
 #    - geerlingguy.apache
     - juju4.MISP
     - juju4.harden-apache
-  tasks:
-# snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
-    - command: find /var/www/MISP/app/ -iname '*.php' -exec chmod 555 {} \;
-    - command: find /var/www/MISP/app/ -iname '*.ctp' -exec chmod 555 {} \;

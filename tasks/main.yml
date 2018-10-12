@@ -412,6 +412,13 @@
     backup: yes
     create: yes
 
+# snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
+- name: Ensure that webroot files are executable but not writeable
+  command: "find {{ misp_rootdir }}/app/ -iname '{{ item }}' -exec chmod 555 {} \;"
+  with_items:
+    - '*.php'
+    - '*.ctp'
+
 - include: misp-modules.yml
 
 - include: lief.yml
