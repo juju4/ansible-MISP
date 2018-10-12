@@ -15,8 +15,13 @@
         - { p: 'dupond_passphrase.', email: dupond@localhost.local, org: 1, role: 4 }
 #        - { p: 'dupond_passphrase.', email: dupona@localhost.local, org: 1, role: 4 }
     - misp_no_log: false
+    - harden_php_disable_functions: 'pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,chown,diskfreespace,disk_free_space,disk_total_space,dl,exec,escapeshellarg,escapeshellcmd,fileinode,highlight_file,max_execution_time,passthru,pclose,phpinfo,popen,proc_close,proc_open,proc_get_status,proc_nice,proc_open,proc_terminate,set_time_limit,shell_exec,show_source,system,__construct, __destruct, __call,__wakeup'
+    - harden_php7_snuffleupagus_rules_template: 'misp-snuffleupagus-rules.ini.j2'
   roles:
 #    - geerlingguy.apache
     - juju4.MISP
     - juju4.harden-apache
-
+  tasks:
+# snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
+    - command: find /var/www/MISP/app/ -iname '*.php' -exec chmod 555 {} \;
+    - command: find /var/www/MISP/app/ -iname '*.ctp' -exec chmod 555 {} \;
