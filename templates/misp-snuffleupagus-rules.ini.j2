@@ -12,10 +12,18 @@
 #sp.sloppy_comparison.enable();
 # FIXME! PHP Fatal error:  [snuffleupagus][unserialize] Invalid HMAC for a:99:{s:9:"Configure";s:57:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Core/Configure.php";s:4:"Hash";s:55:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Utility/Hash.php";s:5:"Cache";s:54:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Cache/Cache.php";s:10:"FileEngine";s:66:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php";s:11:"CacheEngine";s:60:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Cache/CacheEngine.php";s:9:"Inflector";s:60:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Utility/Inflector.php";s:12:"ErrorHandler";s:61:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Error/ErrorHandler.php";s:9:"PhpReader";s:62:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Configure/PhpReader.php";s:21:"ConfigReaderInterface";s:74:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Configure/ConfigReaderInterface.php";s:10:"CakePlugin";s:58:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Core/CakePlugin.php";s:7:"CakeLog";s:54:"/var/www/MISP/app/Lib/cakephp/lib/Cake/Log/CakeLog.php";s:19:"LogEngineCollection";s:66:"/ in /var/www/MISP/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php on line 194
 #sp.unserialize_hmac.enable();
+# FIXME! PHP Fatal error:  [snuffleupagus][readonly_exec] Attempted execution of a writable file (/var/www/MISP/app/Config/config.php). in /var/www/MISP/app/Lib/cakephp/lib/Cake/Configure/PhpReader.php on line 72
+#sp.readonly_exec.enable();
+## simulation mode
+# FIXME! PHP Fatal error:  [snuffleupagus][unserialize] The serialized object is too small. in /var/www/MISP/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php on line 194
+sp.unserialize_hmac.simulation().enable();
+## those seems to create issues with apache2 start
+#sp.global_strict.simulation().enable();
+#sp.sloppy_comparison.simulation().enable();
+#sp.readonly_exec.simulation().enable();
 
 sp.global.secret_key("{{ snuffleupagus_secret1.stdout | default(snuffleupagus_secret2.stdout) }}");
 sp.harden_random.enable();
-sp.readonly_exec.enable();
 sp.disable_xxe.enable();
 sp.eval_blacklist.list("system,exec,shell_exec");
 sp.eval_whitelist.list("strlen,strcmp").simulation();
@@ -25,7 +33,7 @@ sp.cookie.name("PHPSESSID").samesite("lax");
 
 # Harden the `chmod` function
 # Note: checked against Cake Cache::config mask
-sp.disable_function.function("chmod").param("mode").value_r("^[0-9]{2}[67]$").drop();
+#sp.disable_function.function("chmod").param("mode").value_r("^[0-9]{2}[67]$").drop();
 
 # Prevent various `mail`-related vulnerabilities
 sp.disable_function.function("mail").param("additional_parameters").value_r("\\-").drop();

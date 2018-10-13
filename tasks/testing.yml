@@ -54,8 +54,8 @@
 #  file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755 recurse=yes"
   file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755"
   become: yes
-#- name: MISP tree permissions
-#  file: "dest={{ item }} owner={{ www_user }} mode=755 recurse=yes"
+- name: MISP tree permissions
+  file: "dest={{ item }} owner={{ www_user }} mode=755"
 ## Note: recurse is only valid if directory and can't select them from fileglob
 #  with_fileglob:
 #    - "{{ misp_rootdir }}/*"

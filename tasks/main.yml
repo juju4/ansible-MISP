@@ -414,10 +414,15 @@
 
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
-  command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' -exec chmod 0444 {} \\;"
+  command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -name config.php -exec chmod 0444 {} \\;"
   with_items:
     - '*.php'
     - '*.ctp'
+- name: Ensure config.php is writeable
+  file:
+    dest: "{{ misp_rootdir }}/app/Config/config.php"
+    owner: "{{ www_user }}"
+    mode: '0644'
 
 - include: misp-modules.yml
 
