@@ -10,7 +10,7 @@
   get_url:
     url: "{{ item.u }}"
     dest: "{{ item.d }}"
-    mode: 0755
+    mode: "{{ item.m }}"
   with_items:
     - { u: 'https://getcomposer.org/installer', d: '/tmp/composer-installer.php', m: '0755' }
     - { u: 'https://composer.github.io/installer.sig', d: '/tmp/installer.sig', m: '0400' }
