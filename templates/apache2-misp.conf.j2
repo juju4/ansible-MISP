@@ -29,4 +29,10 @@ Listen {{ misp_base_port }}
     ServerSignature Off
     Header set X-Content-Type-Options nosniff
     Header set X-Frame-Options DENY
+
+{% if misp_base_port == 443 %}
+    SSLCertificateFile {{ ssl_dir }}/{{ ansible_fqdn }}.crt
+    SSLCertificateKeyFile {{ ssl_privatedir }}/{{ ansible_fqdn }}.key
+    Include {{ apacheetc }}/harden-apache2-https.conf
+{% endif %}
 </VirtualHost>

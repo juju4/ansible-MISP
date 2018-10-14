@@ -11,7 +11,11 @@ set :backend, :exec
 #  end 
 #end
 
-describe command('wget -O - http://localhost') do
+curl_args='-sSvLk'
+#misp_url = 'http://localhost'
+misp_url = 'https://localhost'
+
+describe command("curl #{curl_args} #{misp_url}") do
   its(:stdout) { should match /Users - MISP/ }
 end
 

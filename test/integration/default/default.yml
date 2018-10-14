@@ -7,18 +7,19 @@
     - misp_testing_user_home: "/home/{{ misp_testing_user }}"
     - misp_testing_key_file: "{{ misp_key_file }}"
 #    - misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
-    - misp_base_url: http://localhost
+    - misp_base_url: https://localhost
     - misp_base_ip: 127.0.0.1
-    - misp_base_port: 80
+    - misp_base_port: 443
     - misp_webusers_list:
         - { p: 'dupont_passphrase.', email: dupont@localhost.local, org: 1, role: 2 }
         - { p: 'dupond_passphrase.', email: dupond@localhost.local, org: 1, role: 4 }
 #        - { p: 'dupond_passphrase.', email: dupona@localhost.local, org: 1, role: 4 }
     - misp_no_log: false
+    - hardenwebserver_enable_defaultssl: false
     - harden_php_disable_functions: 'pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,chown,diskfreespace,disk_free_space,disk_total_space,dl,exec,escapeshellarg,escapeshellcmd,fileinode,highlight_file,max_execution_time,passthru,pclose,phpinfo,popen,proc_close,proc_open,proc_get_status,proc_nice,proc_open,proc_terminate,set_time_limit,shell_exec,show_source,system,__construct, __destruct, __call,__wakeup'
     - harden_php7_snuffleupagus_rules_template: '/tmp/kitchen/juju4.MISP/templates/misp-snuffleupagus-rules.ini.j2'
     - harden_apache_php_variants: [ 'apache2' ]
   roles:
 #    - geerlingguy.apache
-    - juju4.MISP
     - juju4.harden-apache
+    - juju4.MISP
