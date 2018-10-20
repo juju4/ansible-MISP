@@ -97,3 +97,4 @@ misp_redis_securecommands:
     - { re: '^rename-command DEBUG .*', l: 'rename-command DEBUG ""' }
     - { re: '^rename-command SHUTDOWN .*', l: 'rename-command SHUTDOWN SHUTDOWN_MISP1234' }
     - { re: '^rename-command CONFIG .*', l: 'rename-command CONFIG CONFIG_MISP1234' }
+    - { re: '^rename-command MONITOR .*', l: 'rename-command MONITOR MONITOR_MISP1234' }
