@@ -446,6 +446,10 @@
     dest: "{{ misp_rootdir }}/app/Config/config.php"
     owner: "{{ www_user }}"
     mode: '0644'
+- name: patch cakephp with stricter casting to support sp.global_strict
+  patch:
+    src: patch-cakephp-snuffleupagus-strict
+    basedir: /var/www/MISP/app/Lib
 
 - include: misp-modules.yml
 
