@@ -1,0 +1,12 @@
+diff -urN app.orig/Controller/AppController.php app/Controller/AppController.php
+--- app.orig/Controller/AppController.php	2018-10-21 20:02:45.772905154 +0000
++++ app/Controller/AppController.php	2018-10-21 20:02:59.395738730 +0000
+@@ -478,7 +478,7 @@
+ 
+     private function __convertEmailToName($email)
+     {
+-        $name = explode('@', $email);
++        $name = explode('@', (string)$email);
+  $name = explode('.', $name[0]);
+  foreach ($name as $key => $value) {
+      $name[$key] = ucfirst($value);

@@ -450,6 +450,10 @@
   patch:
     src: patch-cakephp-snuffleupagus-strict
     basedir: /var/www/MISP/app/Lib
+- name: patch MISP with stricter casting to support sp.global_strict
+  patch:
+    src: patch-misp-snuffleupagus-strict
+    basedir: /var/www/MISP
 
 - include: misp-modules.yml
 
