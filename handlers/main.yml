@@ -1,6 +1,8 @@
 ---
 - name: restart webserver
   service: name={{ apache_svc }} state=restarted
+  when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+
 - name: restart php-fpm
   service: name=php-fpm state=restarted
 

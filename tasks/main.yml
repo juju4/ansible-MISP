@@ -30,20 +30,40 @@
     - restart rng-tools
   when: ansible_os_family == "Debian"
 
+- name: Ensure /var/run/mysqld exists
+  file:
+    dest: /var/run/mysqld
+    state: directory
+    mode: '0755'
+    owner: mysql
+  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+
 - name: Ensure services are enabled and started
   service: "name={{ item }} state=started enabled=yes"
   with_items: "{{ misp_services }}"
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
-- name: Docker | Manually start services
-  shell: "{{ item }}"
+- name: Debian | Docker | Manually start services
+  shell: "{{ item.c }}"
+  args:
+    creates "{{ item.t }}"
   with_items:
-#    - /sbin/rngd -f
-    - sudo -H -u mysql /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1
-    - cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &
-    - /usr/sbin/httpd -DFOREGROUND > /tmp/httpd.out 2>&1 &
+    - { c: "sudo -H -u mysql mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1", t: /tmp/mysql_install_db.out }
+    - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &", t: /tmp/mysqld_safe.out }
+    - { c: "apachectl restart > /tmp/apache2.out 2>&1 &", t: /tmp/apache2.out }
   ignore_errors: true
-  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and ansible_os_family == "Debian"
+
+- name: RedHat | Docker | Manually start services
+  shell: "{{ item.c }}"
+  args:
+    creates "{{ item.t }}"
+  with_items:
+    - { c: "sudo -H -u mysql /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1", t: /tmp/mysql_install_db.out }
+    - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &", t: /tmp/mysqld_safe.out }
+    - { c: "apachectl restart > /tmp/apache2.out 2>&1 &", t: /tmp/apache2.out }
+  ignore_errors: true
+  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and ansible_os_family == "RedHat"
 
 - name: check installed pear packages
   command: pear list
@@ -386,9 +406,12 @@
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Docker | Manually start redis
-  shell: "{{ item }}"
-  with_items:
-    - "sudo -H -u redis /usr/bin/redis-server {{ redis_conf }} --daemonize yes"
+  shell: "/usr/bin/redis-server {{ redis_conf }} --daemonize yes > /tmp/redis.out"
+  become: yes
+  become_user: redis
+  become_flags: -H
+  args:
+    creates: /tmp/redis.out
   ignore_errors: true
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 

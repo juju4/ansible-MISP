@@ -2,6 +2,13 @@
 # https://redis.io/topics/security
 # https://www.digitalocean.com/community/tutorials/how-to-secure-your-redis-installation-on-ubuntu-18-04
 
+- name: redis | configure network binding
+  lineinfile:
+    dest: "{{ redis_conf }}"
+    regexp: '^bind .*'
+    line: "bind {{ misp_redis_bind }}"
+    backup: yes
+
 - name: redis | require password
   lineinfile:
     dest: "{{ redis_conf }}"

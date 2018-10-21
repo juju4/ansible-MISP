@@ -89,6 +89,8 @@ misp_git_signing_keys_local:
 misp_pymisp_verifycert: False
 misp_no_log: true
 
+# if adding ::1, ensure IPv6 is functional. https://github.com/antirez/redis/issues/3241
+misp_redis_bind: '127.0.0.1'
 # FIXME! https://github.com/MISP/MISP/issues/3452
 #misp_redis_password: redis_password_to_change
 misp_redis_securecommands:
