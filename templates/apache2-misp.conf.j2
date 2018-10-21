@@ -29,4 +29,20 @@ Listen {{ misp_base_port }}
     ServerSignature Off
     Header set X-Content-Type-Options nosniff
     Header set X-Frame-Options DENY
+
+    <LocationMatch /attributes/.*>
+        <IfModule mod_security2.c>
+            SecRuleRemoveById 920180
+        </IfModule>
+    </LocationMatch>
+    <LocationMatch /events/.*>
+        <IfModule mod_security2.c>
+            SecRuleRemoveById 920180
+        </IfModule>
+    </LocationMatch>
+    <LocationMatch /stix/.*>
+        <IfModule mod_security2.c>
+            SecRuleRemoveById 920180
+        </IfModule>
+    </LocationMatch>
 </VirtualHost>
