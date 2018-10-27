@@ -103,3 +103,36 @@ diff -urN cakephp.orig/lib/Cake/basics.php cakephp/lib/Cake/basics.php
  		}
  
  		if ($key === 'SCRIPT_NAME') {
+diff -urN cakephp.orig/lib/Cake/Model/Datasource/Database/Mysql.php cakephp/lib/Cake/Model/Datasource/Database/Mysql.php
+--- cakephp.orig/lib/Cake/Model/Datasource/Database/Mysql.php	2018-10-27 20:58:11.781602239 +0000
++++ cakephp/lib/Cake/Model/Datasource/Database/Mysql.php	2018-10-27 20:58:42.272840239 +0000
+@@ -360,7 +360,7 @@
+ 				$fields[$column->Field]['unsigned'] = $this->_unsigned($column->Type);
+ 			}
+ 			if (in_array($fields[$column->Field]['type'], array('timestamp', 'datetime')) &&
+-				in_array(strtoupper($column->Default), array('CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP()'))
++				in_array(strtoupper((string)$column->Default), array('CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP()'))
+ 			) {
+ 				$fields[$column->Field]['default'] = null;
+ 			}
+diff -urN cakephp.orig/lib/Cake/Model/Datasource/DboSource.php cakephp/lib/Cake/Model/Datasource/DboSource.php
+--- cakephp.orig/lib/Cake/Model/Datasource/DboSource.php	2018-10-27 20:58:11.781602239 +0000
++++ cakephp/lib/Cake/Model/Datasource/DboSource.php	2018-10-27 21:01:11.847590239 +0000
+@@ -2774,7 +2774,7 @@
+ 			if (is_array($value)) {
+ 				$valueInsert = (
+ 					!empty($value) &&
+-					(substr_count($key, '?') === count($value) || substr_count($key, ':') === count($value))
++					(substr_count((string)$key, '?') === count($value) || substr_count((string)$key, ':') === count($value))
+ 				);
+ 			}
+ 
+@@ -2783,7 +2783,7 @@
+ 			} elseif (is_numeric($key) && is_string($value)) {
+ 				$out[] = $this->_quoteFields($value);
+ 			} elseif ((is_numeric($key) && is_array($value)) || in_array(strtolower(trim($key)), $this->_sqlBoolOps)) {
+-				if (in_array(strtolower(trim($key)), $this->_sqlBoolOps)) {
++				if (in_array(strtolower(trim((string)$key)), $this->_sqlBoolOps)) {
+ 					$join = ' ' . strtoupper($key) . ' ';
+ 				} else {
+ 					$key = $join;
