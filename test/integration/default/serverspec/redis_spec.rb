@@ -19,9 +19,20 @@ describe port(6379) do
   it { should be_listening.with('tcp') }
 end
 
-describe file('/var/log/redis/redis-server.log'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
+describe file('/var/log/redis/redis-server.log'), :if => os[:family] == 'debian' do
   its(:size) { should > 0 }
   its(:content) { should match /Configuration loaded/ }
+  its(:content) { should_not match /bind: Cannot assign requested address/ }
+end
+describe file('/var/log/redis/redis-server.log'), :if => os[:family] == 'ubuntu' && os[:release] == '18.04' do
+  its(:size) { should > 0 }
+  its(:content) { should match /Configuration loaded/ }
+  its(:content) { should_not match /bind: Cannot assign requested address/ }
+end
+describe file('/var/log/redis/redis-server.log'), :if => os[:family] == 'ubuntu'  && os[:release] == '16.04' do
+  its(:size) { should > 0 }
+  its(:content) { should match /Server started, Redis version/ }
+  its(:content) { should match /The server is now ready to accept connections on port/ }
   its(:content) { should_not match /bind: Cannot assign requested address/ }
 end
 describe file('/var/log/redis/redis.log'), :if => os[:family] == 'redhat' do
