@@ -316,7 +316,7 @@
   lineinfile:
     dest: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php"
     regexp: "^          'mask' => .*"
-    line: "^          'mask' => 0600"
+    line: "          'mask' => 0600"
     backup: yes
 - name: add vendor/autoload.php to core
   lineinfile: 'dest={{ misp_rootdir }}/app/Config/core.php line="{{ item }}"'
