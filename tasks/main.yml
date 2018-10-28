@@ -311,6 +311,13 @@
 #             Cache::config('default', array('engine' => 'File'));
     regexp: "^Cache::config.'default', array.'engine' => 'File'.*.;"
     line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
+    backup: yes
+- name: set Cache::Config whole cakephp - mask acceptable for snuffleupagus
+  lineinfile:
+    dest: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php"
+    regexp: "^          'mask' => .*"
+    line: "^          'mask' => 0600"
+    backup: yes
 - name: add vendor/autoload.php to core
   lineinfile: 'dest={{ misp_rootdir }}/app/Config/core.php line="{{ item }}"'
   with_items:
