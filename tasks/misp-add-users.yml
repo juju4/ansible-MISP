@@ -6,6 +6,8 @@
   register: ap
 - name: set admin password
   command: "{{ misp_rootdir }}/app/Console/cake Password \"{{ misp_web_user }}\" \"{{ misp_web_pass }}\""
+  become: yes
+  become_user: "{{ www_user }}"
   when: not ap.stat.exists
 - name: Admin pass set marker
   file: dest="{{ misp_rootdir }}/.admin_pass_set" state=touch
@@ -42,6 +44,8 @@
 
 - name: ensure PyMISP API working
   command: "{{ python3_bin }} ./last.py -l 10"
+  become: yes
+  become_user: "{{ www_user }}"
   args:
     chdir: "{{ misp_rootdir }}/PyMISP/examples"
   environment:
@@ -52,7 +56,11 @@
   ignore_errors: true
 
 - name: list current users
-  command: "{{ python3_bin }} ./users_list.py chdir={{ misp_rootdir }}/PyMISP/examples"
+  command: "{{ python3_bin }} ./users_list.py"
+  become: yes
+  become_user: "{{ www_user }}"
+  args:
+    chdir: "{{ misp_rootdir }}/PyMISP/examples"
   environment:
     PYTHONPATH: /usr/local/lib/python3.6/site-packages
   register: listusers

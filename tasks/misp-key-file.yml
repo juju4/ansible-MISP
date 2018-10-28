@@ -8,7 +8,7 @@
     - name: generate key file - cake userInit
       shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
       become: yes
-#      become_user: "{{ user }}"
+      become_user: "{{ www_user }}"
       register: userInit
       no_log: "{{ misp_no_log }}"
       failed_when: "'Error' in userInit.stderr"
