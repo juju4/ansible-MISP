@@ -310,8 +310,7 @@
     dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
 #             Cache::config('default', array('engine' => 'File'));
     regexp: "^Cache::config.'default', array.'engine' => 'File'.*.;"
-    line: "Cache::config('default', array( 'engine' => 'File', 'mask' => octdec('0600') ));"
-    backup: yes
+    line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
 - name: add vendor/autoload.php to core
   lineinfile: 'dest={{ misp_rootdir }}/app/Config/core.php line="{{ item }}"'
   with_items:
