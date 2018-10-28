@@ -463,6 +463,13 @@
     src: patch-misp-snuffleupagus-strict
     basedir: /var/www/MISP
 
+- name: Debian | Docker | Restart apache
+  shell: "apachectl restart > /tmp/apache3.out 2>&1"
+  args:
+    creates: /tmp/apache3.out
+  ignore_errors: true
+  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+
 - include: misp-modules.yml
 
 - include: lief.yml
