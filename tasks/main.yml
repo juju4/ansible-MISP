@@ -308,7 +308,8 @@
 - name: set Cache::Config - mask acceptable for snuffleupagus
   lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
-    regexp: "^Cache::config('default', .*);"
+#             Cache::config('default', array('engine' => 'File'));
+    regexp: "^Cache::config.'default', array.'engine' => 'File'.*.;"
     line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
 - name: add vendor/autoload.php to core
   lineinfile: 'dest={{ misp_rootdir }}/app/Config/core.php line="{{ item }}"'
