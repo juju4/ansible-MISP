@@ -327,6 +327,7 @@
   shell: "openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;' | tee {{ misp_rootdir }}/.salt creates={{ misp_rootdir }}/.salt"
   register: salt1
   changed_when: false
+  no_log: "{{ misp_no_log }}"
   tags:
     - salt
 - stat: path="{{ misp_rootdir }}/.salt"
@@ -335,12 +336,15 @@
   command: "cat {{ misp_rootdir }}/.salt"
   changed_when: false
   register: salt2
+  no_log: "{{ misp_no_log }}"
   when: s.stat.exists
 - set_fact:
     salt: "{{ salt1.stdout }}"
+  no_log: "{{ misp_no_log }}"
   when: salt1.changed
 - set_fact:
     salt: "{{ salt2.stdout }}"
+  no_log: "{{ misp_no_log }}"
   when: s.stat.exists
 
 # FIXME! idempotence. MISP is rewriting this file regularly
