@@ -48,8 +48,12 @@
   args:
     creates: "{{ item.t }}"
   with_items:
-    - { c: "sudo -H -u mysql mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1", t: /tmp/mysql_install_db.out }
-    - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &", t: /tmp/mysqld_safe.out }
+    - { c: "sudo -H -u mysql mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1",
+        t: /tmp/mysql_install_db.out
+      }
+    - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &",
+        t: /tmp/mysqld_safe.out
+      }
     - { c: "apachectl restart > /tmp/apache2.out 2>&1 &", t: /tmp/apache2.out }
   ignore_errors: true
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and ansible_os_family == "Debian"
@@ -60,7 +64,9 @@
     creates "{{ item.t }}"
   with_items:
     - { c: "sudo -H -u mysql /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1", t: /tmp/mysql_install_db.out }
-    - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &", t: /tmp/mysqld_safe.out }
+    - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &",
+        t: /tmp/mysqld_safe.out
+      }
     - { c: "apachectl restart > /tmp/apache2.out 2>&1 &", t: /tmp/apache2.out }
   ignore_errors: true
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and ansible_os_family == "RedHat"
