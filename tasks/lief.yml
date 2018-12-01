@@ -19,12 +19,14 @@
         - devtoolset-7
         - cmake3
 
-    - stat: path={{ misp_lief_rootdir }}/include/LIEF
+    - name: check if LIEF present
+      stat: path={{ misp_lief_rootdir }}/include/LIEF
       register: l
     - name: git clone LIEF - Library to Instrument Executable Formats
       git:
         repo: https://github.com/lief-project/LIEF.git
         dest: "{{ misp_lief_rootdir }}"
+        version: HEAD
         update: no
         force: no
       when: not l.stat.exists

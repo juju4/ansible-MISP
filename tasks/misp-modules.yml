@@ -1,11 +1,14 @@
 ---
 ## https://github.com/MISP/misp-modules
 
-- stat: path={{ mispmodules_rootdir }}/misp-modules
+- name: Check if misp-modules directory exists
+  stat: path={{ mispmodules_rootdir }}/misp-modules
   register: mm
 - name: git clone MISP modules
-  git: repo=https://github.com/MISP/misp-modules.git
-       dest={{ mispmodules_rootdir }}/misp-modules
+  git:
+    repo: https://github.com/MISP/misp-modules.git
+    dest: "{{ mispmodules_rootdir }}/misp-modules"
+    version: HEAD
   when: not mm.stat.exists
 
 - name: debian | install dependencies for MISP modules (pip3)

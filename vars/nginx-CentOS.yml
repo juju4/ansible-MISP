@@ -8,4 +8,3 @@ apache_svc: nginx
 apache_sitedir: /etc/nginx/conf.d
 php_ini: /etc/php.ini
 fpm_user: nginx
-

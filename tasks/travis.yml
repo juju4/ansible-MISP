@@ -2,10 +2,12 @@
 ## Travis workaround
 
 ## Travis error: "asn1 encoding routines:ASN1_mbstring_ncopy:string too longi:a_mbstr.c:154:maxsize=64" as cn=testing-gce-4d114f77-0ff1-41fb-bd33-22879d3249da.c.eco-emissary-99515.internal
-- set_fact:
+- name: Default | set certificate_cn
+  set_fact:
     certificate_cn: "{{ ansible_fqdn }}"
 
-- set_fact:
+- name: Travis | set certificate_cn to shorter name to avoid openssl bug
+  set_fact:
     certificate_cn: "testing-travis.internal"
     travisci: true
     rolesroot: '/etc/ansible/roles'
@@ -13,4 +15,3 @@
 #    misp_testing_user_home: "/home/{{ misp_testing_user }}"
 #    misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
   when: ansible_env['TRAVIS'] is defined and ansible_env['TRAVIS'] == 'true'
-

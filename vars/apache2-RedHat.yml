@@ -16,4 +16,3 @@ misp_services:
     - "{{ apache_svc }}"
     - "{{ mysql_svc }}"
     - "{{ rng_svc }}"
-

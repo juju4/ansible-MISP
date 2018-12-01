@@ -35,4 +35,3 @@
   notify:
     - restart webserver
   when: ansible_os_family == 'Debian'
-

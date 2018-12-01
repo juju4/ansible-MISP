@@ -32,4 +32,3 @@
 - name: check no script error
   fail: msg="Fatal! error retrieving user key"
   when: userkey.find("Script aborted{{ ':' }} MISP instance already initialised.") != -1 or userkey == ''
-

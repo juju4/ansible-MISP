@@ -15,4 +15,3 @@
   with_items: "{{ misp_disable_feeds }}"
   register: disableresults
 #- debug: var=disableresults
-

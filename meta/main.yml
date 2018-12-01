@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: MISP
   author: juju4
   description: MISP - Malware Information Sharing Platform & Threat Sharing
   license: BSD
@@ -32,4 +33,3 @@ dependencies:
 ## one or the other?
 #  - geerlingguy.nginx
 #  - geerlingguy.apache
-

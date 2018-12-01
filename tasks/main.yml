@@ -5,7 +5,7 @@
   when: ansible_distribution == 'Ubuntu'
 - name: Include version-specific variables for RedHat
   include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 ## must be last to override previous vars
 - name: Include webserver+distribution-specific variables
   include_vars: "{{ misp_webserver }}-{{ ansible_distribution }}.yml"
@@ -14,7 +14,7 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - include: redhat.yml
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - debug: var=misp_webserver
 - include: nginx.yml
@@ -46,7 +46,7 @@
 - name: Debian | Docker | Manually start services
   shell: "{{ item.c }}"
   args:
-    creates "{{ item.t }}"
+    creates: "{{ item.t }}"
   with_items:
     - { c: "sudo -H -u mysql mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1", t: /tmp/mysql_install_db.out }
     - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &", t: /tmp/mysqld_safe.out }
@@ -73,7 +73,7 @@
   command: pear channel-update pear.php.net
   when: pearinstalled.stdout.find("Crypt_GPG") == -1
 - name: install php pear dependencies
-  pear: name={{item}} state=present
+  pear: name={{ item }} state=present
   with_items:
     - Crypt_GPG
     - Net_GeoIP
@@ -142,7 +142,8 @@
     value: "{{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}"
   when: misp_proxy_host is defined and misp_proxy_host != ''
 
-- stat: path={{ misp_rootdir }}/INSTALL
+- name: Check if MISP folder already present
+  stat: path={{ misp_rootdir }}/INSTALL
   register: m
 - name: git clone MISP
   git:
@@ -242,7 +243,12 @@
 - stat: path="{{ misp_rootdir }}/app/tmp/debug.log"
   register: debuglog
 - name: touch debug.log
-  file: "dest={{ misp_rootdir }}/app/tmp/debug.log mode=0644 owner={{ www_user }} group={{ www_user }} state=touch"
+  file:
+    dest: "{{ misp_rootdir }}/app/tmp/debug.log"
+    mode: '0644'
+    owner: "{{ www_user }}"
+    group: "{{ www_user }}"
+    state: touch
   when: not debuglog.stat.exists
 
 - include: mysql-configure.yml
@@ -296,7 +302,10 @@
 #    - config
 
 - name: update database settings
-  replace: dest={{ misp_rootdir }}/app/Config/database.php regexp="{{ item.regexp }}" replace="{{ item.replace }}"
+  replace:
+    dest: "{{ misp_rootdir }}/app/Config/database.php"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
   with_items:
     - { regexp: 'db login', replace: "{{ misp_db_user }}" }
     - { regexp: 'db password', replace: "{{ misp_db_pass }}" }
@@ -338,17 +347,19 @@
   register: salt2
   no_log: "{{ misp_no_log }}"
   when: s.stat.exists
-- set_fact:
+- name: Set salt
+  set_fact:
     salt: "{{ salt1.stdout }}"
   no_log: "{{ misp_no_log }}"
   when: salt1.changed
-- set_fact:
+- name: Set salt
+  set_fact:
     salt: "{{ salt2.stdout }}"
   no_log: "{{ misp_no_log }}"
   when: s.stat.exists
 
 # FIXME! idempotence. MISP is rewriting this file regularly
-- name: updating MISP config
+- name: updating MISP config with salt
   template:
     src: "{{ misp_config_php_template }}"
     dest: "{{ misp_rootdir }}/app/Config/config.php"
@@ -367,7 +378,7 @@
   command: "gpg-agent --daemon --homedir={{ misp_rootdir }}/.gnupg"
   become: yes
   become_user: "{{ www_user }}"
-  when: not gkey.stat.exists and (ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux') and misp_webserver == 'nginx'
+  when: not gkey.stat.exists and (ansible_os_family == "RedHat") and misp_webserver == 'nginx'
   ignore_errors: true
 - name: create gnupg key for {{ misp_email }}
   shell: "{{ item.s }} chdir={{ misp_rootdir }}/.gnupg creates={{ item.c }}"
@@ -426,7 +437,6 @@
     creates: /tmp/redis.out
   ignore_errors: true
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
-
 
 - name: check if worker active
   command: "ps axu"
@@ -487,7 +497,8 @@
 - include: misp-feeds.yml
 
 ## or use tools/misp-backup/misp-backup.sh ?
-- file: path={{ scriptsdir }} state=directory mode=0755
+- name: Ensure scriptsdir directory exists
+  file: path={{ scriptsdir }} state=directory mode=0755
 - name: add backup script
   template: src=backup-misp.sh.j2 dest={{ scriptsdir }}/backup-misp.sh mode=0755
 - name: add restore script
@@ -497,4 +508,3 @@
     job="{{ scriptsdir }}/backup-misp.sh > /dev/null 2>&1"
     user=root
     cron_file=ansible_misp-backup
-

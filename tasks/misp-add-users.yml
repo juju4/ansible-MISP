@@ -2,7 +2,8 @@
 
 ## FIXME! how to do it once only!
 ## Note: more a reset as next login, will ask to change password...
-- stat: path="{{ misp_rootdir }}/.admin_pass_set"
+- name: Check if admin pass already set
+  stat: path="{{ misp_rootdir }}/.admin_pass_set"
   register: ap
 - name: set admin password
   command: "{{ misp_rootdir }}/app/Console/cake Password \"{{ misp_web_user }}\" \"{{ misp_web_pass }}\""
@@ -70,4 +71,3 @@
     - include: "misp-add-user.yml user={{ item }} list={{ listusers }}"
       with_items: "{{ misp_webusers_list }}"
   when: misp_webusers_list is defined and misp_webusers_list != []
-
