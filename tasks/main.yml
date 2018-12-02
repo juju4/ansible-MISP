@@ -56,7 +56,9 @@
       }
     - { c: "apachectl restart > /tmp/apache2.out 2>&1 &", t: /tmp/apache2.out }
   ignore_errors: true
-  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and ansible_os_family == "Debian"
+  when: >
+    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and
+    ansible_os_family == "Debian"
 
 - name: RedHat | Docker | Manually start services
   shell: "{{ item.c }}"
@@ -69,7 +71,9 @@
       }
     - { c: "apachectl restart > /tmp/apache2.out 2>&1 &", t: /tmp/apache2.out }
   ignore_errors: true
-  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and ansible_os_family == "RedHat"
+  when: >
+    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+    and ansible_os_family == "RedHat"
 
 - name: check installed pear packages
   command: pear list
@@ -136,7 +140,10 @@
   when: misp_proxy_host is not defined or misp_proxy_host == ''
 
 - name: recover gpg key to check git signed commit - proxy
-  command: "gpg --keyserver {{ misp_pgp_server }} --recv-keys {{ item }} --keyserver-options \"timeout=10 http-proxy={{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}\""
+  command: >
+    gpg --keyserver {{ misp_pgp_server }} --recv-keys {{ item }}
+        --keyserver-options
+        \"timeout=10 http-proxy={{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}\"
   with_items: "{{ misp_git_signing_keys }}"
   register: import
   changed_when: "'imported: [1-9]+' in import.stdout"
@@ -179,14 +186,12 @@
 - include: apache2.yml
   when: misp_webserver is not defined or misp_webserver == 'apache2'
 
-## https://github.com/kosssi/ansible-role-gitconfig ?
-- name: get git config
-  command: "git config core.filemode chdir={{ misp_rootdir }}"
-  changed_when: false
-  register: gc
 - name: setting core.filemode for git
-  command: "git config core.filemode false chdir={{ misp_rootdir }}"
-  when: gc.stdout != 'false'
+  git_config:
+    name: core.filemode
+    value: false
+    scope: local
+    repo: "{{ misp_rootdir }}"
 
 - include: stix-cybox.yml
 
@@ -271,7 +276,9 @@
   file: "src={{ php_confdir }}/misp-php.ini dest={{ php_confenable }}/99-misp.ini state=link"
   notify:
     - restart webserver
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and (misp_webserver is not defined or misp_webserver == 'apache2')
+  when: >
+    (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and
+    (misp_webserver is not defined or misp_webserver == 'apache2')
 
 - stat: path={{ misp_rootdir }}/app/Config/bootstrap.php
   register: conffiles
@@ -339,7 +346,10 @@
     - "require_once dirname(__DIR__) . '/Vendor/autoload.php';"
 
 - name: Generating salt
-  shell: "openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;' | tee {{ misp_rootdir }}/.salt creates={{ misp_rootdir }}/.salt"
+  shell: >
+    openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;' | tee {{ misp_rootdir }}/.salt
+  args:
+    creates: "{{ misp_rootdir }}/.salt"
   register: salt1
   changed_when: false
   no_log: "{{ misp_no_log }}"
@@ -375,7 +385,8 @@
   tags:
     - salt
 
-- stat: "path={{ misp_rootdir }}/app/webroot/gpg.asc"
+- name: Check if webroot gpg.asc exists
+  stat: "path={{ misp_rootdir }}/app/webroot/gpg.asc"
   register: gkey
 - name: create gpg configuration template
   template: "src=gpg-template.j2 dest=/var/tmp/gpg-template owner={{ www_user }} mode=0600"
@@ -389,10 +400,18 @@
 - name: create gnupg key for {{ misp_email }}
   shell: "{{ item.s }} chdir={{ misp_rootdir }}/.gnupg creates={{ item.c }}"
   with_items:
-    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --gen-key --batch /var/tmp/gpg-template", c: "{{ misp_rootdir }}/.gnupg/misp.pub" }
-    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ misp_rootdir }}/.gnupg/misp.pub", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
-#    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ gnupg_privdir }}/misp.sec", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
-    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc", c: "{{ misp_rootdir }}/app/webroot/gpg.asc" }
+    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --gen-key --batch /var/tmp/gpg-template",
+        c: "{{ misp_rootdir }}/.gnupg/misp.pub"
+      }
+    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ misp_rootdir }}/.gnupg/misp.pub",
+        c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
+      }
+#    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ gnupg_privdir }}/misp.sec",
+#        c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
+#      }
+    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc",
+        c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
+      }
   become: yes
   become_user: "{{ www_user }}"
 ## FIXME! seems become_method/flags is not working in vagrant, ansible 2.5.0
@@ -426,7 +445,9 @@
         - { re: '^PrivateTmp=yes', rep: 'PrivateTmp=no' }
         - { re: '^PrivateDevices=yes', rep: 'PrivateDevices=no' }
 #        - { re: '^', rep: '' }
-  when: ansible_virtualization_type is defined and ansible_virtualization_type == "docker" and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
+  when: >
+    ansible_virtualization_type is defined and ansible_virtualization_type == "docker"
+    and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
 - name: ensure redis is active before launching worker
   service:
     name: "{{ redis_svc }}"
