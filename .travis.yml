@@ -53,7 +53,7 @@ before_install:
 #  - service --status-all
   - sudo service lxd restart
 
-  - sudo pip install ansible
+  - sudo pip install ansible ansible-lint
   - gem install kitchen
   - gem install kitchen-ansible
   - gem install kitchen-sync
@@ -71,6 +71,7 @@ before_install:
 #  - sudo -E -u $USER kitchen diagnose --all
 
 script:
+  - ansible-lint tasks/main.yml
 #  - KITCHEN_LOCAL_YAML=.kitchen.local.yml bundle exec kitchen verify ${INSTANCE}
   - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug || (cat $HOME/.kitchen/logs/${suite}-${distribution}-${version//./}.log; find /tmp/kitchen)"
 
