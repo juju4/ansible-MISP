@@ -13,7 +13,7 @@
 #      Authorization: "{{ userkey }}"
 #      Accept: application/json
 #      Content-Type: application/json
-#  with_items: "{{ misp_enable_feeds }}"
+  with_items: "{{ misp_enable_feeds }}"
   register: enableresults
 #- debug: var=enableresults
 
