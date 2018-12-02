@@ -34,4 +34,4 @@
 ## FIXME! fail if returns 'Script aborted: MISP instance already initialised.'
 - name: check no script error
   fail: msg="Fatal! error retrieving user key"
-  when: '"Script aborted{{ ':' }} MISP instance already initialised." in userkey' or not userkey
+  when: "'Script aborted: MISP instance already initialised.' in userkey" or not userkey
