@@ -1,7 +1,9 @@
 ---
 ## Travis workaround
 
-## Travis error: "asn1 encoding routines:ASN1_mbstring_ncopy:string too longi:a_mbstr.c:154:maxsize=64" as cn=testing-gce-4d114f77-0ff1-41fb-bd33-22879d3249da.c.eco-emissary-99515.internal
+## Travis error:
+##  "asn1 encoding routines:ASN1_mbstring_ncopy:string too longi:a_mbstr.c:154:maxsize=64" as
+##  cn=testing-gce-4d114f77-0ff1-41fb-bd33-22879d3249da.c.eco-emissary-99515.internal
 - name: Default | set certificate_cn
   set_fact:
     certificate_cn: "{{ ansible_fqdn }}"

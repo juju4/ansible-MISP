@@ -15,7 +15,7 @@
     regexp: '^requirepass .*'
     line: "requirepass {{ misp_redis_password }}"
     backup: yes
-  when: misp_redis_password is defined and misp_redis_password != ''
+  when: misp_redis_password is defined and misp_redis_password
 
 - name: redis | rename dangerous commands
   lineinfile:

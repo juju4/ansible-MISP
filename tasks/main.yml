@@ -137,7 +137,7 @@
   with_items: "{{ misp_git_signing_keys }}"
   register: import
   changed_when: "'imported: [1-9]+' in import.stdout"
-  when: misp_proxy_host is not defined or misp_proxy_host == ''
+  when: not (misp_proxy_host is defined and misp_proxy_host)
 
 - name: recover gpg key to check git signed commit - proxy
   command: >
@@ -147,13 +147,13 @@
   with_items: "{{ misp_git_signing_keys }}"
   register: import
   changed_when: "'imported: [1-9]+' in import.stdout"
-  when: misp_proxy_host is defined and misp_proxy_host != ''
+  when: misp_proxy_host is defined and misp_proxy_host
 
 - name: git setup proxy
   git_config:
     name: http.proxy
     value: "{{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}"
-  when: misp_proxy_host is defined and misp_proxy_host != ''
+  when: misp_proxy_host is defined and misp_proxy_host
 
 - name: Check if MISP folder already present
   stat: path={{ misp_rootdir }}/INSTALL
@@ -206,7 +206,7 @@
 #  failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
 #  with_items:
 #    - redis
-#  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+#  when: ansible_os_family == "RedHat"
 
 - name: setup MISP Cake config
   copy:
@@ -251,7 +251,8 @@
     - "{{ misp_rootdir }}/app/tmp/cached_exports/csv_all"
     - "{{ misp_rootdir }}/app/tmp/cached_exports/xml"
     - "{{ misp_rootdir }}/app/tmp/cached_exports/rpz"
-- stat: path="{{ misp_rootdir }}/app/tmp/debug.log"
+- name: Check if debug.log exists
+  stat: path="{{ misp_rootdir }}/app/tmp/debug.log"
   register: debuglog
 - name: touch debug.log
   file:
@@ -280,7 +281,8 @@
     (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and
     (misp_webserver is not defined or misp_webserver == 'apache2')
 
-- stat: path={{ misp_rootdir }}/app/Config/bootstrap.php
+- name: Check if bootstrap.php exists
+  stat: path={{ misp_rootdir }}/app/Config/bootstrap.php
   register: conffiles
 - name: create config files from default
   copy:
@@ -355,7 +357,8 @@
   no_log: "{{ misp_no_log }}"
   tags:
     - salt
-- stat: path="{{ misp_rootdir }}/.salt"
+- name: Check if .salt exists
+  stat: path="{{ misp_rootdir }}/.salt"
   register: s
 - name: Recover existing salt
   command: "cat {{ misp_rootdir }}/.salt"
@@ -409,7 +412,8 @@
 #    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ gnupg_privdir }}/misp.sec",
 #        c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
 #      }
-    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc",
+    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }}
+                --batch > {{ misp_rootdir }}/app/webroot/gpg.asc",
         c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
       }
   become: yes
@@ -474,7 +478,7 @@
   command: "bash {{ misp_rootdir }}/app/Console/worker/start.sh"
   become: yes
   become_user: "{{ www_user }}"
-  when: ps.stdout.find("{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex") == -1
+  when: "'{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex' in ps.stdout"
 
 - name: add MISP worker script for boot
   lineinfile:

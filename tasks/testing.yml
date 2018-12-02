@@ -3,7 +3,9 @@
 - include: travis.yml
 
 - name: install testing tools
-  package: name={{ item }} state=present
+  package:
+    name: "{{ item }}"
+    state: present
   with_items: "{{ misp_testing_pkg }}"
 
 - name: replace misp.local hostname
@@ -45,7 +47,11 @@
     - "{{ misp_rootdir }}/build"
     - "{{ misp_rootdir }}/tests"
 #- name: use MISP travis bootstrap
-#  copy: "src={{ misp_rootdir }}/travis/bootstrap.php dest={{ misp_rootdir }}/app/Config/bootstrap.php backup=yes force=yes"
+#  copy:
+#    src: "{{ misp_rootdir }}/travis/bootstrap.php"
+#    dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
+#    backup: yes
+#    force: yes
 
 - include: misp-key-file.yml
 

@@ -62,7 +62,8 @@
   when: ansible_os_family == 'RedHat'
 
 # FIXME! pip install fails on centos7. https://www.centos.org/forums/viewtopic.php?t=66248
-#   ImportError: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.20' not found (required by /usr/lib64/python2.7/site-packages/_pylief.so)
+#   ImportError: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.20' not found
+#        (required by /usr/lib64/python2.7/site-packages/_pylief.so)
 #   $ strings /usr/lib64/libstdc++.so.6.0.19 | grep GLIBCXX
 #   ? /opt/rh/devtoolset-7/root/usr/lib/gcc/x86_64-redhat-linux/7/libstdc++.so
 - name: Ensure LIEF is working
