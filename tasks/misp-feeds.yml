@@ -8,9 +8,10 @@
   uri:
     url: "{{ misp_base_url }}/feeds/enable/{{ item }}"
     method: POST
-    HEADER_Authorization: "{{ userkey }}"
-    HEADER_Accept: application/json
-    HEADER_Content-Type: application/json
+    headers:
+      - Authorization: "{{ userkey }}"
+      - Accept: application/json
+      - Content-Type: application/json
   with_items: "{{ misp_enable_feeds }}"
   register: enableresults
 #- debug: var=enableresults
@@ -19,9 +20,10 @@
   uri:
     url: "{{ misp_base_url }}/feeds/disable/{{ item }}"
     method: POST
-    HEADER_Authorization: "{{ userkey }}"
-    HEADER_Accept: application/json
-    HEADER_Content-Type: application/json
+    headers:
+      - Authorization: "{{ userkey }}"
+      - Accept: application/json
+      - Content-Type: application/json
   with_items: "{{ misp_disable_feeds }}"
   register: disableresults
 #- debug: var=disableresults
