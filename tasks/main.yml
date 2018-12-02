@@ -172,15 +172,15 @@
 
 ## https://github.com/MISP/MISP/blob/e763e7646f7bbae5183ab93df840501d88c47119/INSTALL/UPDATE.txt
 - name: updating existing MISP - minor releases
-  command: "git pull origin {{ misp_version }} chdir={{ misp_rootdir }}"
+  command: "git pull origin {{ misp_version }}"
+  args:
+    chdir: "{{ misp_rootdir }}"
 #  command: "git pull origin {{ misp_version }} --verify-signatures chdir={{ misp_rootdir }}"
   when: m.stat.exists
   register: gitpull_result
   changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
-- name: updating existing MISP submodules - minor releases
-  command: "git submodule update --init --force chdir={{ misp_rootdir }}"
-  when: gitpull_result.changed
-
+  notify:
+    - updating existing MISP submodules - minor releases
 
 ## must be after git cloning MISP
 - include: apache2.yml

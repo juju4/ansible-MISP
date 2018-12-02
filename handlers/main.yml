@@ -8,3 +8,8 @@
 
 - name: restart rng-tools
   service: name=rng-tools state=restarted
+
+- name: updating existing MISP submodules - minor releases
+  command: "git submodule update --init --force"
+  args:
+    chdir: "{{ misp_rootdir }}"
