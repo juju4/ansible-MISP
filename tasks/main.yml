@@ -63,7 +63,7 @@
 - name: RedHat | Docker | Manually start services
   shell: "{{ item.c }}"
   args:
-    creates "{{ item.t }}"
+    creates: "{{ item.t }}"
   with_items:
     - { c: "sudo -H -u mysql /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1", t: /tmp/mysql_install_db.out }
     - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &",
@@ -226,7 +226,12 @@
     - { f: "{{ misp_rootdir }}/.gnupg", m: '0700' }
     - { f: "{{ misp_rootdir }}/app/webroot", m: '0700' }
 - name: check owner/group for multiple MISP folders
-  file: "dest={{ item }} owner={{ www_user }} group={{ www_user }} state=directory mode=2755"
+  file:
+    dest: "{{ item }}"
+    owner: "{{ www_user }}"
+    group: "{ www_user }}"
+    state: directory
+    mode: '2755'
 #  with_fileglob:
 #    - {{ misp_rootdir }}/app/files/scripts/tmp/*
 #    - {{ misp_rootdir }}/app/files/scripts/tmp/cache/*
