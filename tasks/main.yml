@@ -229,7 +229,7 @@
   file:
     dest: "{{ item }}"
     owner: "{{ www_user }}"
-    group: "{ www_user }}"
+    group: "{{ www_user }}"
     state: directory
     mode: '2755'
 #  with_fileglob:
