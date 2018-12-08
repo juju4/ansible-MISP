@@ -7,6 +7,15 @@
 - name: show packages
   debug: var=ansible_facts.packages
 
+- name: Import Remi rpm repository keys
+  rpm_key:
+    key: "{{ item }}"
+    state: present
+  with_items:
+    - https://rpms.remirepo.net/RPM-GPG-KEY-remi
+    - https://rpms.remirepo.net/RPM-GPG-KEY-remi2017
+    - https://rpms.remirepo.net/RPM-GPG-KEY-remi2018
+
 - name: RedHat6 | Install Remi repo
   yum: name=http://rpms.remirepo.net/enterprise/remi-release-6.rpm
        state=present
