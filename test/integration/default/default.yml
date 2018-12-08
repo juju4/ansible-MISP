@@ -21,4 +21,4 @@
   roles:
 #    - geerlingguy.apache
     - juju4.MISP
-    - juju4.harden-apache
+    - juju4.harden_apache
