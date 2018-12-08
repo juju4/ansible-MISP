@@ -2,4 +2,4 @@
 
 - hosts: all
   roles:
-    - juju4.MISP
+    - juju4.misp

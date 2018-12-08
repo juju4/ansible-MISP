@@ -20,5 +20,5 @@
     - harden_apache_php_variants: [ 'apache2' ]
   roles:
 #    - geerlingguy.apache
-    - juju4.MISP
+    - juju4.misp
     - juju4.harden_apache
