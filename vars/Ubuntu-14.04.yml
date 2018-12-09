@@ -84,3 +84,7 @@ nginx_sock: /var/run/php5-fpm.sock
 fpm_user: www-data
 
 gnupg_privdir: "{{ misp_rootdir }}/.gnupg"
+
+ssl_user: ssl-cert
+ssl_dir: /etc/ssl
+ssl_privatedir: /etc/ssl/private
