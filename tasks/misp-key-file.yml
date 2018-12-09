@@ -8,14 +8,16 @@
     - name: generate key file - cake userInit
       shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
       become: yes
-#      become_user: "{{ user }}"
+      become_user: "{{ www_user }}"
       register: userInit
       no_log: "{{ misp_no_log }}"
       failed_when: "'Error' in userInit.stderr"
       ignore_errors: true
 #    - debug: var=userInit
-    - set_fact:
+    - name: Set fact userkey
+      set_fact:
         userkey: "{{ userInit.stdout }}"
+      no_log: "{{ misp_no_log }}"
   when: not skey.stat.exists or skey.stat.size == 0
 - block:
     - name: get existing key file
@@ -23,7 +25,8 @@
       changed_when: false
       register: userInit2
       no_log: "{{ misp_no_log }}"
-    - set_fact:
+    - name: Set fact userkey
+      set_fact:
         userkey: "{{ userInit2.stdout }}"
   when: skey.stat.exists
 #- debug: var=userkey
@@ -31,5 +34,4 @@
 ## FIXME! fail if returns 'Script aborted: MISP instance already initialised.'
 - name: check no script error
   fail: msg="Fatal! error retrieving user key"
-  when: userkey.find("Script aborted{{ ':' }} MISP instance already initialised.") != -1 or userkey == ''
-
+  when: "'Script aborted: MISP instance already initialised.' in userkey or not userkey"

@@ -56,7 +56,7 @@ before_install:
   - sudo sysctl -w net.ipv4.tcp_timestamps=1
   - sudo sysctl -w net.ipv4.tcp_tw_recycle=1
 
-  - sudo pip install ansible
+  - sudo pip install ansible ansible-lint
   - gem install kitchen
   - gem install kitchen-ansible
   - gem install kitchen-sync
@@ -74,12 +74,18 @@ before_install:
 #  - sudo -E -u $USER kitchen diagnose --all
 
 script:
+  - ansible-lint tasks/main.yml
 #  - KITCHEN_LOCAL_YAML=.kitchen.local.yml bundle exec kitchen verify ${INSTANCE}
   - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug || (cat $HOME/.kitchen/logs/${suite}-${distribution}-${version//./}.log; find /tmp/kitchen)"
 
 after_script:
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /tmp/idempotency.test'"
+  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/www/MISP/app/Config/bootstrap.php'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/log/apache2/misp.local_error.log'"
+  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/www/MISP/app/tmp/logs/error.log'"
+  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/MISP/app/tmp/cache/models/'"
+  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'getfacl /var/www/MISP/app/tmp/cache/models'"
+  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'find /usr -iname \"*libyara*.so\"'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'netstat -anp'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'systemctl -l --no-pager status'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'journalctl -xe --no-pager'"
@@ -87,4 +93,3 @@ after_script:
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
-

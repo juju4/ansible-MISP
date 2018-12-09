@@ -53,7 +53,8 @@
       package:
         name: libselinux-python
         state: present
-    - action: setup
+    - name: re-collect facts
+      action: setup
     - debug: var=ansible_selinux
   when: ansible_os_family == "RedHat"
 - block:
@@ -82,4 +83,3 @@
         state: present
       when: misp_base_port != 80 and misp_base_port != 443
   when: ansible_os_family == "RedHat" and ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
-

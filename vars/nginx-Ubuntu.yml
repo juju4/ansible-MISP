@@ -9,4 +9,3 @@ apache_sitedir: /etc/nginx/sites-available
 misp_services: "{{ misp_services_nginx }}"
 
 php_ini: "{{ php_ini_nginx }}"
-

@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: misp
   author: juju4
   description: MISP - Malware Information Sharing Platform & Threat Sharing
   license: BSD
@@ -26,10 +27,9 @@ galaxy_info:
   - system
   - security
 dependencies:
-  - juju4.redhat-epel
+  - juju4.redhat_epel
 ## eventual dependencies for fine tuning but integration needed
 #  - geerlingguy.mysql
 ## one or the other?
 #  - geerlingguy.nginx
 #  - geerlingguy.apache
-

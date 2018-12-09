@@ -3,7 +3,9 @@
 - include: travis.yml
 
 - name: install testing tools
-  package: name={{ item }} state=present
+  package:
+    name: "{{ item }}"
+    state: present
   with_items: "{{ misp_testing_pkg }}"
 
 - name: replace misp.local hostname
@@ -45,17 +47,21 @@
     - "{{ misp_rootdir }}/build"
     - "{{ misp_rootdir }}/tests"
 #- name: use MISP travis bootstrap
-#  copy: "src={{ misp_rootdir }}/travis/bootstrap.php dest={{ misp_rootdir }}/app/Config/bootstrap.php backup=yes force=yes"
+#  copy:
+#    src: "{{ misp_rootdir }}/travis/bootstrap.php"
+#    dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
+#    backup: yes
+#    force: yes
 
 - include: misp-key-file.yml
 
 - name: MISP tree permissions
 ## break .gnupg if applied to whole tree
 #  file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755 recurse=yes"
-  file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755"
+  file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=0755"
   become: yes
 - name: MISP tree permissions
-  file: "dest={{ item }} owner={{ www_user }} mode=755"
+  file: "dest={{ item }} owner={{ www_user }} mode=0755"
 ## Note: recurse is only valid if directory and can't select them from fileglob
 #  with_fileglob:
 #    - "{{ misp_rootdir }}/*"
@@ -66,13 +72,26 @@
     - "{{ misp_rootdir }}/tools"
   become: yes
 - name: PyMISP world-writeable permissions
-  file: "dest={{ misp_rootdir }}/PyMISP mode=777 owner={{ misp_testing_user }} recurse=yes"
+  file:
+    dest: "{{ misp_rootdir }}/PyMISP"
+    mode: '0777'
+    owner: "{{ misp_testing_user }}"
+    recurse: yes
   become: yes
 ## FIXME! for some reason .coverage still own by root during serverspec test
 - name: PyMISP .coverage permissions
-  file: "dest={{ misp_rootdir }}/PyMISP/.coverage mode=777 owner={{ misp_testing_user }} state=touch"
+  file:
+    dest: "{{ misp_rootdir }}/PyMISP/.coverage"
+    mode: '0777'
+    owner: "{{ misp_testing_user }}"
+    state: touch
 - name: PyMISP pymisp.egg-info permissions
-  file: "dest={{ misp_rootdir }}/PyMISP/pymisp.egg-info mode=777 owner={{ misp_testing_user }} state=directory recurse=yes"
+  file:
+    dest: "{{ misp_rootdir }}/PyMISP/pymisp.egg-info"
+    mode: '0777'
+    owner: "{{ misp_testing_user }}"
+    state: directory
+    recurse: yes
 
 - debug: var=misp_base_url
 - debug: var=userInit
@@ -83,7 +102,16 @@
     - "key = \"{{ userkey }}\""
   no_log: "{{ misp_no_log }}"
 - name: symlink key file in examples/events
-  file: "src={{ misp_rootdir }}/PyMISP/tests/keys.py dest={{ misp_rootdir }}/PyMISP/examples/events/keys.py state=link force=yes owner={{ misp_testing_user }}"
+  file:
+    src: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
+    dest: "{{ misp_rootdir }}/PyMISP/examples/events/keys.py"
+    owner: "{{ misp_testing_user }}"
+    state: link
+    force: yes
 - name: symlink key file in PyMISP
-  file: "src={{ misp_rootdir }}/PyMISP/tests/keys.py dest={{ misp_rootdir }}/PyMISP/keys.py state=link force=yes owner={{ misp_testing_user }}"
-
+  file:
+    src: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
+    dest: "{{ misp_rootdir }}/PyMISP/keys.py"
+    owner: "{{ misp_testing_user }}"
+    state: link
+    force: yes

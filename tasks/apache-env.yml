@@ -24,5 +24,4 @@
     modsecurity_active: /etc/httpd/modsecurity.d/activated_rules
     php_confdir: /etc/php.d
     php_ini: /etc/php.ini
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-
+  when: ansible_os_family == "RedHat"

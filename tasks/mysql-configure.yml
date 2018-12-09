@@ -2,7 +2,8 @@
 
 - name: creating mysql misp db
   mysql_db: name=misp state=present
-- stat: path=/root/.mysql_misp_imported
+- name: Check if mysql import done
+  stat: path=/root/.mysql_misp_imported
   register: mispdbloaded
 
 ## trusty: mysql 5.5, centos7: mariadb 5.5
@@ -17,10 +18,15 @@
 - name: importing mysql misp db template
   mysql_db: name=misp state=import target={{ misp_rootdir }}/INSTALL/MYSQL.sql
   when: not mispdbloaded.stat.exists
-- file: dest=/root/.mysql_misp_imported state=touch
+- name: Add marker for mysql import
+  file: dest=/root/.mysql_misp_imported state=touch
   when: not mispdbloaded.stat.exists
 - name: creating mysql misp db user
-  mysql_user: name="{{ misp_db_user }}" password="{{ misp_db_pass }}" priv=*.*:USAGE/misp.*:ALL state=present
+  mysql_user:
+    name: "{{ misp_db_user }}"
+    password: "{{ misp_db_pass }}"
+    priv: "*.*:USAGE/misp.*:ALL"
+    state: present
 
 - block:
     - name: Temporary workaround - mysql57 disable strict mode
@@ -33,4 +39,3 @@
       service: name=mysql state=restarted
       when: mysqlstrict.changed
   when: ansible_distribution_release == 'xenial'
-

@@ -34,5 +34,21 @@ Listen {{ misp_base_port }}
     SSLCertificateFile {{ ssl_dir }}/{{ ansible_fqdn }}.crt
     SSLCertificateKeyFile {{ ssl_privatedir }}/{{ ansible_fqdn }}.key
     Include {{ apacheetc }}/harden-apache2-https.conf
+
 {% endif %}
+    <LocationMatch /attributes/.*>
+        <IfModule mod_security2.c>
+            SecRuleRemoveById 920180
+        </IfModule>
+    </LocationMatch>
+    <LocationMatch /events/.*>
+        <IfModule mod_security2.c>
+            SecRuleRemoveById 920180
+        </IfModule>
+    </LocationMatch>
+    <LocationMatch /stix/.*>
+        <IfModule mod_security2.c>
+            SecRuleRemoveById 920180
+        </IfModule>
+    </LocationMatch>
 </VirtualHost>

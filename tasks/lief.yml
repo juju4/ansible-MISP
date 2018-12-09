@@ -19,12 +19,14 @@
         - devtoolset-7
         - cmake3
 
-    - stat: path={{ misp_lief_rootdir }}/include/LIEF
+    - name: check if LIEF present
+      stat: path={{ misp_lief_rootdir }}/include/LIEF
       register: l
     - name: git clone LIEF - Library to Instrument Executable Formats
       git:
         repo: https://github.com/lief-project/LIEF.git
         dest: "{{ misp_lief_rootdir }}"
+        version: HEAD
         update: no
         force: no
       when: not l.stat.exists
@@ -43,9 +45,15 @@
 # FIXME! can stop around 85% with
 #   c++: internal compiler error: Killed (program cc1plus)
 #   => replay and check that you have enough memory
-        - { c: 'scl enable devtoolset-7 "bash -c \"cmake3 -DLIEF_PYTHON_API=on -DLIEF_DOC=off -DCMAKE_INSTALL_PREFIX=$LIEF_INSTALL -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=2.7 ..\""', t: "{{ misp_lief_rootdir }}/build/Makefile" }
+        - { c: 'scl enable devtoolset-7 "bash -c \"cmake3 -DLIEF_PYTHON_API=on -DLIEF_DOC=off
+                -DCMAKE_INSTALL_PREFIX=$LIEF_INSTALL -DCMAKE_BUILD_TYPE=Release
+                -DPYTHON_VERSION=2.7 ..\""',
+            t: "{{ misp_lief_rootdir }}/build/Makefile"
+          }
         - { c: 'make -j3', t: "{{ misp_lief_rootdir }}/build/api/python/_pylief.so" }
-        - { c: 'cd api/python && python setup.py install || :', t: '/usr/lib64/python2.7/site-packages/lief-0.9.0-py2.7-linux.egg' }
+        - { c: 'cd api/python && python setup.py install || :',
+            t: '/usr/lib64/python2.7/site-packages/lief-0.9.0-py2.7-linux.egg'
+          }
         - { c: 'make install', t: '/share/LIEF/examples/c/elf_reader.c' }
         - { c: 'make package', t: '/var/lief/build/LIEF-0.9.0-Linux.tar.gz' }
       async: 3600
@@ -54,9 +62,11 @@
   when: ansible_os_family == 'RedHat'
 
 # FIXME! pip install fails on centos7. https://www.centos.org/forums/viewtopic.php?t=66248
-#   ImportError: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.20' not found (required by /usr/lib64/python2.7/site-packages/_pylief.so)
+#   ImportError: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.20' not found
+#        (required by /usr/lib64/python2.7/site-packages/_pylief.so)
 #   $ strings /usr/lib64/libstdc++.so.6.0.19 | grep GLIBCXX
 #   ? /opt/rh/devtoolset-7/root/usr/lib/gcc/x86_64-redhat-linux/7/libstdc++.so
 - name: Ensure LIEF is working
   command: "python -c 'import lief'"
   ignore_errors: true
+  changed_when: false

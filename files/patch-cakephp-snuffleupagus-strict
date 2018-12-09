@@ -1,0 +1,138 @@
+diff -urN cakephp.orig/lib/Cake/Core/Configure.php cakephp/lib/Cake/Core/Configure.php
+--- cakephp.orig/lib/Cake/Core/Configure.php	2018-10-21 15:45:43.806009341 +0000
++++ cakephp/lib/Cake/Core/Configure.php	2018-10-21 16:11:10.063865546 +0000
+@@ -167,9 +167,9 @@
+ 
+ 		if (isset($config['debug']) && function_exists('ini_set')) {
+ 			if (static::$_values['debug']) {
+-				ini_set('display_errors', 1);
++				ini_set('display_errors', '1');
+ 			} else {
+-				ini_set('display_errors', 0);
++				ini_set('display_errors', '0');
+ 			}
+ 		}
+ 		return true;
+diff -urN cakephp.orig/lib/Cake/Model/Datasource/CakeSession.php cakephp/lib/Cake/Model/Datasource/CakeSession.php
+--- cakephp.orig/lib/Cake/Model/Datasource/CakeSession.php	2018-10-21 15:45:43.927007832 +0000
++++ cakephp/lib/Cake/Model/Datasource/CakeSession.php	2018-10-21 16:13:36.389035130 +0000
+@@ -578,7 +578,7 @@
+ 		if (empty($_SESSION)) {
+ 			if (!empty($sessionConfig['ini']) && is_array($sessionConfig['ini'])) {
+ 				foreach ($sessionConfig['ini'] as $setting => $value) {
+-					if (ini_set($setting, $value) === false) {
++					if (ini_set($setting, (string)$value) === false) {
+ 						throw new CakeSessionException(__d('cake_dev', 'Unable to configure the session, setting %s failed.', $setting));
+ 					}
+ 				}
+diff -urN cakephp.orig/lib/Cake/Network/CakeRequest.php cakephp/lib/Cake/Network/CakeRequest.php
+--- cakephp.orig/lib/Cake/Network/CakeRequest.php	2018-10-21 15:45:43.953007508 +0000
++++ cakephp/lib/Cake/Network/CakeRequest.php	2018-10-21 16:12:27.085901916 +0000
+@@ -902,7 +902,7 @@
+  */
+ 	protected static function _parseAcceptWithQualifier($header) {
+ 		$accept = array();
+-		$header = explode(',', $header);
++		$header = explode(',', (string)$header);
+ 		foreach (array_filter($header) as $value) {
+ 			$prefValue = '1.0';
+ 			$value = trim($value);
+diff -urN cakephp.orig/lib/Cake/Network/CakeResponse.php cakephp/lib/Cake/Network/CakeResponse.php
+--- cakephp.orig/lib/Cake/Network/CakeResponse.php	2018-10-21 15:45:43.953007508 +0000
++++ cakephp/lib/Cake/Network/CakeResponse.php	2018-10-21 16:16:57.794517293 +0000
+@@ -1101,7 +1101,7 @@
+  * @return bool
+  */
+ 	public function outputCompressed() {
+-		return strpos(env('HTTP_ACCEPT_ENCODING'), 'gzip') !== false
++		return strpos((string)env('HTTP_ACCEPT_ENCODING'), 'gzip') !== false
+ 			&& (ini_get("zlib.output_compression") === '1' || in_array('ob_gzhandler', ob_list_handlers()));
+ 	}
+ 
+@@ -1160,7 +1160,7 @@
+  * @return bool whether the response was marked as not modified or not.
+  */
+ 	public function checkNotModified(CakeRequest $request) {
+-		$etags = preg_split('/\s*,\s*/', $request->header('If-None-Match'), null, PREG_SPLIT_NO_EMPTY);
++		$etags = preg_split('/\s*,\s*/', (string)$request->header('If-None-Match'), (int)null, PREG_SPLIT_NO_EMPTY);
+ 		$modifiedSince = $request->header('If-Modified-Since');
+ 		if ($responseTag = $this->etag()) {
+ 			$etagMatches = in_array('*', $etags) || in_array($responseTag, $etags);
+diff -urN cakephp.orig/lib/Cake/Routing/Route/CakeRoute.php cakephp/lib/Cake/Routing/Route/CakeRoute.php
+--- cakephp.orig/lib/Cake/Routing/Route/CakeRoute.php	2018-10-21 15:45:44.029006560 +0000
++++ cakephp/lib/Cake/Routing/Route/CakeRoute.php	2018-10-21 16:15:09.125875601 +0000
+@@ -470,7 +470,7 @@
+ 		//check patterns for routed params
+ 		if (!empty($this->options)) {
+ 			foreach ($this->options as $key => $pattern) {
+-				if (array_key_exists($key, $url) && !preg_match('#^' . $pattern . '$#', $url[$key])) {
++				if (array_key_exists($key, $url) && !preg_match('#^' . $pattern . '$#', (string)$url[$key])) {
+ 					return false;
+ 				}
+ 			}
+diff -urN cakephp.orig/lib/Cake/View/Helper.php cakephp/lib/Cake/View/Helper.php
+--- cakephp.orig/lib/Cake/View/Helper.php	2018-10-21 15:45:44.844996384 +0000
++++ cakephp/lib/Cake/View/Helper.php	2018-10-21 16:53:24.601939569 +0000
+@@ -573,7 +573,7 @@
+ 		if ($setScope === true) {
+ 			$this->_modelScope = $entity;
+ 		}
+-		$parts = array_values(Hash::filter(explode('.', $entity)));
++		$parts = array_values(Hash::filter(explode('.', (string)$entity)));
+ 		if (empty($parts)) {
+ 			return;
+ 		}
+diff -urN cakephp.orig/lib/Cake/basics.php cakephp/lib/Cake/basics.php
+--- cakephp.orig/lib/Cake/basics.php	2018-10-21 15:45:43.271016013 +0000
++++ cakephp/lib/Cake/basics.php	2018-10-21 16:52:48.698380763 +0000
+@@ -228,7 +228,7 @@
+ 		if (is_string($double)) {
+ 			$charset = $double;
+ 		}
+-		return htmlspecialchars($text, ENT_QUOTES, ($charset) ? $charset : $defaultCharset, $double);
++		return htmlspecialchars((string)$text, ENT_QUOTES, ($charset) ? $charset : $defaultCharset, $double);
+ 	}
+ 
+ }
+@@ -323,7 +323,7 @@
+ 			if (isset($_SERVER['HTTPS'])) {
+ 				return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+ 			}
+-			return (strpos(env('SCRIPT_URI'), 'https://') === 0);
++			return (strpos((string)env('SCRIPT_URI'), 'https://') === 0);
+ 		}
+ 
+ 		if ($key === 'SCRIPT_NAME') {
+diff -urN cakephp.orig/lib/Cake/Model/Datasource/Database/Mysql.php cakephp/lib/Cake/Model/Datasource/Database/Mysql.php
+--- cakephp.orig/lib/Cake/Model/Datasource/Database/Mysql.php	2018-10-27 20:58:11.781602239 +0000
++++ cakephp/lib/Cake/Model/Datasource/Database/Mysql.php	2018-10-27 20:58:42.272840239 +0000
+@@ -360,7 +360,7 @@
+ 				$fields[$column->Field]['unsigned'] = $this->_unsigned($column->Type);
+ 			}
+ 			if (in_array($fields[$column->Field]['type'], array('timestamp', 'datetime')) &&
+-				in_array(strtoupper($column->Default), array('CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP()'))
++				in_array(strtoupper((string)$column->Default), array('CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP()'))
+ 			) {
+ 				$fields[$column->Field]['default'] = null;
+ 			}
+diff -urN cakephp.orig/lib/Cake/Model/Datasource/DboSource.php cakephp/lib/Cake/Model/Datasource/DboSource.php
+--- cakephp.orig/lib/Cake/Model/Datasource/DboSource.php	2018-10-27 20:58:11.781602239 +0000
++++ cakephp/lib/Cake/Model/Datasource/DboSource.php	2018-10-27 21:01:11.847590239 +0000
+@@ -2774,7 +2774,7 @@
+ 			if (is_array($value)) {
+ 				$valueInsert = (
+ 					!empty($value) &&
+-					(substr_count($key, '?') === count($value) || substr_count($key, ':') === count($value))
++					(substr_count((string)$key, '?') === count($value) || substr_count((string)$key, ':') === count($value))
+ 				);
+ 			}
+ 
+@@ -2783,7 +2783,7 @@
+ 			} elseif (is_numeric($key) && is_string($value)) {
+ 				$out[] = $this->_quoteFields($value);
+ 			} elseif ((is_numeric($key) && is_array($value)) || in_array(strtolower(trim($key)), $this->_sqlBoolOps)) {
+-				if (in_array(strtolower(trim($key)), $this->_sqlBoolOps)) {
++				if (in_array(strtolower(trim((string)$key)), $this->_sqlBoolOps)) {
+ 					$join = ' ' . strtoupper($key) . ' ';
+ 				} else {
+ 					$key = $join;
