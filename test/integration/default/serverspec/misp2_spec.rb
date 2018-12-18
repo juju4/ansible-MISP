@@ -8,6 +8,8 @@ describe command('cd /var/www/MISP/tests && ./curl_tests.sh `cat $HOME/build/key
 ##	not like https://travis-ci.org/MISP/MISP/jobs/128166085
   its(:stdout) { should match /548847db-060c-4275-a0c7-15bb950d210b/}
   its(:stdout) { should_not match /HTTP\/1.1 500 Internal Server Error/}
+  its(:stderr) { should match /diff compare.csv 1.csv/}
+  its(:stderr) { should_not match /error/}
   its(:exit_status) { should eq 0 }
   let(:sudo_options) { '-u _misp -H' }
 end
