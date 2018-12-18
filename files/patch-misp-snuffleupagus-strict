@@ -1,6 +1,5 @@
-diff -urN app.orig/Controller/AppController.php app/Controller/AppController.php
---- app.orig/Controller/AppController.php	2018-10-21 20:02:45.772905154 +0000
-+++ app/Controller/AppController.php	2018-10-21 20:02:59.395738730 +0000
+--- app.orig/Controller/AppController.php	2018-12-18 06:15:57.464044001 +0000
++++ app/Controller/AppController.php	2018-12-18 06:23:33.259828000 +0000
 @@ -478,7 +478,7 @@
  
      private function __convertEmailToName($email)
@@ -11,11 +10,11 @@ diff -urN app.orig/Controller/AppController.php app/Controller/AppController.php
          foreach ($name as $key => $value) {
              $name[$key] = ucfirst($value);
 @@ -621,7 +621,7 @@
-      foreach ($options['paramArray'] as $p) {
-          if (
-              isset($options['ordered_url_params'][$p]) &&
+             foreach ($options['paramArray'] as $p) {
+                 if (
+                     isset($options['ordered_url_params'][$p]) &&
 -                    (!in_array(strtolower($options['ordered_url_params'][$p]), array('null', '0', false, 'false', null)))
 +                    (!in_array(strtolower((string)$options['ordered_url_params'][$p]), array('null', '0', false, 'false', null)))
-          ) {
-              $data[$p] = $options['ordered_url_params'][$p];
-              $data[$p] = str_replace(';', ':', $data[$p]);
+                 ) {
+                     $data[$p] = $options['ordered_url_params'][$p];
+                     $data[$p] = str_replace(';', ':', $data[$p]);
