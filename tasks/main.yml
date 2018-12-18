@@ -104,6 +104,13 @@
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
+# possible git clone issues else
+- name: RedHat | Ensure latest nss curl libcurl
+  package:
+    name: [ 'nss', 'curl', 'libcurl' ]
+    state: latest
+  when: ansible_os_family == "RedHat"
+
 - name: install python dependencies with pip - python, latest
   pip:
     name: [ 'git+https://github.com/kbandla/pydeep.git', 'python-magic']
