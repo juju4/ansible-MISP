@@ -120,5 +120,5 @@
   replace:
     dest: /var/www/MISP/tests/curl_tests.sh
     regexp: '^curl -([iH].)'
-    replace: '^curl -k -\1'
+    replace: 'curl -k -\1'
     backup: yes
