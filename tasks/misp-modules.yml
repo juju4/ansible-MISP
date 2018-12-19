@@ -11,6 +11,14 @@
     version: HEAD
   when: not mm.stat.exists
 
+- name: Ubuntu 16.04 | Disable PyIntel471 - Python 3.6+ required
+  replace:
+    dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
+    regexp: "^git+https://github.com/MISP/PyIntel471.git"
+    replace: "#git+https://github.com/MISP/PyIntel471.git"
+    backup: yes
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
+
 - name: debian | install dependencies for MISP modules (pip3)
   pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip3
   when: ansible_os_family == 'Debian'
