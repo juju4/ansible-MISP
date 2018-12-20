@@ -12,10 +12,10 @@
   when: not mm.stat.exists
 
 - name: Ubuntu 16.04 | Disable PyIntel471 - Python 3.6+ required
-  replace:
+  lineinfile:
     dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-    regexp: "^git+https://github.com/MISP/PyIntel471.git"
-    replace: "#git+https://github.com/MISP/PyIntel471.git"
+    regexp: '^git\+https:\/\/github.com\/MISP\/PyIntel471.git'
+    state: absent
     backup: yes
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
 
