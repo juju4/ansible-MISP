@@ -42,7 +42,13 @@ describe command("python36 -c 'import sigma'"), :if => os[:family] == 'redhat' &
   its(:exit_status) { should eq 0 }
 end
 
-describe command("misp-modules -t") do
+describe command("misp-modules -t"), :if => os[:family] == 'ubuntu' && os[:release] != '16.04' do
+  its(:stdout) { should_not match /ERROR/ }
+  its(:stdout) { should_not match /WARNING/ }
+  let(:sudo_options) { '-u www-data -H' }
+end
+
+describe command("misp-modules -t"), :if => os[:family] == 'redhat' do
   its(:stdout) { should_not match /ERROR/ }
   its(:stdout) { should_not match /WARNING/ }
   let(:sudo_options) { '-u www-data -H' }
