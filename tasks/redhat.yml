@@ -2,6 +2,8 @@
 
 - name: yum | remi yum-utils
   yum: name=yum-utils state=present update_cache=yes
+  register: pkg_result
+  until: pkg_result is success
 
 ## for php-redis
 - include: redhat-remi.yml
@@ -13,6 +15,8 @@
     update_cache: yes
   async: 3600
   poll: 300
+  register: pkg_result
+  until: pkg_result is success
 
 - block:
     - name: set php-fpm to use socket file
@@ -73,6 +77,8 @@
         - libselinux-python
         - libsemanage-python
         - policycoreutils-python
+      register: pkg_result
+      until: pkg_result is success
 
     - name: RedHat | Allow proxy to network connect in selinux
       seboolean:

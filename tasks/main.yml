@@ -87,6 +87,8 @@
   with_items:
     - Crypt_GPG
     - Net_GeoIP
+  register: pkg_result
+  until: pkg_result is success
 
 ## TODO duplicate from misp-modules/requirements?
 - name: install python dependencies with pip - python3
@@ -110,6 +112,8 @@
     name: [ 'nss', 'curl', 'libcurl' ]
     state: latest
   when: ansible_os_family == "RedHat"
+  register: pkg_result
+  until: pkg_result is success
 
 - name: install python dependencies with pip - python, latest
   pip:
@@ -118,6 +122,8 @@
 #    executable: pip3
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  register: pkg_result
+  until: pkg_result is success
 
 - include: redis-secure.yml
 

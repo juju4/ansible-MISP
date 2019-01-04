@@ -22,17 +22,23 @@
 - name: debian | install dependencies for MISP modules (pip3)
   pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip3
   when: ansible_os_family == 'Debian'
+  register: pkg_result
+  until: pkg_result is success
 ## centos7: pip points to python3x
 - name: redhat | install dependencies for MISP modules (pip)
   pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip
   when: ansible_os_family == 'RedHat'
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  register: pkg_result
+  until: pkg_result is success
 
 - name: install MISP modules (pip3)
   pip: name=file://{{ mispmodules_rootdir }}/misp-modules executable=pip3
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  register: pkg_result
+  until: pkg_result is success
 
 - name: add MISP modules script for boot
   lineinfile:

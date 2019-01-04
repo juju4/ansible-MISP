@@ -4,9 +4,10 @@
 
 - name: install testing tools
   package:
-    name: "{{ item }}"
+    name: "{{ misp_testing_pkg }}"
     state: present
-  with_items: "{{ misp_testing_pkg }}"
+  register: pkg_result
+  until: pkg_result is success
 
 - name: replace misp.local hostname
   replace: dest="{{ item }}" regexp='http:\/\/misp.local' replace="{{ misp_base_url }}" backup=yes
@@ -28,6 +29,8 @@
     - requests-mock
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  register: pkg_result
+  until: pkg_result is success
 
 - name: ensure test user in group of web server
   user: "user={{ misp_testing_user }} groups={{ www_user }} append=yes"

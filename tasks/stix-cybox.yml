@@ -24,3 +24,5 @@
     - maec
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  register: pkg_result
+  until: pkg_result is success
