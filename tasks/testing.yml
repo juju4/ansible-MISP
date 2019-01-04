@@ -10,9 +10,11 @@
   until: pkg_result is success
 
 - name: replace misp.local hostname
-  replace: dest="{{ item }}" regexp='http:\/\/misp.local' replace="{{ misp_base_url }}" backup=yes
-  with_items:
-    - "{{ misp_rootdir }}/tests/curl_tests.sh"
+  replace:
+    dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
+    regexp: 'http:\/\/misp.local'
+    replace: "{{ misp_base_url }}"
+    backup: yes
 - name: check tool version for debugging
   command: "{{ item }}"
   with_items:
