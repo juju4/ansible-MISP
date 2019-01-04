@@ -38,6 +38,13 @@
         - restart php-fpm
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
+- name: redhat | ensure python36 site-packages directory exists
+  file:
+    dest: /usr/local/lib/python3.6/site-packages
+    owner: root
+    mode: '0755'
+    state: directory
+
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 - name: redhat | install missing pip3 command
   command: "{{ easy_install_bin }} pip"
