@@ -8,7 +8,7 @@
   git:
     repo: https://github.com/MISP/misp-modules.git
     dest: "{{ mispmodules_rootdir }}/misp-modules"
-    version: HEAD
+    version: "{{ mispmodules_version | default('e6f4503763300f5c99a998a3cab58802a9c30b4b') }}"
   when: not mm.stat.exists
 
 - name: Ubuntu 16.04 | Disable PyIntel471 - Python 3.6+ required

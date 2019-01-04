@@ -64,6 +64,8 @@
       package:
         name: libselinux-python
         state: present
+      register: pkg_result
+      until: pkg_result is success
     - name: re-collect facts
       action: setup
     - debug: var=ansible_selinux
@@ -86,8 +88,6 @@
         state: yes
         persistent: yes
 
-# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Managing_Confined_Services/sect-Managing_Confined_Services-Configuration_examples-Changing_port_numbers.html
-# https://wiki.centos.org/HowTos/SELinux#head-ad837f60830442ae77a81aedd10c20305a811388
     - name: RedHat | Allow httpd to listen to unusual ports
       seport:
         ports: "{{ misp_base_port }}"

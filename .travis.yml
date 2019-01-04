@@ -25,6 +25,9 @@ env:
 #    version: 3.4
 #  - distribution: debian
 #    version: stretch
+  - distribution: ubuntu
+    version: 18.04
+    suite: default-HEAD
 
 before_install:
   - env
