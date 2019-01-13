@@ -1,3 +1,5 @@
+{{ ansible_managed | comment }}
+
 {% if misp_base_port != 80 and misp_base_port != 443 and ansible_os_family == "Debian" %}
 Listen {{ misp_base_port }}
 {% elif misp_base_port != 80 and ansible_os_family == "RedHat" %}
