@@ -29,6 +29,7 @@
   until: pkg_result is success
   become: yes
   become_user: "{{ www_user }}"
+  become_flags: '-H'
 ## centos7: pip points to python3x
 - name: redhat | install dependencies for MISP modules (pip)
   pip:
