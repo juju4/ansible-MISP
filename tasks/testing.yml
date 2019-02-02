@@ -23,12 +23,10 @@
   changed_when: false
   ignore_errors: true
 - name: pip dependencies for testing
-  pip: name={{ item }} executable=pip3
-  with_items:
-    - coveralls
-    - codecov
-    - nose
-    - requests-mock
+  pip:
+    name: ['coveralls', 'codecov', 'nose', 'requests-mock']
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
