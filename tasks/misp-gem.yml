@@ -2,6 +2,7 @@
 
 - name: install gem dependencies
   gem:
-    name: "{{ misp_gem_list | default([]) }}"
+    name: "{{ item }}"
     pre_release: yes
     state: present
+  with_items: "{{ misp_gem_list | default([]) }}"
