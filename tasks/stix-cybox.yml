@@ -14,6 +14,8 @@
     - { n: stix, v: "{{ misp_pip_stix_version }}" }
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  become: yes
+  become_user: "{{ www_user }}"
 
 - name: install python dependencies with pip - latest
   pip:
@@ -25,6 +27,8 @@
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
   until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
 
 - name: install cti-python-stix2
   pip:
@@ -36,3 +40,5 @@
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
   until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"

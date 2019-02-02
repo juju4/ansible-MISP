@@ -31,6 +31,8 @@
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
   until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
 
 - name: ensure test user in group of web server
   user: "user={{ misp_testing_user }} groups={{ www_user }} append=yes"
