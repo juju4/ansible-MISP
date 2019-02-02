@@ -2,7 +2,7 @@
 
 #- debug: var=list
 - name: add user {{ user.email }}
-  command: "{{ python3_bin }} ./add_user.py -e {{ user.email }} -o {{ user.org }} -r {{ user.role }}"
+  command: "{{ misp_virtualenv }}/bin/python ./add_user.py -e {{ user.email }} -o {{ user.org }} -r {{ user.role }}"
   become: yes
   become_user: "{{ www_user }}"
   args:

@@ -44,7 +44,7 @@
     timeout: 300
 
 - name: ensure PyMISP API working
-  command: "{{ python3_bin }} ./last.py -l 10"
+  command: "{{ misp_virtualenv }}/bin/python ./last.py -l 10"
   become: yes
   become_user: "{{ www_user }}"
   args:
@@ -57,7 +57,7 @@
   ignore_errors: true
 
 - name: list current users
-  command: "{{ python3_bin }} ./users_list.py"
+  command: "{{ misp_virtualenv }}/bin/python ./users_list.py"
   become: yes
   become_user: "{{ www_user }}"
   args:
