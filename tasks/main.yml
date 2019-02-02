@@ -82,15 +82,6 @@
 #- name: updated access to pear.php.net
 #  command: pear channel-update pear.php.net
 #  when: pearinstalled.stdout.find("Crypt_GPG") == -1
-- name: install php pear dependencies
-  pear:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - "{{ misp_rootdir }}/INSTALL/dependencies/Console_CommandLine/package.xml"
-    - "{{ misp_rootdir }}/INSTALL/dependencies/Crypt_GPG/package.xml"
-  register: pkg_result
-  until: pkg_result is success
 
 ## TODO duplicate from misp-modules/requirements?
 - name: install python dependencies with pip - python3
@@ -196,6 +187,16 @@
   changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
   notify:
     - updating existing MISP submodules - minor releases
+
+- name: install php pear dependencies
+  pear:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ misp_rootdir }}/INSTALL/dependencies/Console_CommandLine/package.xml"
+    - "{{ misp_rootdir }}/INSTALL/dependencies/Crypt_GPG/package.xml"
+  register: pkg_result
+  until: pkg_result is success
 
 ## must be after git cloning MISP
 - include: apache2.yml
