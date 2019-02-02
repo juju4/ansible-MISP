@@ -27,6 +27,8 @@
   when: ansible_os_family == 'Debian'
   register: pkg_result
   until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
 ## centos7: pip points to python3x
 - name: redhat | install dependencies for MISP modules (pip)
   pip:
@@ -37,6 +39,8 @@
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
   until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
 
 - name: install MISP modules (pip3)
   pip:
@@ -47,6 +51,8 @@
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
   until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
 
 - name: add MISP modules script for boot
   lineinfile:

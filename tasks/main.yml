@@ -83,40 +83,12 @@
 #  command: pear channel-update pear.php.net
 #  when: pearinstalled.stdout.find("Crypt_GPG") == -1
 
-## TODO duplicate from misp-modules/requirements?
-- name: install python dependencies with pip - python3
-  pip:
-    name: "{{ item.n }}"
-    version: "{{ item.v }}"
-    extra_args: '--exists-action=w'
-    virtualenv: "{{ misp_virtualenv }}"
-    virtualenv_python: "{{ python3_bin }}"
-  with_items:
-    - { n: redis, v: '2.10.5' }
-#    - { n: pyzmq, v: '16.0.2' }
-    - { n: 'pymisp', v: "{{ misp_pymisp_version }}" }
-## required for users API
-#  when: ansible_distribution_release == 'xenial'
-  environment:
-    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
 # possible git clone issues else
 - name: RedHat | Ensure latest nss curl libcurl
   package:
     name: [ 'nss', 'curl', 'libcurl' ]
     state: latest
   when: ansible_os_family == "RedHat"
-  register: pkg_result
-  until: pkg_result is success
-
-- name: install python dependencies with pip - python, latest
-  pip:
-    name: [ 'git+https://github.com/kbandla/pydeep.git', 'python-magic']
-    extra_args: '--exists-action=w'
-    virtualenv: "{{ misp_virtualenv }}"
-    virtualenv_python: "{{ python3_bin }}"
-  environment:
-    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
   until: pkg_result is success
 
@@ -177,6 +149,19 @@
 #    verify_commit: yes
 #    track_submodules: yes
 #  when: not m.stat.exists
+  become: yes
+  become_user: "{{ www_user }}"
+
+- name: update git submodules
+  command: "{{ item }}"
+  args:
+    chdir: "{{ misp_rootdir }}"
+  with_items:
+    - git submodule update --init --recursive
+    - git submodule foreach --recursive git config core.filemode false
+  become: yes
+  become_user: "{{ www_user }}"
+  when: not m.stat.exists
 
 ## https://github.com/MISP/MISP/blob/e763e7646f7bbae5183ab93df840501d88c47119/INSTALL/UPDATE.txt
 - name: updating existing MISP - minor releases
@@ -189,6 +174,39 @@
   changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
   notify:
     - updating existing MISP submodules - minor releases
+  become: yes
+  become_user: "{{ www_user }}"
+
+- name: install python dependencies with pip - python3
+  pip:
+    name: "{{ item.n }}"
+    version: "{{ item.v }}"
+    extra_args: '--exists-action=w'
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
+  with_items:
+    - { n: redis, v: '2.10.5' }
+#    - { n: pyzmq, v: '16.0.2' }
+    - { n: 'pymisp', v: "{{ misp_pymisp_version }}" }
+## required for users API
+#  when: ansible_distribution_release == 'xenial'
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  become: yes
+  become_user: "{{ www_user }}"
+
+- name: install python dependencies with pip - python, latest
+  pip:
+    name: [ 'git+https://github.com/kbandla/pydeep.git', 'python-magic']
+    extra_args: '--exists-action=w'
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  register: pkg_result
+  until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
 
 - name: install php pear dependencies
   pear:
