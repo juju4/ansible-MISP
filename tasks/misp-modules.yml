@@ -35,6 +35,8 @@
     requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     virtualenv: "{{ misp_virtualenv }}"
   when: ansible_os_family == 'RedHat'
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
   until: pkg_result is success
   become: yes
@@ -45,6 +47,8 @@
     name: "file://{{ mispmodules_rootdir }}/misp-modules"
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
   until: pkg_result is success
   become: yes
