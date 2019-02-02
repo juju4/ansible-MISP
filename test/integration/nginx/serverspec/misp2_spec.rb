@@ -37,7 +37,7 @@ end
 
 ## FIXME! 
 ##	nginx-centos7: fail
-describe command('cd /var/www/MISP/PyMISP && /var/www/MISP/venv/bin/coverage3 run setup.py test 2>&1 | tee /tmp/coverage.out'), :if => os[:release] != '14.04' && os[:release] != '6' do
+describe command('cd /var/www/MISP/PyMISP && /var/www/MISP/venv/bin/coverage run setup.py test 2>&1 | tee /tmp/coverage.out'), :if => os[:release] != '14.04' && os[:release] != '6' do
   its(:stdout) { should match /version/ }
 ## nginx-centos7 output is pretty print, while other are not
 #  its(:stdout) { should match /{u'Event': {u'info': u'This is a test'/ }

@@ -40,7 +40,7 @@ end
 ## FIXME! 
 ##	trusty: fail
 ##	centos6: fail
-describe command('cd /var/www/MISP/PyMISP && /var/www/MISP/venv/bin/coverage3 run setup.py test 2>&1 | tee /tmp/coverage.out'), :if => os[:release] != '14.04' && os[:release] != '6' do
+describe command('cd /var/www/MISP/PyMISP && /var/www/MISP/venv/bin/coverage run setup.py test 2>&1 | tee /tmp/coverage.out'), :if => os[:release] != '14.04' && os[:release] != '6' do
 #  its(:stdout) { should match /{u'Event': {u'info': u'This is a test'/ }
   its(:stdout) { should match /running test/ }
 ## 201701: 3/18 tests failing also on xenial and centos7
