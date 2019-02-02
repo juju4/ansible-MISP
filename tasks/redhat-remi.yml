@@ -15,15 +15,21 @@
     - https://rpms.remirepo.net/RPM-GPG-KEY-remi
     - https://rpms.remirepo.net/RPM-GPG-KEY-remi2017
     - https://rpms.remirepo.net/RPM-GPG-KEY-remi2018
+  register: pkg_result
+  until: pkg_result is success
 
 - name: RedHat6 | Install Remi repo
   yum: name=http://rpms.remirepo.net/enterprise/remi-release-6.rpm
        state=present
   when: ansible_distribution_major_version == "6" and 'remi-release' not in ansible_facts.packages
+  register: pkg_result
+  until: pkg_result is success
 - name: RedHat7 | Install Remi repo
   yum: name=http://rpms.remirepo.net/enterprise/remi-release-7.rpm
        state=present
   when: ansible_distribution_major_version == "7" and 'remi-release' not in ansible_facts.packages
+  register: pkg_result
+  until: pkg_result is success
 
 - name: check if remi-php repo is enabled
   command: "grep '^enabled=' /etc/yum.repos.d/remi-php72.repo"

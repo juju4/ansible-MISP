@@ -8,23 +8,37 @@
   git:
     repo: https://github.com/MISP/misp-modules.git
     dest: "{{ mispmodules_rootdir }}/misp-modules"
-    version: HEAD
+    version: "{{ mispmodules_version | default('e6f4503763300f5c99a998a3cab58802a9c30b4b') }}"
   when: not mm.stat.exists
+
+- name: Ubuntu 16.04 | Disable PyIntel471 - Python 3.6+ required
+  lineinfile:
+    dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
+    regexp: '^git\+https:\/\/github.com\/MISP\/PyIntel471.git'
+    state: absent
+    backup: yes
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
 
 - name: debian | install dependencies for MISP modules (pip3)
   pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip3
   when: ansible_os_family == 'Debian'
+  register: pkg_result
+  until: pkg_result is success
 ## centos7: pip points to python3x
 - name: redhat | install dependencies for MISP modules (pip)
   pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip
   when: ansible_os_family == 'RedHat'
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  register: pkg_result
+  until: pkg_result is success
 
 - name: install MISP modules (pip3)
   pip: name=file://{{ mispmodules_rootdir }}/misp-modules executable=pip3
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  register: pkg_result
+  until: pkg_result is success
 
 - name: add MISP modules script for boot
   lineinfile:

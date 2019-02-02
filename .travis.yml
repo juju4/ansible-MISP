@@ -25,6 +25,9 @@ env:
 #    version: 3.4
 #  - distribution: debian
 #    version: stretch
+  - distribution: ubuntu
+    version: 18.04
+    suite: default-HEAD
 
 before_install:
   - env
@@ -52,6 +55,9 @@ before_install:
 #  - cat /etc/default/lxd-bridge
 #  - service --status-all
   - sudo service lxd restart
+# https://redis4you.com/articles.php?id=012&name=redis
+  - sudo sysctl -w net.ipv4.tcp_timestamps=1
+  - sudo sysctl -w net.ipv4.tcp_tw_recycle=1
 
   - sudo pip install ansible ansible-lint
   - gem install kitchen
@@ -71,12 +77,13 @@ before_install:
 #  - sudo -E -u $USER kitchen diagnose --all
 
 script:
-  - ansible-lint tasks/main.yml
+  - ansible-lint tasks/main.yml || true
 #  - KITCHEN_LOCAL_YAML=.kitchen.local.yml bundle exec kitchen verify ${INSTANCE}
   - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug || (cat $HOME/.kitchen/logs/${suite}-${distribution}-${version//./}.log; find /tmp/kitchen)"
 
 after_script:
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /tmp/idempotency.test'"
+  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/MISP/'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/www/MISP/app/Config/bootstrap.php'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/log/apache2/misp.local_error.log'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/www/MISP/app/tmp/logs/error.log'"
@@ -84,6 +91,7 @@ after_script:
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'getfacl /var/www/MISP/app/tmp/cache/models'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'find /usr -iname \"*libyara*.so\"'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'netstat -anp'"
+  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'ss -nlp'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'systemctl -l --no-pager status'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'journalctl -xe --no-pager'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen destroy ${suite}-${distribution}-${version//./} -l debug || (cat $HOME/.kitchen/logs/${suite}-${distribution}-${version//./}.log; find /tmp/kitchen)"

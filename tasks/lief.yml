@@ -6,6 +6,8 @@
     name: lief
     state: present
   when: ansible_os_family == 'Debian'
+  register: pkg_result
+  until: pkg_result is success
 
 - block:
     - name: Ensure LIEF build dependencies are present
@@ -18,6 +20,8 @@
 # https://wiki.centos.org/SpecialInterestGroup/SCLo/CollectionsList
         - devtoolset-7
         - cmake3
+      register: pkg_result
+      until: pkg_result is success
 
     - name: check if LIEF present
       stat: path={{ misp_lief_rootdir }}/include/LIEF
@@ -26,7 +30,7 @@
       git:
         repo: https://github.com/lief-project/LIEF.git
         dest: "{{ misp_lief_rootdir }}"
-        version: HEAD
+        version: "{{ misp_lief_version | default('0.9.0') }}"
         update: no
         force: no
       when: not l.stat.exists

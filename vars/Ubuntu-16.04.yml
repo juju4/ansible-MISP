@@ -86,3 +86,8 @@ fpm_user: www-data
 gnupg_privdir: "{{ misp_rootdir }}/.gnupg"
 
 mispmodules_libyarapath: /usr/local/lib/python3.5/dist-packages/usr/lib
+
+apacheetc: /etc/apache2
+ssl_user: ssl-cert
+ssl_dir: /etc/ssl
+ssl_privatedir: /etc/ssl/private

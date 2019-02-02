@@ -156,6 +156,10 @@ New ansible v2.2 letsencrypt module allow certificate creation but no renewal of
 
 * LIEF build can take a while (30-60min) on Centos7. Disable if not needed
 
+* RedHat Selinux references:
+  * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Managing_Confined_Services/sect-Managing_Confined_Services-Configuration_examples-Changing_port_numbers.html
+  * https://wiki.centos.org/HowTos/SELinux#head-ad837f60830442ae77a81aedd10c20305a811388
+
 ## TODO
 * role is not managing upgrade (Work in progress/git pull between minor releases)
 * monitoring unless using serverspec

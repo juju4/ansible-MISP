@@ -2,6 +2,8 @@
 
 - name: yum | remi yum-utils
   yum: name=yum-utils state=present update_cache=yes
+  register: pkg_result
+  until: pkg_result is success
 
 ## for php-redis
 - include: redhat-remi.yml
@@ -13,6 +15,8 @@
     update_cache: yes
   async: 3600
   poll: 300
+  register: pkg_result
+  until: pkg_result is success
 
 - block:
     - name: set php-fpm to use socket file
@@ -38,6 +42,13 @@
         - restart php-fpm
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
+- name: redhat | ensure python36 site-packages directory exists
+  file:
+    dest: /usr/local/lib/python3.6/site-packages
+    owner: root
+    mode: '0755'
+    state: directory
+
 ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
 - name: redhat | install missing pip3 command
   command: "{{ easy_install_bin }} pip"
@@ -53,6 +64,8 @@
       package:
         name: libselinux-python
         state: present
+      register: pkg_result
+      until: pkg_result is success
     - name: re-collect facts
       action: setup
     - debug: var=ansible_selinux
@@ -66,6 +79,8 @@
         - libselinux-python
         - libsemanage-python
         - policycoreutils-python
+      register: pkg_result
+      until: pkg_result is success
 
     - name: RedHat | Allow proxy to network connect in selinux
       seboolean:
@@ -73,8 +88,6 @@
         state: yes
         persistent: yes
 
-# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Managing_Confined_Services/sect-Managing_Confined_Services-Configuration_examples-Changing_port_numbers.html
-# https://wiki.centos.org/HowTos/SELinux#head-ad837f60830442ae77a81aedd10c20305a811388
     - name: RedHat | Allow httpd to listen to unusual ports
       seport:
         ports: "{{ misp_base_port }}"

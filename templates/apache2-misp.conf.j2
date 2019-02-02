@@ -1,4 +1,8 @@
-{% if misp_base_port != 80 and misp_base_port != 443 %}
+{{ ansible_managed | comment }}
+
+{% if misp_base_port != 80 and misp_base_port != 443 and ansible_os_family == "Debian" %}
+Listen {{ misp_base_port }}
+{% elif misp_base_port != 80 and ansible_os_family == "RedHat" %}
 Listen {{ misp_base_port }}
 
 {% endif %}
@@ -30,6 +34,15 @@ Listen {{ misp_base_port }}
     Header set X-Content-Type-Options nosniff
     Header set X-Frame-Options DENY
 
+{% if misp_base_port == 443 %}
+{% if ansible_os_family == "RedHat" %}
+    SSLEngine on
+{% endif %}
+    SSLCertificateFile {{ ssl_dir }}/{{ ansible_fqdn }}.crt
+    SSLCertificateKeyFile {{ ssl_privatedir }}/{{ ansible_fqdn }}.key
+    Include {{ apacheetc }}/harden-apache2-https.conf
+
+{% endif %}
     <LocationMatch /attributes/.*>
         <IfModule mod_security2.c>
             SecRuleRemoveById 920180
