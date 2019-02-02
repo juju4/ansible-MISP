@@ -19,6 +19,14 @@
     backup: yes
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
 
+- name: Ensure pip cache directory exists
+  file:
+    dest: "/var/www/.cache/pip/http"
+    owner: "{{ www_user }}"
+    group: "{{ www_user }}"
+    state: directory
+    mode: '0755'
+
 - name: debian | install dependencies for MISP modules (pip3)
   pip:
     requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
