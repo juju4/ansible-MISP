@@ -135,6 +135,14 @@
     value: "{{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}"
   when: misp_proxy_host is defined and misp_proxy_host
 
+- name: Ensure MISP root dir exists
+  file:
+    dest: "{{ misp_rootdir }}"
+    owner: "{{ www_user }}"
+    group: "{{ www_user }}"
+    state: directory
+    mode: '0755'
+
 - name: Check if MISP folder already present
   stat: path={{ misp_rootdir }}/INSTALL
   register: m
