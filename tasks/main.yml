@@ -198,8 +198,6 @@
     - { n: 'pymisp', v: "{{ misp_pymisp_version }}" }
 ## required for users API
 #  when: ansible_distribution_release == 'xenial'
-  environment:
-    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   become: yes
   become_user: "{{ www_user }}"
 
@@ -209,8 +207,6 @@
     extra_args: '--exists-action=w'
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
-  environment:
-    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
   until: pkg_result is success
   become: yes
