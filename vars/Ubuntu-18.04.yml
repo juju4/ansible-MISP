@@ -42,6 +42,10 @@ misp_pkg_list:
 # - libczmq-dev
  - openssl
  - libfuzzy-dev
+ - ruby-pygments.rb
+
+misp_gem_list:
+ - asciidoctor-pdf
 
 python3_bin: python3
 python3_pip: pip3

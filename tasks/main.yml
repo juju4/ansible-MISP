@@ -89,7 +89,8 @@
     name: "{{ item.n }}"
     version: "{{ item.v }}"
     extra_args: '--exists-action=w'
-    executable: "{{ python3_pip }}"
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
   with_items:
     - { n: redis, v: '2.10.5' }
 #    - { n: pyzmq, v: '16.0.2' }
@@ -112,7 +113,8 @@
   pip:
     name: [ 'git+https://github.com/kbandla/pydeep.git', 'python-magic']
     extra_args: '--exists-action=w'
-#    executable: pip3
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
@@ -549,6 +551,7 @@
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - include: misp-modules.yml
+- include: misp-gem.yml
 
 - include: lief.yml
   when: misp_lief_enable and (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int >= 18)

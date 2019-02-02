@@ -20,13 +20,18 @@
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
 
 - name: debian | install dependencies for MISP modules (pip3)
-  pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip3
+  pip:
+    requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
   when: ansible_os_family == 'Debian'
   register: pkg_result
   until: pkg_result is success
 ## centos7: pip points to python3x
 - name: redhat | install dependencies for MISP modules (pip)
-  pip: requirements={{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS executable=pip
+  pip:
+    requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
+    virtualenv: "{{ misp_virtualenv }}"
   when: ansible_os_family == 'RedHat'
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -34,7 +39,10 @@
   until: pkg_result is success
 
 - name: install MISP modules (pip3)
-  pip: name=file://{{ mispmodules_rootdir }}/misp-modules executable=pip3
+  pip:
+    name: "file://{{ mispmodules_rootdir }}/misp-modules"
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
@@ -43,8 +51,8 @@
 - name: add MISP modules script for boot
   lineinfile:
     dest: /etc/rc.local
-    regexp: "sudo -H -u {{ www_user }} misp-modules .* &"
-    line: "sudo -H -u {{ www_user }} misp-modules -s > /tmp/misp-modules.boot 2>&1 &"
+    regexp: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules .* &"
+    line: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.boot 2>&1 &"
     insertbefore: "^exit 0"
     backup: yes
 
@@ -54,7 +62,7 @@
   changed_when: false
   ignore_errors: true
 - name: start MISP modules app
-  shell: "misp-modules -s > /tmp/misp-modules.start 2>&1 &"
+  shell: "{{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.start 2>&1 &"
   become: yes
   become_user: "{{ www_user }}"
   when: "'misp-modules' not in ps.stdout"

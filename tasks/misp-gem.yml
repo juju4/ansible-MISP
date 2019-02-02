@@ -1,0 +1,7 @@
+---
+
+- name: install gem dependencies
+  gem:
+    name: "{{ misp_gem_list | default([]) }}"
+    pre_release: yes
+    state: present

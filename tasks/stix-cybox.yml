@@ -7,7 +7,8 @@
     name: "{{ item.n }}"
     version: "{{ item.v }}"
     extra_args: "--exists-action=w"
-    executable: pip3
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
   with_items:
     - { n: cybox, v: "{{ misp_pip_cybox_version }}" }
     - { n: stix, v: "{{ misp_pip_stix_version }}" }
@@ -16,12 +17,21 @@
 
 - name: install python dependencies with pip - latest
   pip:
-    name: "{{ item }}"
+    name: [ 'mixbox', 'maec' ]
     extra_args: "--exists-action=w"
-    executable: pip3
-  with_items:
-    - mixbox
-    - maec
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  register: pkg_result
+  until: pkg_result is success
+
+- name: install cti-python-stix2
+  pip:
+    name: "file://{{ misp_rootdir }}/cti-python-stix2"
+    extra_args: "--exists-action=w"
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   register: pkg_result
