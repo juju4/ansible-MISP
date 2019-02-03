@@ -1,15 +1,23 @@
 ---
 ## https://github.com/MISP/misp-modules
 
-- name: Check if misp-modules directory exists
-  stat: path={{ mispmodules_rootdir }}/misp-modules
-  register: mm
+- name: Ensure misp-modules directory exists
+  file:
+    dest: "{{ mispmodules_rootdir }}/misp-modules"
+    owner: "{{ www_user }}"
+    group: "{{ www_user }}"
+    state: directory
+    mode: '0755'
+
 - name: git clone MISP modules
   git:
     repo: https://github.com/MISP/misp-modules.git
     dest: "{{ mispmodules_rootdir }}/misp-modules"
     version: "{{ mispmodules_version | default('e6f4503763300f5c99a998a3cab58802a9c30b4b') }}"
-  when: not mm.stat.exists
+    update: no
+    force: no
+  become: yes
+  become_user: "{{ www_user }}"
 
 - name: Ubuntu 16.04 | Disable PyIntel471 - Python 3.6+ required
   lineinfile:
