@@ -17,13 +17,13 @@ provisioner:
   ansible_verbose: true
 #  ansible_verbose: false
   ansible_verbosity: 2
+  ansible_version: latest
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
   ansible_cfg_path: test/vagrant/ansible.cfg
   require_ansible_omnibus: true
 #  require_chef_for_busser: false
   enable_yum_epel: true
   ansible_connection: ssh
-  ansible_version: 2.5.5
 
 platforms:
   - name: ubuntu-18.04
