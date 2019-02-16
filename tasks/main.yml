@@ -43,37 +43,48 @@
   with_items: "{{ misp_services }}"
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
-- name: Debian | Docker | Manually start services
-  shell: "{{ item.c }}"
-  args:
-    creates: "{{ item.t }}"
-  with_items:
-    - { c: "sudo -H -u mysql mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1",
-        t: /tmp/mysql_install_db.out
-      }
-    - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &",
-        t: /tmp/mysqld_safe.out
-      }
-    - { c: "apachectl restart > /tmp/apache2.out 2>&1 &", t: /tmp/apache2.out }
-  ignore_errors: true
+- block:
+    - name: Debian | Docker | Manually initialize mysql
+      shell: >
+        mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1
+      args:
+        creates: /tmp/mysql_install_db.out
+      ignore_errors: true
+      become: yes
+      become_user: mysql
   when: >
     (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and
     ansible_os_family == "Debian"
 
-- name: RedHat | Docker | Manually start services
-  shell: "{{ item.c }}"
-  args:
-    creates: "{{ item.t }}"
-  with_items:
-    - { c: "sudo -H -u mysql /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1", t: /tmp/mysql_install_db.out }
-    - { c: "cd /var/lib/mysql; /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &",
-        t: /tmp/mysqld_safe.out
-      }
-    - { c: "apachectl restart > /tmp/apache2.out 2>&1 &", t: /tmp/apache2.out }
-  ignore_errors: true
+- block:
+    - name: RedHat | Docker | Manually initialize mysql
+      shell: >
+        /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1
+      args:
+        creates: /tmp/mysql_install_db.out
+      ignore_errors: true
+      become: yes
+      become_user: mysql
   when: >
     (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     and ansible_os_family == "RedHat"
+
+- block:
+    - name: Docker | Manually start mysql service
+      shell: >
+        /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &
+      args:
+        creates: /tmp/mysqld_safe.out
+        chdir: /var/lib/mysql
+      ignore_errors: true
+    - name: Docker | Manually restart apache service
+      shell: >
+        apachectl restart > /tmp/apache2.out 2>&1 &
+      args:
+        creates: /tmp/apache2.out
+      ignore_errors: true
+  when: >
+    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: check installed pear packages
   command: pear list
@@ -275,7 +286,7 @@
     owner: "{{ www_user }}"
     group: "{{ www_user }}"
     state: directory
-    mode: '2755'
+    mode: '02755'
 #  with_fileglob:
 #    - {{ misp_rootdir }}/app/files/scripts/tmp/*
 #    - {{ misp_rootdir }}/app/files/scripts/tmp/cache/*
@@ -450,7 +461,7 @@
   when: not gkey.stat.exists and (ansible_os_family == "RedHat") and misp_webserver == 'nginx'
   ignore_errors: true
 - name: create gnupg key for {{ misp_email }}
-  shell: "{{ item.s }}"
+  command: "{{ item.s }}"
   args:
     chdir: "{{ misp_rootdir }}/.gnupg"
     creates: "{{ item.c }}"
@@ -464,10 +475,18 @@
 #    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ gnupg_privdir }}/misp.sec",
 #        c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
 #      }
-    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }}
-                --batch > {{ misp_rootdir }}/app/webroot/gpg.asc",
-        c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
-      }
+  become: yes
+  become_user: "{{ www_user }}"
+## FIXME! seems become_method/flags is not working in vagrant, ansible 2.5.0
+  become_method: su
+  become_flags: '-s /bin/sh'
+- name: create gnupg key for {{ misp_email }}
+  shell: >
+    gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }}
+        --batch > {{ misp_rootdir }}/app/webroot/gpg.asc
+  args:
+    chdir: "{{ misp_rootdir }}/.gnupg"
+    creates: "{{ misp_rootdir }}/app/webroot/gpg.asc"
   become: yes
   become_user: "{{ www_user }}"
 ## FIXME! seems become_method/flags is not working in vagrant, ansible 2.5.0
@@ -477,7 +496,9 @@
 #- command: wipe -q -y /var/tmp/gpg-template
 #  when: not gkey.stat.exists
 - name: check permissions of gpg files
-  file: "dest={{ item.d }} mode={{ item.m }}"
+  file:
+    dest: "{{ item.d }}"
+    mode: "{{ item.m }}"
   with_items:
     - { d: "{{ misp_rootdir }}/.gnupg/misp.pub", m: '0400' }
 #    - { d: "{{ gnupg_privdir }}/misp.sec", m: '0400' }
