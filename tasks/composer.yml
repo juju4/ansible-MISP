@@ -26,16 +26,21 @@
   changed_when: false
   ignore_errors: true
 
-- name: check composer signature
-  fail: msg="FATAL! composer signature not matching. ({{ installer.stat.checksum }} vs {{ installersig.stdout }})"
+- block:
+    - debug: var=installer.stat.checksum
+    - debug: var=installersig.stdout
+    - name: check composer signature
+      fail: msg="FATAL! composer signature not matching."
   when: installer.stat.checksum != installersig.stdout
 
 - name: install composer
-  shell: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
+  command: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
   args:
     creates: /usr/local/bin/composer
 
 - name: install PHP dependencies via composer (kamisama/cake-resque, Vendor)
-  composer: command=install working_dir={{ misp_rootdir }}/app
+  composer:
+    command: install
+    working_dir: "{{ misp_rootdir }}/app"
   register: pkg_result
   until: pkg_result is success

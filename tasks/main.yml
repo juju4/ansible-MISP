@@ -450,7 +450,10 @@
   when: not gkey.stat.exists and (ansible_os_family == "RedHat") and misp_webserver == 'nginx'
   ignore_errors: true
 - name: create gnupg key for {{ misp_email }}
-  shell: "{{ item.s }} chdir={{ misp_rootdir }}/.gnupg creates={{ item.c }}"
+  shell: "{{ item.s }}"
+  args:
+    chdir: "{{ misp_rootdir }}/.gnupg"
+    creates: "{{ item.c }}"
   with_items:
     - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --gen-key --batch /var/tmp/gpg-template",
         c: "{{ misp_rootdir }}/.gnupg/misp.pub"

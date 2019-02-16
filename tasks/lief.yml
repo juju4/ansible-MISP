@@ -41,7 +41,7 @@
         state: directory
 
     - name: Build LIEF
-      shell: "{{ item.c }}"
+      command: "{{ item.c }}"
       args:
         creates: "{{ item.t }}"
         chdir: "{{ misp_lief_rootdir }}/build"
