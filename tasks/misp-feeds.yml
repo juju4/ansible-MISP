@@ -5,31 +5,25 @@
 
 ## FIXME! not idempotent, no way to list feeds with their status
 - name: enable feeds
-  command: >
-    curl -k -X POST -H 'Authorization: {{ userkey }}' -H 'Content-Type: application/json'
-        -H 'Accept: application/json' {{ misp_base_url }}/feeds/enable/{{ item }}
-#  uri:
-#    url: "{{ misp_base_url }}/feeds/enable/{{ item }}"
-#    method: POST
-#    headers:
-#      Authorization: "{{ userkey }}"
-#      Accept: application/json
-#      Content-Type: application/json
+  uri:
+    url: "{{ misp_base_url }}/feeds/enable/{{ item }}"
+    method: POST
+    headers:
+      Authorization: "{{ userkey }}"
+      Accept: application/json
+      Content-Type: application/json
   with_items: "{{ misp_enable_feeds }}"
   register: enableresults
 #- debug: var=enableresults
 
 - name: disable feeds
-  command: >
-    curl -k -X POST -H 'Authorization: {{ userkey }}' -H 'Content-Type: application/json'
-        -H 'Accept: application/json' {{ misp_base_url }}/feeds/disable/{{ item }}
-#  uri:
-#    url: "{{ misp_base_url }}/feeds/disable/{{ item }}"
-#    method: POST
-#    headers:
-#      Authorization: "{{ userkey }}"
-#      Accept: application/json
-#      Content-Type: application/json
+  uri:
+    url: "{{ misp_base_url }}/feeds/disable/{{ item }}"
+    method: POST
+    headers:
+      Authorization: "{{ userkey }}"
+      Accept: application/json
+      Content-Type: application/json
   with_items: "{{ misp_disable_feeds }}"
   register: disableresults
 #- debug: var=disableresults
