@@ -481,7 +481,7 @@
   become_method: su
   become_flags: '-s /bin/sh'
 - name: create gnupg key for {{ misp_email }}
-  shell: >-
+  shell: >
     gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }}
         --batch > {{ misp_rootdir }}/app/webroot/gpg.asc
   args:
