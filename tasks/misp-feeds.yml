@@ -12,6 +12,7 @@
       Authorization: "{{ userkey }}"
       Accept: application/json
       Content-Type: application/json
+    validate_certs: False
   with_items: "{{ misp_enable_feeds }}"
   register: enableresults
 #- debug: var=enableresults
@@ -24,6 +25,7 @@
       Authorization: "{{ userkey }}"
       Accept: application/json
       Content-Type: application/json
+    validate_certs: False
   with_items: "{{ misp_disable_feeds }}"
   register: disableresults
 #- debug: var=disableresults
