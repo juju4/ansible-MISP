@@ -550,7 +550,7 @@
   command: "bash {{ misp_rootdir }}/app/Console/worker/start.sh"
   become: yes
   become_user: "{{ www_user }}"
-  when: "'{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex' in ps.stdout"
+  when: ps.stdout.find("{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex") != -1
 
 - name: add MISP worker script for boot
   lineinfile:
