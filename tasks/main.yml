@@ -482,8 +482,7 @@
   become_flags: '-s /bin/sh'
 - name: create gnupg key for {{ misp_email }}
   shell: >
-    gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }}
-        --batch > {{ misp_rootdir }}/app/webroot/gpg.asc
+    gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc
   args:
     chdir: "{{ misp_rootdir }}/.gnupg"
     creates: "{{ misp_rootdir }}/app/webroot/gpg.asc"
