@@ -56,6 +56,7 @@ before_install:
   - ifconfig -a
   - ps ax | grep dnsmasq
   - systemctl status -l --no-pager lxd-bridge
+  - cat /etc/network/interfaces.d/50-cloud-init.cfg
 # https://redis4you.com/articles.php?id=012&name=redis
 # https://vincent.bernat.ch/en/blog/2014-tcp-time-wait-state-linux
   - sudo sysctl -w net.ipv4.tcp_timestamps=1
