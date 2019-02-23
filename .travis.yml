@@ -37,7 +37,7 @@ before_install:
   - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
   - echo "deb http://archive.ubuntu.com/ubuntu xenial-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/xenial-backports.list
   - sudo apt-get update -qq
-  - sudo apt -y install lxd acl dnsmasq-base -q
+  - sudo apt -t xenial-backports -y install lxd acl dnsmasq-base -q
 ## change of group implies logout+login to apply... can't do with travis = run as root (sic)
 ## https://github.com/travis-ci/travis-ci/issues/1839   or chain: sudo -E su $USER -c "..."
   - sudo usermod -G lxd travis
