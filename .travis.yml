@@ -49,24 +49,20 @@ before_install:
   - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] || lxc image copy images:${distribution}/${version}/amd64 local: --alias=${distribution}-${version}-nossh"'
   - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] && lxc image copy ubuntu:${version} local: --alias=${distribution}-${version}" || true'
 ## configure network
-  - sudo lxc network info
+  - ifconfig -a
+  - sudo lxc info
   - sudo lxc network list
+  - sudo lxc network create lxdbr0 ipv4.address=10.252.116.1/24 ipv4.dhcp.gateway=10.252.116.1 ipv4.dhcp.range=10.252.116.2-10.252.116.254
   - sudo lxc network show lxdbr0
-  - sudo lxc network set lxdbr0 ipv4.address 10.252.116.1/24
-  - sudo lxc network set lxdbr0 ipv4.dhcp.gateway 10.252.116.1
-  - sudo lxc network set lxdbr0 ipv4.dhcp.range 10.252.116.2-10.252.116.254
-  - sudo lxc network show lxdbr0
+  - sudo lxc network attach-profile lxdbr0 default ens4
   - sudo perl -pi -e 's@eth0@ens4@;' /usr/lib/lxd/profile-config
   - sudo lxc profile device get default eth0 nictype || true
   - sudo lxc profile device get default ens4 nictype || true
 #  - cat /etc/default/lxd-bridge
 #  - service --status-all
   - sudo service lxd restart
-  - ifconfig -a
   - ps ax | grep dnsmasq
-  - systemctl status -l --no-pager lxd-bridge
   - systemctl status -l --no-pager lxd || true
-  - cat /etc/default/lxd-bridge
   - cat /etc/network/interfaces.d/50-cloud-init.cfg
   - systemd-resolve --status lxdbr0
 # https://redis4you.com/articles.php?id=012&name=redis
