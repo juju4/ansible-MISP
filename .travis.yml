@@ -37,7 +37,7 @@ before_install:
   - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
   - echo "deb http://archive.ubuntu.com/ubuntu xenial-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/xenial-backports.list
   - sudo apt-get update -qq
-  - sudo apt -t xenial-backports -y install lxd acl dnsmasq-base -q
+  - sudo apt -t xenial-backports -y install lxd acl dnsmasq-base zfsutils-linux -q
 ## change of group implies logout+login to apply... can't do with travis = run as root (sic)
 ## https://github.com/travis-ci/travis-ci/issues/1839   or chain: sudo -E su $USER -c "..."
   - sudo usermod -G lxd travis
@@ -60,6 +60,13 @@ before_install:
   - ps ax | grep dnsmasq
   - systemctl status -l --no-pager lxd || true
   - cat /etc/network/interfaces.d/50-cloud-init.cfg
+# configure storage pool
+  - sudo lxc storage list
+  - sudo lxc storage create pool1 zfs volume.size=20GB
+  - sudo lxc storage list
+  - sudo zpool list
+  - sudo lxc profile device add default root disk path=/ pool=pool1
+  - sudo lxc profile show default
 # https://redis4you.com/articles.php?id=012&name=redis
 # https://vincent.bernat.ch/en/blog/2014-tcp-time-wait-state-linux
   - sudo sysctl -w net.ipv4.tcp_timestamps=1
