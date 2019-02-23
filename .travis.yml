@@ -53,7 +53,7 @@ before_install:
 #  - cat /etc/default/lxd-bridge
 #  - service --status-all
   - sudo service lxd restart
-  - ifconfig lxcbr0
+  - ifconfig -a
   - ps ax | grep dnsmasq
   - systemctl status -l --no-pager lxd-bridge
 # https://redis4you.com/articles.php?id=012&name=redis
