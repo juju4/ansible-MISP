@@ -52,7 +52,7 @@ before_install:
   - ifconfig -a
   - sudo lxc info
   - sudo lxc network list
-  - sudo lxc network create lxdbr0 ipv4.address=10.252.116.1/24 ipv4.dhcp.gateway=10.252.116.1 ipv4.dhcp.ranges=10.252.116.2-10.252.116.254
+  - sudo lxc network create lxdbr0
   - sudo lxc network show lxdbr0
   - sudo lxc network attach-profile lxdbr0 default ens4
   - sudo lxc profile device get default ens4 nictype || true
@@ -60,6 +60,7 @@ before_install:
   - ps ax | grep dnsmasq
   - systemctl status -l --no-pager lxd || true
   - cat /etc/network/interfaces.d/50-cloud-init.cfg
+  - sudo lxc network list
 # configure storage pool
   - sudo lxc storage list
   - sudo lxc storage create pool1 zfs
