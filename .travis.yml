@@ -58,7 +58,7 @@ before_install:
   - ifconfig -a
   - ps ax | grep dnsmasq
   - systemctl status -l --no-pager lxd-bridge
-  - systemctl status -l --no-pager lxd
+  - systemctl status -l --no-pager lxd || true
   - cat /etc/default/lxd-bridge
   - cat /etc/network/interfaces.d/50-cloud-init.cfg
 # https://redis4you.com/articles.php?id=012&name=redis
