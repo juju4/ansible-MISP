@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Travis: dist from trusty to xenial + lxd3
+https://blog.travis-ci.com/2018-11-08-xenial-release
+- Travis: rvm 2.6
+
 ## [0.9.0] - 2019-02-17
 
 ### Added
