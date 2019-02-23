@@ -53,8 +53,8 @@ before_install:
 #  - service --status-all
   - sudo service lxd restart
 # https://redis4you.com/articles.php?id=012&name=redis
+# https://vincent.bernat.ch/en/blog/2014-tcp-time-wait-state-linux
   - sudo sysctl -w net.ipv4.tcp_timestamps=1
-  - sudo sysctl -w net.ipv4.tcp_tw_recycle=1
 
   - sudo pip install ansible ansible-lint
   - gem install kitchen
