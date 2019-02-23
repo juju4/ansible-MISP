@@ -52,7 +52,7 @@ before_install:
   - ifconfig -a
   - sudo lxc info
   - sudo lxc network list
-  - sudo lxc network create lxdbr0 ipv4.address=10.252.116.1/24 ipv4.dhcp.gateway=10.252.116.1 ipv4.dhcp.range=10.252.116.2-10.252.116.254
+  - sudo lxc network create lxdbr0 ipv4.address=10.252.116.1/24 ipv4.dhcp.gateway=10.252.116.1 ipv4.dhcp.ranges=10.252.116.2-10.252.116.254
   - sudo lxc network show lxdbr0
   - sudo lxc network attach-profile lxdbr0 default ens4
   - sudo perl -pi -e 's@eth0@ens4@;' /usr/lib/lxd/profile-config
