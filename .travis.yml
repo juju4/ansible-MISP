@@ -35,6 +35,7 @@ before_install:
   - find -ls
 ## use appropriate role path and not github name
   - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
+  - echo "deb http://archive.ubuntu.com/ubuntu xenial-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/xenial-backports.list
   - sudo apt-get update -qq
   - sudo apt -y install lxd acl -q
 ## change of group implies logout+login to apply... can't do with travis = run as root (sic)
@@ -52,6 +53,9 @@ before_install:
 #  - cat /etc/default/lxd-bridge
 #  - service --status-all
   - sudo service lxd restart
+  - ifconfig lxcbr0
+  - ps ax | grep dnsmasq
+  - systemctl status -l --no-pager lxd-bridge
 # https://redis4you.com/articles.php?id=012&name=redis
 # https://vincent.bernat.ch/en/blog/2014-tcp-time-wait-state-linux
   - sudo sysctl -w net.ipv4.tcp_timestamps=1
