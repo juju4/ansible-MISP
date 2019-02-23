@@ -1,8 +1,8 @@
 ---
-dist: trusty
+dist: xenial
 sudo: required
 rvm:
-  - 2.4
+  - 2.6
 
 env:
 ## those images need pre-configuration before being usable (openssh...)
@@ -35,11 +35,8 @@ before_install:
   - find -ls
 ## use appropriate role path and not github name
   - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
-## No Xenial, https://github.com/travis-ci/travis-ci/issues/5821
-#  - sudo apt install lxd
-  - echo "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/trusty-backports.list
   - sudo apt-get update -qq
-  - sudo apt -t trusty-backports -y install lxd acl -q
+  - sudo apt -y install lxd acl -q
 ## change of group implies logout+login to apply... can't do with travis = run as root (sic)
 ## https://github.com/travis-ci/travis-ci/issues/1839   or chain: sudo -E su $USER -c "..."
   - sudo usermod -G lxd travis
