@@ -19,18 +19,6 @@ diff -urN cakephp.orig/lib/Cake/basics.php cakephp/lib/Cake/basics.php
  		}
  
  		if ($key === 'SCRIPT_NAME') {
-diff -urN cakephp.orig/lib/Cake/Core/App.php cakephp/lib/Cake/Core/App.php
---- cakephp.orig/lib/Cake/Core/App.php	2018-12-17 22:55:59.049819951 +0000
-+++ cakephp/lib/Cake/Core/App.php	2018-12-17 23:00:04.184317072 +0000
-@@ -470,7 +470,7 @@
- 				if ($dir != APP && is_dir($dir)) {
- 					$files = new RegexIterator(new DirectoryIterator($dir), $extension);
- 					foreach ($files as $file) {
--						$fileName = basename($file);
-+						$fileName = basename((string)$file);
- 						if (!$file->isDot() && $fileName[0] !== '.') {
- 							$isDir = $file->isDir();
- 							if ($isDir && $includeDirectories) {
 diff -urN cakephp.orig/lib/Cake/Core/Configure.php cakephp/lib/Cake/Core/Configure.php
 --- cakephp.orig/lib/Cake/Core/Configure.php	2018-12-17 22:55:59.049819951 +0000
 +++ cakephp/lib/Cake/Core/Configure.php	2018-12-17 22:55:59.730159926 +0000
@@ -115,6 +103,15 @@ diff -urN cakephp.orig/lib/Cake/Network/CakeRequest.php cakephp/lib/Cake/Network
 diff -urN cakephp.orig/lib/Cake/Network/CakeResponse.php cakephp/lib/Cake/Network/CakeResponse.php
 --- cakephp.orig/lib/Cake/Network/CakeResponse.php	2018-12-17 22:55:59.061825950 +0000
 +++ cakephp/lib/Cake/Network/CakeResponse.php	2018-12-17 22:55:59.730159926 +0000
+@@ -590,7 +590,7 @@
+ 			if ($value === null && strpos($header, ':') !== false) {
+ 				list($header, $value) = explode(':', $header, 2);
+ 			}
+-			$this->_headers[$header] = is_array($value) ? array_map('trim', $value) : trim($value);
++			$this->_headers[$header] = is_array($value) ? array_map('trim', $value) : trim((string)$value);
+ 		}
+ 		return $this->_headers;
+ 	}
 @@ -1101,7 +1101,7 @@
   * @return bool
   */
@@ -124,18 +121,21 @@ diff -urN cakephp.orig/lib/Cake/Network/CakeResponse.php cakephp/lib/Cake/Networ
  			&& (ini_get("zlib.output_compression") === '1' || in_array('ob_gzhandler', ob_list_handlers()));
  	}
  
-@@ -1160,7 +1160,7 @@
-  * @return bool whether the response was marked as not modified or not.
-  */
- 	public function checkNotModified(CakeRequest $request) {
--		$etags = preg_split('/\s*,\s*/', $request->header('If-None-Match'), null, PREG_SPLIT_NO_EMPTY);
-+		$etags = preg_split('/\s*,\s*/', (string)$request->header('If-None-Match'), (int)null, PREG_SPLIT_NO_EMPTY);
- 		$modifiedSince = $request->header('If-Modified-Since');
- 		if ($responseTag = $this->etag()) {
- 			$etagMatches = in_array('*', $etags) || in_array($responseTag, $etags);
+diff -urN cakephp.orig/lib/Cake/Core/App.php cakephp/lib/Cake/Core/App.php
+--- cakephp.orig/lib/Cake/Core/App.php	2019-04-07 15:37:04.862876497 +0000
++++ cakephp/lib/Cake/Core/App.php	2019-04-07 18:26:19.944928262 +0000
+@@ -470,7 +470,7 @@
+ 				if ($dir != APP && is_dir($dir)) {
+ 					$files = new RegexIterator(new DirectoryIterator($dir), $extension);
+ 					foreach ($files as $file) {
+-						$fileName = basename($file);
++						$fileName = basename((string)$file);
+ 						if (!$file->isDot() && $fileName[0] !== '.') {
+ 							$isDir = $file->isDir();
+ 							if ($isDir && $includeDirectories) {
 diff -urN cakephp.orig/lib/Cake/Routing/Route/CakeRoute.php cakephp/lib/Cake/Routing/Route/CakeRoute.php
---- cakephp.orig/lib/Cake/Routing/Route/CakeRoute.php	2018-12-17 22:55:59.069829950 +0000
-+++ cakephp/lib/Cake/Routing/Route/CakeRoute.php	2018-12-17 22:55:59.730159926 +0000
+--- cakephp.orig/lib/Cake/Routing/Route/CakeRoute.php	2019-04-07 15:37:04.898877313 +0000
++++ cakephp/lib/Cake/Routing/Route/CakeRoute.php	2019-04-07 18:42:15.398583605 +0000
 @@ -470,7 +470,7 @@
  		//check patterns for routed params
  		if (!empty($this->options)) {
@@ -145,21 +145,9 @@ diff -urN cakephp.orig/lib/Cake/Routing/Route/CakeRoute.php cakephp/lib/Cake/Rou
  					return false;
  				}
  			}
-diff -urN cakephp.orig/lib/Cake/Utility/CakeText.php cakephp/lib/Cake/Utility/CakeText.php
---- cakephp.orig/lib/Cake/Utility/CakeText.php	2018-12-17 22:55:59.221905945 +0000
-+++ cakephp/lib/Cake/Utility/CakeText.php	2018-12-17 22:59:20.770622644 +0000
-@@ -42,7 +42,7 @@
- 			$ipSix = '';
- 
- 			foreach ($node as $id) {
--				$ipSix .= str_pad(base_convert($id, 16, 2), 16, 0, STR_PAD_LEFT);
-+				$ipSix .= str_pad(base_convert($id, 16, 2), 16, (string)0, STR_PAD_LEFT);
- 			}
- 			$node = base_convert($ipSix, 2, 10);
- 
 diff -urN cakephp.orig/lib/Cake/View/Helper.php cakephp/lib/Cake/View/Helper.php
---- cakephp.orig/lib/Cake/View/Helper.php	2018-12-17 22:55:59.225907944 +0000
-+++ cakephp/lib/Cake/View/Helper.php	2018-12-17 22:55:59.730159926 +0000
+--- cakephp.orig/lib/Cake/View/Helper.php	2019-04-07 15:37:05.182883749 +0000
++++ cakephp/lib/Cake/View/Helper.php	2019-04-07 19:08:31.774589020 +0000
 @@ -573,7 +573,7 @@
  		if ($setScope === true) {
  			$this->_modelScope = $entity;
