@@ -583,6 +583,10 @@
     dest: /var/www/MISP/app/Controller/AppController.php.orig
     remote_src: true
   when: misp_testing is defined and misp_testing
+- name: patch cakephp with stricter casting to support sp.global_strict
+  patch:
+    src: patch-cakephp-snuffleupagus-strict
+    basedir: /var/www/MISP/app/Lib
 - name: patch MISP with stricter casting to support sp.global_strict
   patch:
     src: patch-misp-snuffleupagus-strict
