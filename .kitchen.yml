@@ -50,6 +50,7 @@ suites:
     attributes:
     includes:
       - ubuntu-18.04
+      - centos-7
   - name: nginx
     run_list:
     includes:

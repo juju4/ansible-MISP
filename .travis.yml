@@ -28,6 +28,9 @@ env:
   - distribution: ubuntu
     version: 18.04
     suite: default-HEAD
+  - distribution: centos
+    version: 7
+    suite: default-HEAD
 
 before_install:
   - env
