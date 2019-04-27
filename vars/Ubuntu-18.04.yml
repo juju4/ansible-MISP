@@ -43,6 +43,7 @@ misp_pkg_list:
  - openssl
  - libfuzzy-dev
  - ruby-pygments.rb
+ - libsm6
 
 misp_gem_list:
  - asciidoctor-pdf

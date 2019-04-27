@@ -42,6 +42,7 @@ misp_pkg_list:
 ## if pyzmq?
 # - libczmq-dev
  - openssl
+ - libsm6
 
 python3_bin: python3
 
