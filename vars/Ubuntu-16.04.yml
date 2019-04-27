@@ -44,6 +44,7 @@ misp_pkg_list:
  - libfuzzy-dev
  - libsm6
  - libzbar0
+ - libpoppler-cpp-dev
 
 python3_bin: python3
 python3_pip: pip3

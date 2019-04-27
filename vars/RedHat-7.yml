@@ -59,6 +59,7 @@ misp_pkg_list:
     - openjpeg-devel
     - rubygem-rouge
     - rubygem-asciidoctor
+    - poppler-cpp-devel
 
 easy_install_bin: easy_install-3.6
 python3_bin: python36
