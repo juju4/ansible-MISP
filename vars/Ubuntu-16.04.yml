@@ -45,6 +45,7 @@ misp_pkg_list:
  - libsm6
  - libzbar0
  - libpoppler-cpp-dev
+ - libxrender1
 
 python3_bin: python3
 python3_pip: pip3

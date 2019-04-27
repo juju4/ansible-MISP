@@ -46,6 +46,7 @@ misp_pkg_list:
  - libsm6
  - libzbar0
  - libpoppler-cpp-dev
+ - libxrender1
 
 misp_gem_list:
  - asciidoctor-pdf
