@@ -44,6 +44,7 @@ misp_pkg_list:
  - libfuzzy-dev
  - ruby-pygments.rb
  - libsm6
+ - libzbar0
 
 misp_gem_list:
  - asciidoctor-pdf

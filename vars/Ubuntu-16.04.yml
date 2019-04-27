@@ -43,6 +43,7 @@ misp_pkg_list:
  - openssl
  - libfuzzy-dev
  - libsm6
+ - libzbar0
 
 python3_bin: python3
 python3_pip: pip3
