@@ -46,6 +46,15 @@
   until: pkg_result is success
   become: yes
   become_user: "{{ www_user }}"
+
+- name: RedHat | ensure permissions for pip cache
+  file:
+    dest: /usr/share/httpd/.cache/pip/http
+    state: directory
+    owner: "{{ www_user }}"
+    mode: '0755'
+  when: ansible_os_family == 'RedHat'
+
 ## centos7: pip points to python3x
 - name: redhat | install dependencies for MISP modules (pip)
   pip:
