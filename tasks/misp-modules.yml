@@ -53,6 +53,7 @@
     state: directory
     owner: "{{ www_user }}"
     mode: '0755'
+    recurse: yes
   when: ansible_os_family == 'RedHat'
 
 ## centos7: pip points to python3x
