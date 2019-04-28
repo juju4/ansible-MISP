@@ -58,6 +58,7 @@
   until: pkg_result is success
   become: yes
   become_user: "{{ www_user }}"
+  become_flags: -H
 
 - name: install MISP modules (pip3)
   pip:
