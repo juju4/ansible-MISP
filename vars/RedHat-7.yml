@@ -59,6 +59,8 @@ misp_pkg_list:
     - openjpeg-devel
     - rubygem-rouge
     - rubygem-asciidoctor
+    - libSM
+    - zbar
     - poppler-cpp-devel
     - libXrender
 
