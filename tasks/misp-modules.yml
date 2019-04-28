@@ -61,6 +61,7 @@
   pip:
     requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     virtualenv: "{{ misp_virtualenv }}"
+    chdir: "{{ mispmodules_rootdir }}/misp-modules"
   when: ansible_os_family == 'RedHat'
   environment:
     PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
