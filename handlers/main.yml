@@ -3,6 +3,24 @@
   service: name={{ apache_svc }} state=restarted
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
+- name: restart webserver - docker,debian
+  command: "{{ item }}"
+  with_items:
+    - killall apache2
+    - /usr/sbin/apache2 -k start > /tmp/httpd.out 2>&1
+  when:
+    - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+    - ansible_os_family == "Debian"
+
+- name: restart webserver - docker,redhat
+  command: "{{ item }}"
+  with_items:
+    - killall httpd
+    - /usr/sbin/httpd -DFOREGROUND > /tmp/httpd.out 2>&1 &
+  when:
+    - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+    - ansible_os_family == "RedHat"
+
 - name: restart php-fpm
   service: name=php-fpm state=restarted
 

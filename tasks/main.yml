@@ -77,12 +77,6 @@
         creates: /tmp/mysqld_safe.out
         chdir: /var/lib/mysql
       ignore_errors: true
-    - name: Docker | Manually restart apache service
-      shell: >
-        apachectl restart > /tmp/apache2.out 2>&1 &
-      args:
-        creates: /tmp/apache2.out
-      ignore_errors: true
   when: >
     (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
@@ -329,14 +323,20 @@
   template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.{{ php_confext }} mode=0644"
   notify:
     - restart webserver
+    - restart webserver - docker,debian
+    - restart webserver - docker,redhat
 - name: Enforce Timezone in php.ini
   replace: "dest={{ php_ini }} regexp='^;date.timezone =' replace='date.timezone = {{ tz }}'"
   notify:
     - restart webserver
+    - restart webserver - docker,debian
+    - restart webserver - docker,redhat
 - name: enabling MISP php settings
   file: "src={{ php_confdir }}/misp-php.ini dest={{ php_confenable }}/99-misp.ini state=link"
   notify:
     - restart webserver
+    - restart webserver - docker,debian
+    - restart webserver - docker,redhat
   when: >
     (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and
     (misp_webserver is not defined or misp_webserver == 'apache2')
@@ -591,13 +591,6 @@
   patch:
     src: patch-misp-snuffleupagus-strict
     basedir: /var/www/MISP
-
-- name: Debian | Docker | Restart apache
-  shell: "apachectl restart > /tmp/apache3.out 2>&1"
-  args:
-    creates: /tmp/apache3.out
-  ignore_errors: true
-  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - include: misp-modules.yml
 - include: misp-gem.yml

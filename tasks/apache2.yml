@@ -9,11 +9,15 @@
     backup: yes
   notify:
     - restart webserver
+    - restart webserver - docker,debian
+    - restart webserver - docker,redhat
 
 - name: Debian | Disable default apache config
   file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
   notify:
     - restart webserver
+    - restart webserver - docker,debian
+    - restart webserver - docker,redhat
   when: ansible_os_family == 'Debian'
 
 - name: debian | ensure required modules are present
@@ -25,6 +29,8 @@
     - rewrite
   notify:
     - restart webserver
+    - restart webserver - docker,debian
+    - restart webserver - docker,redhat
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Debian | Enable misp apache config
@@ -34,4 +40,6 @@
     state: link
   notify:
     - restart webserver
+    - restart webserver - docker,debian
+    - restart webserver - docker,redhat
   when: ansible_os_family == 'Debian'
