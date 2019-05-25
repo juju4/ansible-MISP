@@ -17,3 +17,16 @@
 #    misp_testing_user_home: "/home/{{ misp_testing_user }}"
 #    misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
   when: ansible_env['TRAVIS'] is defined and ansible_env['TRAVIS'] == 'true'
+
+- name: Check if /home/kitchen/.gem exists
+  stat:
+    path: /home/kitchen/.gem
+  register: gemdir
+
+- name: Travis | kitchen-docker | ensure /home/kitchen/.gem permissions are correct
+  file:
+    dest: /home/kitchen/.gem
+    owner: kitchen
+    mode: '0755'
+    recurse: yes
+  when: gemdir.stat.exists
