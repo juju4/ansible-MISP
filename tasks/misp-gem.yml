@@ -5,6 +5,7 @@
     name: "{{ item }}"
     pre_release: yes
     state: present
+    user_install: no
   with_items: "{{ misp_gem_list | default([]) }}"
   register: pkg_result
   until: pkg_result is success
