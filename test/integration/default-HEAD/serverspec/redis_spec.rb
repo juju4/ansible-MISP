@@ -7,12 +7,14 @@ describe process("redis-server") do
   it { should be_running }
 end
 
-describe service('redis-server'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do  
+describe service('redis-server'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   it { should be_enabled }
   it { should be_running }
 end
-describe service('redis'), :if => os[:family] == 'redhat' do  
+describe service('redis'), :if => os[:family] == 'redhat' && host_inventory['virtualization'][:system] != 'docker' do
   it { should be_enabled }
+end
+describe service('redis'), :if => os[:family] == 'redhat' do
   it { should be_running }
 end
 describe port(6379) do
