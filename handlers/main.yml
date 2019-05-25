@@ -7,7 +7,15 @@
   command: "{{ item }}"
   with_items:
     - killall apache2
-    - /usr/sbin/apache2 -k start > /tmp/httpd.out 2>&1
+    - /usr/sbin/apache2 -k start
+  environment:
+    APACHE_RUN_USER: www-data
+    APACHE_RUN_GROUP: www-data
+    APACHE_PID_FILE: /var/run/apache2/apache2.pid
+    APACHE_RUN_DIR: /var/run/apache2
+    APACHE_LOCK_DIR: /var/lock/apache2
+    APACHE_LOG_DIR: /var/log/apache2
+    LANG: C
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "Debian"
@@ -16,7 +24,7 @@
   command: "{{ item }}"
   with_items:
     - killall httpd
-    - /usr/sbin/httpd -DFOREGROUND > /tmp/httpd.out 2>&1 &
+    - /usr/sbin/httpd -k start
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "RedHat"
