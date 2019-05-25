@@ -8,20 +8,20 @@ env:
     init: /usr/lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
-    ansible_version: 2.4.4.0
+    ansible_version: 2.8.0
   - distribution: ubuntu
     version: 18.04
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
-    ansible_version: 2.4.4.0
+    ansible_version: 2.8.0
     ansible_extra_vars: "'-e misp_pymisp_use=false'"
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
-    ansible_version: 2.4.4.0
+    ansible_version: 2.8.0
 ## FIXME! travis: 'No output has been received in the last 10m0s, this potentially indicates a stalled build or something wrong with the build itself.'
 #  - distribution: ubuntu
 #    version: 14.04
@@ -35,21 +35,21 @@ env:
 #    suite: default
 ## past ansible versions
   - distribution: ubuntu
-    version: 16.04
+    version: 18.04
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
-    ansible_version: 2.3.3.0
+    ansible_version: 2.7.11
   - distribution: ubuntu
-    version: 16.04
+    version: 18.04
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
-    ansible_version: 2.3.3.0
+    ansible_version: 2.7.11
     ansible_extra_vars: "'-e misp_pymisp_use=false'"
 # upcoming ansible version
   - distribution: ubuntu
-    version: 16.04
+    version: 18.04
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
