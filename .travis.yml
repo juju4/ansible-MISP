@@ -5,7 +5,6 @@ rvm:
   - 2.6
 
 env:
-## those images need pre-configuration before being usable (openssh...)
 #  - distribution: centos
 #    version: 6
   - distribution: centos
@@ -38,82 +37,45 @@ before_install:
   - find -ls
 ## use appropriate role path and not github name
   - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
-  - echo "deb http://archive.ubuntu.com/ubuntu xenial-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/xenial-backports.list
-  - sudo apt-get update -qq
-  - sudo apt -t xenial-backports -y install lxd acl dnsmasq-base zfsutils-linux -q
-## change of group implies logout+login to apply... can't do with travis = run as root (sic)
-## https://github.com/travis-ci/travis-ci/issues/1839   or chain: sudo -E su $USER -c "..."
-  - sudo usermod -G lxd travis
-  # Pull container
-#  - lxc remote add images images.linuxcontainers.org
-  - sudo -E su $USER -c "lxc remote list"
-  - sudo -E su $USER -c "lxc image list"
-## pre-download base images
-  - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] || lxc image copy images:${distribution}/${version}/amd64 local: --alias=${distribution}-${version}-nossh"'
-  - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] && lxc image copy ubuntu:${version} local: --alias=${distribution}-${version}" || true'
-## configure network
-  - ifconfig -a
-  - sudo lxc info
-  - sudo lxc network list
-  - sudo lxc network create lxdbr0
-  - sudo lxc network show lxdbr0
-  - sudo lxc network attach-profile lxdbr0 default ens4
-  - sudo lxc profile device get default ens4 nictype || true
-  - sudo service lxd restart
-  - ps ax | grep dnsmasq
-  - systemctl status -l --no-pager lxd || true
-  - cat /etc/network/interfaces.d/50-cloud-init.cfg
-  - sudo lxc network list
-# configure storage pool
-  - sudo lxc storage list
-  - sudo lxc storage create pool1 zfs
-  - sudo lxc storage list
-  - sudo zpool list
-  - sudo lxc profile device add default root disk path=/ pool=pool1
-  - sudo lxc profile show default
-# https://redis4you.com/articles.php?id=012&name=redis
-# https://vincent.bernat.ch/en/blog/2014-tcp-time-wait-state-linux
-  - sudo sysctl -w net.ipv4.tcp_timestamps=1
-
-  - sudo pip install ansible ansible-lint
+  - sudo pip install ansible
+  - 'echo "gem: --no-document" >> ~/.gemrc'
+## need to use chef gem for some reason? BAD PATH https://github.com/chef/chef-dk/issues/15
+#  - chef gem install kitchen
   - gem install kitchen
   - gem install kitchen-ansible
   - gem install kitchen-sync
-  - gem install kitchen-lxd_cli
+  - gem install kitchen-docker
   - gem list
   - which kitchen
-## ssh key for lxd_cli ?
-  - ls ~/.ssh
-  - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
-## sudo/su get us a non-usual PATH ...
-  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "sh -x ./test/lxd/centos-ssh-image.sh" || true'
-  - sudo -E su $USER -c "env"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen diagnose --all"
-#  - sudo -E su $USER -c "kitchen diagnose --all"
-#  - sudo -E -u $USER kitchen diagnose --all
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen diagnose --all
 
 script:
-  - ansible-lint tasks/main.yml || true
-#  - KITCHEN_LOCAL_YAML=.kitchen.local.yml bundle exec kitchen verify ${INSTANCE}
-  - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug || (cat $HOME/.kitchen/logs/${suite}-${distribution}-${version//./}.log; find /tmp/kitchen)"
+## avoid locale issue under xenial docker, https://github.com/pypa/pip/issues/3575
+  - export LC_ALL=C.UTF-8
+  - export LANG=C.UTF-8
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen verify ${suite}-${distribution}-${version//./}
 
 after_script:
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /tmp/idempotency.test'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/MISP/'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/.cache/pip/http/'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/www/MISP/app/Config/bootstrap.php'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/log/apache2/misp.local_error.log'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/www/MISP/app/tmp/logs/error.log'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/MISP/app/tmp/cache/models/'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'getfacl /var/www/MISP/app/tmp/cache/models'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'find /usr -iname \"*libyara*.so\"'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'find /var/www/MISP/ -iname \"*.rej\"'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'find /var/www/MISP/ -iname \"*.rej\" -exec cat {} \;'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'netstat -anp'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'ss -nlp'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'systemctl -l --no-pager status'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'journalctl -xe --no-pager'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen destroy ${suite}-${distribution}-${version//./} -l debug || (cat $HOME/.kitchen/logs/${suite}-${distribution}-${version//./}.log; find /tmp/kitchen)"
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /tmp/idempotency.test'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/MISP/'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/.cache/pip/http/'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/www/MISP/app/Config/bootstrap.php'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/log/apache2/misp.local_error.log'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /var/www/MISP/app/tmp/logs/error.log'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/MISP/app/tmp/cache/models/'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'getfacl /var/www/MISP/app/tmp/cache/models'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'find /usr -iname \"*libyara*.so\"'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'find /var/www/MISP/ -iname \"*.rej\"'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'find /var/www/MISP/ -iname \"*.rej\" -exec cat {} \;'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'netstat -anp'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ss -nlp'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'systemctl -l --no-pager status osqueryd'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'journalctl -xe --no-pager'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -lA /tmp/'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'grep -i error /var/log/osquery/osqueryd.results.log'
+
+  # Clean up
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen destroy ${suite}-${distribution}-${version//./}
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
