@@ -49,6 +49,7 @@ describe command("/var/www/MISP/venv/bin/misp-modules -t"), :if => os[:family] =
 end
 
 describe command("/var/www/MISP/venv/bin/misp-modules -t"), :if => os[:family] == 'redhat' do
+  let(:pre_command) { 'export LANG=C' }
   its(:stdout) { should_not match /ERROR/ }
   its(:stdout) { should_not match /WARNING/ }
   let(:sudo_options) { '-u www-data -H' }
