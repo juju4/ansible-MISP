@@ -56,6 +56,9 @@ script:
   - KITCHEN_YAML=.kitchen.docker.yml kitchen verify ${suite}-${distribution}-${version//./}
 
 after_script:
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /tmp/httpd.out'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /home/kitchen/.gem'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /home/kitchen/.gem/specs'
   - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /tmp/idempotency.test'
   - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/MISP/'
   - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -la /var/www/.cache/pip/http/'
@@ -69,6 +72,9 @@ after_script:
   - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'sudo find /var/www/MISP/ -iname \"*.rej\" -exec cat {} \;'
   - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'netstat -anp'
   - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ss -nlp'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'cat /etc/locale.conf'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'localectl status'
+  - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'localectl --no-pager list-locales'
   - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'systemctl -l --no-pager status osqueryd'
   - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'journalctl -xe --no-pager'
   - KITCHEN_YAML=.kitchen.docker.yml kitchen exec ${suite}-${distribution}-${version//./} -c 'ls -lA /tmp/'
