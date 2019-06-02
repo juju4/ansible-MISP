@@ -76,7 +76,7 @@ before_install:
   - sudo sysctl -w net.ipv4.tcp_timestamps=1
 
   - sudo pip install ansible ansible-lint
-  - gem install kitchen
+  - gem install test-kitchen --version "=1.25.0"
   - gem install kitchen-ansible
   - gem install kitchen-sync
   - gem install kitchen-lxd_cli
