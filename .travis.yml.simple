@@ -18,7 +18,7 @@ install:
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
   - gem2.0 --version
 script:
-  - "echo \"[test-kitchen]\nlocalhost\" > inventory"
+  - "echo \"localhost\" > inventory"
 
 # Check the role/playbook's syntax.
   - "ansible-playbook -i inventory --syntax-check test/integration/default/default.yml"
