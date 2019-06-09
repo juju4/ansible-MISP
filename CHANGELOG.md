@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Travis: force test-kitchen 0.1.25 to keep compatibility with kitchen-lxd_cli
+- misp-modules dependencies update
+- update patch to support php strict
 - Travis: dist from trusty to xenial + lxd3
 https://blog.travis-ci.com/2018-11-08-xenial-release
 - Travis: rvm 2.6
