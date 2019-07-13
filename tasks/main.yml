@@ -178,13 +178,19 @@
 
 ## https://github.com/MISP/MISP/blob/e763e7646f7bbae5183ab93df840501d88c47119/INSTALL/UPDATE.txt
 - name: updating existing MISP - minor releases
-  command: "git pull origin {{ misp_version }}"
-  args:
-    chdir: "{{ misp_rootdir }}"
+  git:
+    repo: https://github.com/MISP/MISP.git
+    dest: "{{ misp_rootdir }}"
+    version: "{{ misp_version }}"
+    update: yes
+    force: yes
+#  command: "git pull origin {{ misp_version }}"
+#  args:
+#    chdir: "{{ misp_rootdir }}"
 #  command: "git pull origin {{ misp_version }} --verify-signatures chdir={{ misp_rootdir }}"
+#  register: gitpull_result
+#  changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
   when: m.stat.exists
-  register: gitpull_result
-  changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
   notify:
     - updating existing MISP submodules - minor releases
   become: yes
@@ -408,10 +414,12 @@
     - "require_once dirname(__DIR__) . '/Vendor/autoload.php';"
 
 - name: Generating salt
-  shell: >
+  shell: |
+    set -o pipefail
     openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;' | tee {{ misp_rootdir }}/.salt
   args:
     creates: "{{ misp_rootdir }}/.salt"
+    executable: /bin/bash
   register: salt1
   changed_when: false
   no_log: "{{ misp_no_log }}"
