@@ -20,7 +20,7 @@ misp_config_php_template: config.php.j2
 
 misp_pip_cybox_version: '2.1.0.17'
 misp_pip_stix_version: '1.2.0.6'
-misp_pymisp_version: '2.4.95.1'
+misp_pymisp_version: 'v2.4.111.1'
 
 ## for automation of users creation and testing
 misp_key_file: "{{ misp_rootdir }}/.ht_key"
