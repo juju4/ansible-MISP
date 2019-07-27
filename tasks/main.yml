@@ -196,6 +196,13 @@
   become: yes
   become_user: "{{ www_user }}"
 
+- name: Ensure pip cache permissions are correct
+  file:
+    dest: /var/www/.cache/pip/http
+    state: directory
+    mode: '0755'
+    owner: "{{ www_user }}"
+
 - name: install python dependencies with pip - python3
   pip:
     name: "{{ item.n }}"
