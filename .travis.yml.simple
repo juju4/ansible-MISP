@@ -24,10 +24,10 @@ script:
   - "ansible-playbook -i inventory --syntax-check test/integration/default/default.yml"
 
 # Run the role/playbook with ansible-playbook.
-  - "ansible-playbook -i inventory --connection=local --sudo -vvvv test/integration/default/default.yml"
+  - "ansible-playbook -i inventory --connection=local --become -vvvv test/integration/default/default.yml"
 
 # Run the role/playbook again, checking to make sure it's idempotent.
-  - "ansible-playbook -i inventory test/integration/default/default.yml --connection=local --sudo | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 0)"
+  - "ansible-playbook -i inventory test/integration/default/default.yml --connection=local --become | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 0)"
 
 # Serverspec
 #  - "test/integration/default/serverspec/run-local-tests.sh"
