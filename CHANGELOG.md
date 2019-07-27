@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Travis: dist from trusty to xenial + lxd3
 https://blog.travis-ci.com/2018-11-08-xenial-release
 - Travis: rvm 2.6
+- Travis: remove testing of Ubuntu 16.04 as recent MISP/PyMISP/misp-modules updates requires python 3.6. Only 3.5 available in normal distribution.
 - Github: rename tags to match semantic versioning: 0.7.0, 0.8.0
 - misp-modules dependencies update
 - update patch to support php strict

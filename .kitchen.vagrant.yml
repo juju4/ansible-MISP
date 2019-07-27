@@ -23,14 +23,14 @@ provisioner:
 
 platforms:
   - name: ubuntu-18.04
-  - name: ubuntu-16.04
-    driver_config:
-      network:
-        - ["forwarded_port", {guest: 80, host: 8588}]
-  - name: ubuntu-14.04
-    driver_config:
-      network:
-        - ["forwarded_port", {guest: 80, host: 8588}]
+#  - name: ubuntu-16.04
+#    driver_config:
+#      network:
+#        - ["forwarded_port", {guest: 80, host: 8588}]
+#  - name: ubuntu-14.04
+#    driver_config:
+#      network:
+#        - ["forwarded_port", {guest: 80, host: 8588}]
 ## No package matching 'php5-redis' is available
 #  - name: ubuntu-12.04
 ## test for agent windows/wixl ? no image available
