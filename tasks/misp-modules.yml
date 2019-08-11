@@ -30,7 +30,7 @@
 - name: Enforce latest PyMISP
   replace:
     dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-    regexp: '^-e git+https://github.com/MISP/PyMISP.git.*'
+    regexp: '^-e git\+https:\/\/github.com\/MISP\/PyMISP.git.*'
     replace: '-e git+https://github.com/MISP/PyMISP.git#egg=pymisp'
     backup: yes
 
