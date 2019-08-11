@@ -27,6 +27,14 @@
     backup: yes
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
 
+- name: Enforce latest PyMISP
+  lineinfile:
+    dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
+    regexp: '^-e git+https://github.com/MISP/PyMISP.git.*'
+    line: '-e git+https://github.com/MISP/PyMISP.git#egg=pymisp'
+    state: present
+    backup: yes
+
 - name: Ensure pip cache directory exists
   file:
     dest: "/var/www/.cache/pip/http"
