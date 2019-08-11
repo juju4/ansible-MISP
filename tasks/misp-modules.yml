@@ -32,7 +32,6 @@
     dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     regexp: '^-e git+https://github.com/MISP/PyMISP.git.*'
     replace: '-e git+https://github.com/MISP/PyMISP.git#egg=pymisp'
-    state: present
     backup: yes
 
 - name: Ensure pip cache directory exists
