@@ -33,6 +33,7 @@
     regexp: '^-e git\+https:\/\/github.com\/MISP\/PyMISP.git.*'
     replace: '-e git+https://github.com/MISP/PyMISP.git#egg=pymisp'
     backup: yes
+  when: misp_latest_pymisp
 
 - name: Ensure pip cache directory exists
   file:

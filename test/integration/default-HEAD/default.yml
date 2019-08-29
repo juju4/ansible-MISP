@@ -4,6 +4,7 @@
   vars:
     - misp_version: HEAD
     - mispmodules_version: HEAD
+    - misp_latest_pymisp: true
     - misp_lief_version: HEAD
     - misp_testing: true
     - misp_testing_user: _misp
