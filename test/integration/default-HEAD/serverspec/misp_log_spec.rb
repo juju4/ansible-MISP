@@ -4,7 +4,7 @@ require 'serverspec'
 set :backend, :exec
 
 describe file('/var/www/MISP/app/tmp/logs/error.log') do
-  its(:size) { should > 0 }
+#  its(:size) { should > 0 }
 #  its(:content) { should_not match /Error:/ }
   its(:content) { should_not match /Warning:/ }
 end
