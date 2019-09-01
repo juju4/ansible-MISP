@@ -37,12 +37,12 @@
       "vm_size": "Standard_D1",
 
       "managed_image_resource_group_name": "Testing",
-      "managed_image_name": "packer-centos73-{{isotime \"2006-01-02\"}}-MISP",
+      "managed_image_name": "packer-centos7-{{isotime \"2006-01-02\"}}-MISP",
 
       "os_type": "Linux",
       "image_publisher": "OpenLogic",
       "image_offer": "CentOS",
-      "image_sku": "7.3",
+      "image_sku": "7.6",
       "image_version": "latest"
     }
   ]
