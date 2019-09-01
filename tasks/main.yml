@@ -492,9 +492,6 @@
 #      }
   become: yes
   become_user: "{{ www_user }}"
-## FIXME! seems become_method/flags is not working in vagrant, ansible 2.5.0
-  become_method: su
-  become_flags: '-s /bin/sh'
 - name: create gnupg key for {{ misp_email }}
   shell: >
     gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc
@@ -503,9 +500,6 @@
     creates: "{{ misp_rootdir }}/app/webroot/gpg.asc"
   become: yes
   become_user: "{{ www_user }}"
-## FIXME! seems become_method/flags is not working in vagrant, ansible 2.5.0
-  become_method: su
-  become_flags: '-s /bin/sh'
 ## it seems to be done by gpg
 #- command: wipe -q -y /var/tmp/gpg-template
 #  when: not gkey.stat.exists
