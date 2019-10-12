@@ -20,7 +20,6 @@ misp_pkg_list:
     - postfix
     - "@Development tools"
     - zip
-    - php-pear
     - git
     - redis
     - make

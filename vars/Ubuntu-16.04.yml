@@ -9,7 +9,6 @@ misp_pkg_list:
  - postfix
  - gcc
  - zip
- - php-pear
  - git
  - redis-server
  - make

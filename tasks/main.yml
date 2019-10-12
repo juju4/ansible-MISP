@@ -234,16 +234,6 @@
   become: yes
   become_user: "{{ www_user }}"
 
-- name: install php pear dependencies
-  pear:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - "{{ misp_rootdir }}/INSTALL/dependencies/Console_CommandLine/package.xml"
-    - "{{ misp_rootdir }}/INSTALL/dependencies/Crypt_GPG/package.xml"
-  register: pkg_result
-  until: pkg_result is success
-
 ## must be after git cloning MISP
 - include: apache2.yml
   when: misp_webserver is not defined or misp_webserver == 'apache2'
