@@ -19,6 +19,7 @@ fi
 ## galaxy naming: kitchen fails to transfer symlink folder
 #[ ! -e $rolesdir/juju4.MISP ] && ln -s ansible-MISP $rolesdir/juju4.MISP
 [ ! -e $rolesdir/juju4.misp ] && cp -R $rolesdir/ansible-MISP $rolesdir/juju4.misp
+[ ! -e $rolesdir/juju4.misp ] && cp -R $rolesdir/juju4.MISP $rolesdir/juju4.misp
 
 ## don't stop build on this script return code
 true

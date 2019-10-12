@@ -7,7 +7,7 @@ node {
         def workspace = pwd()
         //def git_url = build.getEnvironment(listener).get('GIT_URL')
         //def directory = git_url.substring(input.lastIndexOf("/") + 1)
-        def directory = "juju4.MISP"
+        def directory = "juju4.misp"
 
         stage 'Clean Workspace'
             deleteDir()
