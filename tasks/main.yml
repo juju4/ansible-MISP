@@ -80,14 +80,6 @@
   when: >
     (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
-- name: check installed pear packages
-  command: pear list
-  register: pearinstalled
-  changed_when: false
-#- name: updated access to pear.php.net
-#  command: pear channel-update pear.php.net
-#  when: pearinstalled.stdout.find("Crypt_GPG") == -1
-
 # possible git clone issues else
 - name: RedHat | Ensure latest nss curl libcurl
   package:
