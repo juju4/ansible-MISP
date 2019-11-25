@@ -33,7 +33,7 @@ Just include this role in your list.
 For example
 
 ```
-- host: all
+- hosts: all
   roles:
     - juju4.MISP
 ```
