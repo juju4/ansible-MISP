@@ -15,6 +15,7 @@ fi
 #[ ! -d $rolesdir/geerlingguy.mysql ] && git clone https://github.com/geerlingguy/ansible-role-mysql.git $rolesdir/geerlingguy.mysql
 [ ! -d $rolesdir/juju4.harden_apache ] && git clone https://github.com/juju4/ansible-harden-apache $rolesdir/juju4.harden_apache
 [ ! -d $rolesdir/juju4.harden_nginx ] && git clone https://github.com/juju4/ansible-harden-nginx $rolesdir/juju4.harden_nginx
+[ ! -d $rolesdir/juju4.faup ] && git clone https://github.com/juju4/ansible-faup $rolesdir/juju4.faup
 #[ ! -d $rolesdir/w3af ] && git clone https://github.com/juju4/ansible-w3af $rolesdir/w3af
 ## galaxy naming: kitchen fails to transfer symlink folder
 #[ ! -e $rolesdir/juju4.MISP ] && ln -s ansible-MISP $rolesdir/juju4.MISP
