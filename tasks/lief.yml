@@ -5,6 +5,7 @@
   pip:
     name: lief
     state: present
+    executable: "{{ python3_pip }}"
   when: ansible_os_family == 'Debian'
   register: pkg_result
   until: pkg_result is success
