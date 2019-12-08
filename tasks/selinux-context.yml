@@ -7,13 +7,13 @@
 #    setype: httpd_sys_rw_content_t
 #    state: present
   with_items:
-    - /var/www/MISP/app/files
-    - /var/www/MISP/app/files/terms
-    - /var/www/MISP/app/files/scripts/tmp
-    - /var/www/MISP/app/Plugin/CakeResque/tmp
-    - /var/www/MISP/app/tmp
-    - /var/www/MISP/app/tmp/cache/persistent
-    - /var/www/MISP/app/webroot/img/orgs
-    - /var/www/MISP/app/webroot/img/custom
+    - "{{ misp_rootdir }}/app/files"
+    - "{{ misp_rootdir }}/app/files/terms"
+    - "{{ misp_rootdir }}/app/files/scripts/tmp"
+    - "{{ misp_rootdir }}/app/Plugin/CakeResque/tmp"
+    - "{{ misp_rootdir }}/app/tmp"
+    - "{{ misp_rootdir }}/app/tmp/cache/persistent"
+    - "{{ misp_rootdir }}/app/webroot/img/orgs"
+    - "{{ misp_rootdir }}/app/webroot/img/custom"
     - "{{ misp_rootdir }}/.gnupg"
-    - /var/www/MISP/app/Config/config.php
+    - "{{ misp_rootdir }}/app/Config/config.php"

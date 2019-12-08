@@ -564,20 +564,20 @@
     mode: '0644'
 - name: Backup cakephp
   command: >
-    cp -R /var/www/MISP/app/Lib/cakephp /var/www/MISP/app/Lib/cakephp.orig
+    cp -R {{ misp_rootdir }}/app/Lib/cakephp {{ misp_rootdir }}/app/Lib/cakephp.orig
   args:
-    creates: /var/www/MISP/app/Lib/cakephp.orig
+    creates: "{{ misp_rootdir }}/app/Lib/cakephp.orig"
   when: misp_testing is defined and misp_testing
 - name: Backup MISP
   copy:
-    src: /var/www/MISP/app/Controller/AppController.php
-    dest: /var/www/MISP/app/Controller/AppController.php.orig
+    src: "{{ misp_rootdir }}/app/Controller/AppController.php"
+    dest: "{{ misp_rootdir }}/app/Controller/AppController.php.orig"
     remote_src: true
   when: misp_testing is defined and misp_testing
 - name: patch cakephp with stricter casting to support sp.global_strict
   patch:
     src: patch-cakephp-snuffleupagus-strict
-    basedir: /var/www/MISP/app/Lib
+    basedir: "{{ misp_rootdir }}/app/Lib"
 
 - include: misp-modules.yml
 - include: misp-gem.yml

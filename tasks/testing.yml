@@ -123,7 +123,7 @@
 
 - name: allow self-signed certificates in curl_tests.sh
   replace:
-    dest: /var/www/MISP/tests/curl_tests.sh
+    dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
     regexp: '^curl -([iH].)'
     replace: 'curl -k -\1'
     backup: yes
