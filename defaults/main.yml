@@ -18,8 +18,8 @@ misp_lief_enable: true
 misp_lief_rootdir: /var/lief
 misp_config_php_template: config.php.j2
 
-misp_pip_cybox_version: '2.1.0.17'
-misp_pip_stix_version: '1.2.0.6'
+misp_pip_cybox_version: '2.1.0.20'
+misp_pip_stix_version: '1.2.0.7'
 # overridden by misp-modules REQUIREMENTS
 misp_pymisp_version: 'v2.4.113'
 # HEAD in misp-modules REQUIREMENTS
