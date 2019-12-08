@@ -66,11 +66,18 @@
 
 ## centos7: pip points to python3x
 - name: redhat | install dependencies for MISP modules (pip)
-  pip:
-    requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-    virtualenv: "{{ misp_virtualenv }}"
-    virtualenv_python: "{{ python3_bin }}"
+#  pip:
+#    requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
+#    virtualenv: "{{ misp_virtualenv }}"
+#    virtualenv_python: "{{ python3_bin }}"
+#    chdir: "{{ mispmodules_rootdir }}/misp-modules"
+  command: "{{ item.c }}"
+  args:
+    creates: "{{ item.t | default(omit) }}"
     chdir: "{{ mispmodules_rootdir }}/misp-modules"
+  with_items:
+    - { c: "virtualenv -p {{ python3_bin }} {{ misp_virtualenv }}", t: "{{ misp_virtualenv }}" }
+    - { c: "{{ misp_virtualenv }}/bin/pip install -r {{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS" }
   when: ansible_os_family == 'RedHat'
   environment:
     PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
