@@ -13,6 +13,7 @@ galaxy_info:
   platforms:
   - name: EL
     versions:
+     - 8
      - 7
   - name: Ubuntu
     versions:

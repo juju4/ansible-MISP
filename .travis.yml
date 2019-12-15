@@ -5,9 +5,9 @@ rvm:
   - 2.6
 
 env:
-## those images need pre-configuration before being usable (openssh...)
-#  - distribution: centos
-#    version: 6
+  - distribution: centos
+    version: 8
+    suite: default
   - distribution: centos
     version: 7
     suite: default
@@ -51,6 +51,7 @@ before_install:
 ## pre-download base images
   - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] || lxc image copy images:${distribution}/${version}/amd64 local: --alias=${distribution}-${version}-nossh"'
   - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] && lxc image copy ubuntu:${version} local: --alias=${distribution}-${version}" || true'
+  - sudo -E su $USER -c "lxc image list"
 ## configure network
   - ifconfig -a
   - sudo lxc info
@@ -86,7 +87,7 @@ before_install:
   - ls ~/.ssh
   - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
 ## sudo/su get us a non-usual PATH ...
-  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "sh -x ./test/lxd/centos-ssh-image.sh" || true'
+  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "sh -x ./test/lxd/centos-ssh-image.sh ${version}" || true'
   - sudo -E su $USER -c "env"
   - sudo -E su $USER -c "env PATH=$PATH kitchen diagnose --all"
 #  - sudo -E su $USER -c "kitchen diagnose --all"

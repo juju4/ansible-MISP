@@ -1,0 +1,90 @@
+---
+
+misp_pkg_list:
+    - openssh-server
+    - httpd
+    - mariadb
+    - mariadb-server
+    - MySQL-python
+    - php
+    - php-mysqlnd
+    - php-mbstring
+    - php-devel
+#    - php-redis
+    - php-opcache
+    - postfix
+    - "@Development tools"
+    - zip
+    - git
+    - redis
+    - make
+    - libxml2-devel
+    - libxslt-devel
+    - zlib-devel
+    - curl
+    - gnupg
+#
+    - rng-tools
+    - wget
+# misp-modules
+    - python36
+    - python36-devel
+    - python3-pip
+    - python36-setuptools
+    - python-virtualenv
+    - libpq
+## misc
+    - acl
+    - sudo
+    - crontabs
+    - libjpeg-turbo-devel
+    - openssl
+    - policycoreutils-python
+## kitchen/ss
+    - iproute
+    - ssdeep-devel
+    - ssdeep-libs
+#    - openjpeg-devel
+#    - rubygem-rouge
+#    - rubygem-asciidoctor
+    - libSM
+#    - zbar
+    - poppler-cpp-devel
+    - libXrender
+
+easy_install_bin: easy_install-3.6
+python3_bin: python3.6
+python3_pip: /usr/local/bin/pip3
+
+misp_webserver_apache2:
+    - httpd
+
+misp_webserver_nginx:
+  - nginx
+  - php-fpm
+
+mysql_svc: mariadb
+rng_svc: rngd
+redis_svc: redis
+redis_conf: /etc/redis.conf
+misp_services:
+    - "{{ apache_svc }}"
+    - "{{ mysql_svc }}"
+    - "{{ rng_svc }}"
+    - php-fpm
+
+misp_testing_pkg:
+    - rubygem-rake
+
+nginx_sock: /var/run/php-fpm/php-fpm.sock
+php_confdir: /etc/php.d
+php_confext: ini
+php_ini: /etc/php.ini
+fpm_user: nobody
+
+gnupg_privdir: "{{ misp_rootdir }}/.gnupg"
+
+apacheetc: /etc/httpd
+ssl_user: root
+ssl_dir: /etc/pki/tls/certs
+ssl_privatedir: /etc/pki/tls/private

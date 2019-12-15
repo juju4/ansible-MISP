@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- add test/support for RedHat/Centos 8
+
 ### Changed
 - Travis: force test-kitchen 0.1.25 to keep compatibility with kitchen-lxd_cli
 - Travis: dist from trusty to xenial + lxd3
