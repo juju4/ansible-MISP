@@ -5,7 +5,7 @@ misp_pkg_list:
     - httpd
     - mariadb
     - mariadb-server
-    - MySQL-python
+    - python3-PyMySQL
     - php
     - php-mysqlnd
     - php-mbstring
