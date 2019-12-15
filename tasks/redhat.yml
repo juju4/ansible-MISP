@@ -7,6 +7,7 @@
 
 ## for php-redis
 - include: redhat-remi.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8
 
 - name: yum | MISP dependencies install
   yum:
