@@ -30,6 +30,7 @@ platforms:
 #  - name: ubuntu-16.04
 #  - name: ubuntu-14.04
 #  - name: ubuntu-12.04
+  - name: centos-8
   - name: centos-7
 ## httpd/centos7/capability issue on lxc
 ## https://github.com/lxc/lxd/issues/1245	= only choice is privileged
