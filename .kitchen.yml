@@ -24,7 +24,7 @@ provisioner:
 #  require_chef_for_busser: false
   enable_yum_epel: true
   ansible_connection: ssh
-  ansible_omnibus_url: https://raw.githubusercontent.com/juju4/omnibus-ansible/d991b723d892b351a42c5d39f303e81cd9bf67c1/ansible_install.sh
+  ansible_omnibus_url: https://raw.githubusercontent.com/juju4/omnibus-ansible/master/ansible_install.sh
 
 platforms:
   - name: ubuntu-18.04
