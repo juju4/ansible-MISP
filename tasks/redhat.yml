@@ -9,6 +9,14 @@
 - include: redhat-remi.yml
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8
 
+- name: RedHat8+ | Enable PowerTools repo
+  ini_file:
+    dest: /etc/yum.repos.d/CentOS-PowerTools.repo
+    section: PowerTools
+    option: enabled
+    value: 1
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
+
 - name: yum | MISP dependencies install
   yum:
     name: "{{ misp_pkg_list + webserver }}"

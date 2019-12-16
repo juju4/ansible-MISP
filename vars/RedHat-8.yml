@@ -30,8 +30,8 @@ misp_pkg_list:
     - python36
     - python36-devel
     - python3-pip
-    - python36-setuptools
-    - python-virtualenv
+    - python3-setuptools
+    - python3-virtualenv
     - libpq
 ## misc
     - acl
@@ -39,7 +39,6 @@ misp_pkg_list:
     - crontabs
     - libjpeg-turbo-devel
     - openssl
-    - policycoreutils-python
 ## kitchen/ss
     - iproute
     - ssdeep-devel
@@ -49,8 +48,9 @@ misp_pkg_list:
 #    - rubygem-asciidoctor
     - libSM
 #    - zbar
-    - poppler-cpp-devel
     - libXrender
+##    CentOS PowerTools x86_64
+    - poppler-cpp-devel
 
 easy_install_bin: easy_install-3.6
 python3_bin: python3.6
