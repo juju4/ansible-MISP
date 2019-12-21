@@ -45,12 +45,6 @@ suites:
   - name: default-HEAD
     run_list:
     attributes:
-    includes:
-      - ubuntu-18.04
-      - centos-7
   - name: nginx
     run_list:
     attributes:
-    includes:
-      - ubuntu-18.04
-      - centos-7
