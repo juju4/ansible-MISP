@@ -40,6 +40,7 @@ misp_pkg_list:
     - crontabs
     - libjpeg-turbo-devel
     - openssl
+    - hostname
 ## kitchen/ss
     - iproute
     - ssdeep-devel
