@@ -37,9 +37,16 @@ describe file('/var/log/redis/redis-server.log'), :if => os[:family] == 'ubuntu'
   its(:content) { should match /The server is now ready to accept connections on port/ }
   its(:content) { should_not match /bind: Cannot assign requested address/ }
 end
-describe file('/var/log/redis/redis.log'), :if => os[:family] == 'redhat' do
+describe file('/var/log/redis/redis.log'), :if => os[:family] == 'redhat' && os[:release] == '7' do
   its(:size) { should > 0 }
   its(:content) { should match /Server started, Redis version/ }
   its(:content) { should match /The server is now ready to accept connections on port/ }
+  its(:content) { should_not match /bind: Cannot assign requested address/ }
+end
+describe file('/var/log/redis/redis.log'), :if => os[:family] == 'redhat' && os[:release] == '8' do
+  its(:size) { should > 0 }
+  its(:content) { should match /Server initialized/ }
+  its(:content) { should match /# Redis version=5\./ }
+  its(:content) { should match /Ready to accept connections/ }
   its(:content) { should_not match /bind: Cannot assign requested address/ }
 end
