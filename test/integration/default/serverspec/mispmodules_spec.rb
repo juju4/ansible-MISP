@@ -45,15 +45,28 @@ describe command("#{misp_virtualenv}/bin/python -c 'import sigma'"), :if => os[:
   its(:exit_status) { should eq 0 }
 end
 
-describe command("#{misp_virtualenv}/bin/misp-modules -t"), :if => os[:family] == 'ubuntu' && os[:release] != '16.04' do
+describe command("#{misp_virtualenv}/bin/misp-modules -t"), :if => os[:family] == 'ubuntu' && os[:release] == '16.04' do
+  its(:stdout) { should_not match /ERROR/ }
+#  its(:stdout) { should_not match /WARNING/ }
+  let(:sudo_options) { '-u www-data -H' }
+end
+
+describe command("#{misp_virtualenv}/bin/misp-modules -t"), :if => os[:family] == 'ubuntu' && os[:release] == '18.04' do
+  its(:stdout) { should_not match /ERROR/ }
+#  its(:stdout) { should_not match /WARNING/ }
+  let(:sudo_options) { '-u www-data -H' }
+end
+
+describe command("#{misp_virtualenv}/bin/misp-modules -t"), :if => os[:family] == 'redhat' && os[:release] == '7' do
+  let(:pre_command) { 'export LANG=C LC_ALL=C' }
   its(:stdout) { should_not match /ERROR/ }
   its(:stdout) { should_not match /WARNING/ }
   let(:sudo_options) { '-u www-data -H' }
 end
 
-describe command("#{misp_virtualenv}/bin/misp-modules -t"), :if => os[:family] == 'redhat' do
+describe command("#{misp_virtualenv}/bin/misp-modules -t"), :if => os[:family] == 'redhat' && os[:release] == '8' do
   let(:pre_command) { 'export LANG=C LC_ALL=C' }
   its(:stdout) { should_not match /ERROR/ }
-  its(:stdout) { should_not match /WARNING/ }
+#  its(:stdout) { should_not match /WARNING/ }
   let(:sudo_options) { '-u www-data -H' }
 end
