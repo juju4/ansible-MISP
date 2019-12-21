@@ -87,6 +87,19 @@
   become_user: "{{ www_user }}"
   become_flags: -H
 
+- name: redhat8+ | install zbar-py dependencies for MISP modules (pip)
+  command: "{{ misp_virtualenv }}/bin/pip install zbar-py"
+  args:
+    chdir: "{{ mispmodules_rootdir }}/misp-modules"
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8
+  environment:
+    PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  register: pkg_result
+  until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
+  become_flags: -H
+
 - name: install MISP modules (pip3)
   pip:
     name: "file://{{ mispmodules_rootdir }}/misp-modules"
