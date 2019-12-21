@@ -29,6 +29,9 @@ env:
     version: 18.04
     suite: default-HEAD
   - distribution: centos
+    version: 8
+    suite: default-HEAD
+  - distribution: centos
     version: 7
     suite: default-HEAD
 
