@@ -69,12 +69,20 @@
 # https://github.com/ansible/ansible/issues/16612
 - block:
     - debug: var=ansible_selinux
-    - name: RedHat | Ensure selinux dependencies are present
+    - name: RedHat7- | Ensure selinux dependencies are present
       package:
         name: libselinux-python
         state: present
       register: pkg_result
       until: pkg_result is success
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8
+    - name: RedHat8+ | Ensure selinux dependencies are present
+      package:
+        name: python3-libselinux
+        state: present
+      register: pkg_result
+      until: pkg_result is success
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
     - name: re-collect facts
       action: setup
     - debug: var=ansible_selinux
