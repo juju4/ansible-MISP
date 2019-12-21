@@ -12,7 +12,7 @@ describe file("#{misp_rootdir}/.gnupg/pubring.gpg"), :if => (os[:family] == 'ubu
   its(:content) { should_not be_empty }
 end
 
-describe file("#{misp_rootdir}/.gnupg/secring.gpg"), :if => :if => (os[:family] == 'ubuntu' && (os[:release] == '14.04' || os[:release] == '16.04') || (os[:family] == 'redhat' && os[:release] == '7')) do
+describe file("#{misp_rootdir}/.gnupg/secring.gpg"), :if => (os[:family] == 'ubuntu' && (os[:release] == '14.04' || os[:release] == '16.04') || (os[:family] == 'redhat' && os[:release] == '7')) do
   it { should be_file }
   it { should exist }
   it { should be_readable.by('owner') }
