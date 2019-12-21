@@ -12,6 +12,7 @@ misp_pkg_list:
     - php-devel
 #    - php-redis
     - php-opcache
+    - php-json
     - postfix
     - "@Development tools"
     - zip
