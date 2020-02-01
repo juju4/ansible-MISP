@@ -583,11 +583,11 @@
     src: patch-cakephp-snuffleupagus-strict
     basedir: "{{ misp_rootdir }}/app/Lib"
 
-- include: misp-modules.yml
-- include: misp-gem.yml
-
 - include: lief.yml
   when: misp_lief_enable
+
+- include: misp-modules.yml
+- include: misp-gem.yml
 
 - include: testing.yml
   when: misp_testing is defined and misp_testing
