@@ -587,7 +587,7 @@
 - include: misp-gem.yml
 
 - include: lief.yml
-  when: misp_lief_enable and (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int >= 18)
+  when: misp_lief_enable
 
 - include: testing.yml
   when: misp_testing is defined and misp_testing
