@@ -47,7 +47,7 @@
         state: directory
 
     - name: Build LIEF - Makefile
-      command: >
+      command: >-
         scl enable devtoolset-7 "bash -c \"cmake3 -DLIEF_PYTHON_API=on -DLIEF_DOC=off
                 -DCMAKE_INSTALL_PREFIX=$LIEF_INSTALL -DCMAKE_BUILD_TYPE=Release
                 -DPYTHON_VERSION=2.7 ..\""
