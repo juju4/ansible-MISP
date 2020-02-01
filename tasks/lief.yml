@@ -6,6 +6,8 @@
     name: lief
     state: present
     executable: "{{ python3_pip }}"
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
   when: ansible_os_family == 'Debian'
   register: pkg_result
   until: pkg_result is success
@@ -56,8 +58,8 @@
             t: "{{ misp_lief_rootdir }}/build/Makefile"
           }
         - { c: 'make -j3', t: "{{ misp_lief_rootdir }}/build/api/python/_pylief.so" }
-        - { c: 'cd api/python && python setup.py install || :',
-            t: '/usr/lib64/python2.7/site-packages/lief-0.9.0-py2.7-linux.egg'
+        - { c: "cd api/python && {{ misp_virtualenv }}/bin/python setup.py install || :",
+            t: '/var/www/_MISP/venv/lib/python3.6/site-packages/lief-0.9.0-py2.7-linux.egg'
           }
         - { c: 'make install', t: '/share/LIEF/examples/c/elf_reader.c' }
         - { c: 'make package', t: '/var/lief/build/LIEF-0.9.0-Linux.tar.gz' }
@@ -72,6 +74,8 @@
 #   $ strings /usr/lib64/libstdc++.so.6.0.19 | grep GLIBCXX
 #   ? /opt/rh/devtoolset-7/root/usr/lib/gcc/x86_64-redhat-linux/7/libstdc++.so
 - name: Ensure LIEF is working
-  command: "{{ python3_bin }} -c 'import lief'"
+  command: "python -c 'import lief'"
+  environment:
+    PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   ignore_errors: true
   changed_when: false
