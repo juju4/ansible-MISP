@@ -46,6 +46,36 @@
         dest: "{{ misp_lief_rootdir }}/build"
         state: directory
 
+    - name: Build LIEF - Makefile
+      command: >
+        scl enable devtoolset-7 "bash -c \"cmake3 -DLIEF_PYTHON_API=on -DLIEF_DOC=off
+                -DCMAKE_INSTALL_PREFIX=$LIEF_INSTALL -DCMAKE_BUILD_TYPE=Release
+                -DPYTHON_VERSION=2.7 ..\""
+      args:
+        creates: "{{ misp_lief_rootdir }}/build/Makefile"
+        chdir: "{{ misp_lief_rootdir }}/build"
+
+# FIXME! can stop around 85% with
+#   c++: internal compiler error: Killed (program cc1plus)
+#   => replay and check that you have enough memory
+    - name: Build LIEF - make
+      command: 'make -j3'
+      args:
+        creates: "{{ misp_lief_rootdir }}/build/api/python/_pylief.so"
+        chdir: "{{ misp_lief_rootdir }}/build"
+      async: 3600
+      poll: 0
+      register: liefbuild
+
+    - name: Build LIEF - check on async task for build
+      async_status:
+        jid: "{{ liefbuild.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished or dpkgbuild.finished
+      retries: 30
+      delay: 60
+      when: liefbuild is changed
+
     - name: Build LIEF
       command: "{{ item.c }}"
       args:
@@ -54,23 +84,12 @@
       become: yes
       become_user: "{{ item.u | default('root') }}"
       with_items:
-# FIXME! can stop around 85% with
-#   c++: internal compiler error: Killed (program cc1plus)
-#   => replay and check that you have enough memory
-        - { c: 'scl enable devtoolset-7 "bash -c \"cmake3 -DLIEF_PYTHON_API=on -DLIEF_DOC=off
-                -DCMAKE_INSTALL_PREFIX=$LIEF_INSTALL -DCMAKE_BUILD_TYPE=Release
-                -DPYTHON_VERSION=2.7 ..\""',
-            t: "{{ misp_lief_rootdir }}/build/Makefile"
-          }
-        - { c: 'make -j3', t: "{{ misp_lief_rootdir }}/build/api/python/_pylief.so" }
         - { c: "cd api/python && {{ misp_virtualenv }}/bin/python setup.py install || :",
             t: '/var/www/_MISP/venv/lib/python3.6/site-packages/lief-0.9.0-py2.7-linux.egg',
             u: "{{ www_user }}"
           }
         - { c: 'make install', t: '/share/LIEF/examples/c/elf_reader.c' }
         - { c: 'make package', t: '/var/lief/build/LIEF-0.9.0-Linux.tar.gz' }
-      async: 3600
-      poll: 60
 
   when: >
     (ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8)
