@@ -7,7 +7,9 @@
     state: present
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
-  when: ansible_os_family == 'Debian'
+  when: >
+    ansible_os_family == 'Debian' or
+    (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8)
   register: pkg_result
   until: pkg_result is success
 
@@ -65,7 +67,8 @@
       async: 3600
       poll: 60
 
-  when: ansible_os_family == 'RedHat'
+  when: >
+    (ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8)
 
 # FIXME! pip install fails on centos7. https://www.centos.org/forums/viewtopic.php?t=66248
 #   ImportError: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.20' not found
