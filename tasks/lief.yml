@@ -72,6 +72,6 @@
 #   $ strings /usr/lib64/libstdc++.so.6.0.19 | grep GLIBCXX
 #   ? /opt/rh/devtoolset-7/root/usr/lib/gcc/x86_64-redhat-linux/7/libstdc++.so
 - name: Ensure LIEF is working
-  command: "python -c 'import lief'"
+  command: "{{ python3_bin }} -c 'import lief'"
   ignore_errors: true
   changed_when: false
