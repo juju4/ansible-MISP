@@ -33,7 +33,7 @@
       git:
         repo: https://github.com/lief-project/LIEF.git
         dest: "{{ misp_lief_rootdir }}"
-        version: "{{ misp_lief_version | default('0.9.0') }}"
+        version: "{{ misp_lief_version | default('0.10.1') }}"
         update: no
         force: no
       when: not l.stat.exists
