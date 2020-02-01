@@ -12,6 +12,8 @@
     (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8)
   register: pkg_result
   until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
 
 - block:
     - name: Ensure LIEF build dependencies are present
@@ -49,6 +51,8 @@
       args:
         creates: "{{ item.t }}"
         chdir: "{{ misp_lief_rootdir }}/build"
+      become: yes
+      become_user: "{{ item.u | default('root') }}"
       with_items:
 # FIXME! can stop around 85% with
 #   c++: internal compiler error: Killed (program cc1plus)
@@ -60,7 +64,8 @@
           }
         - { c: 'make -j3', t: "{{ misp_lief_rootdir }}/build/api/python/_pylief.so" }
         - { c: "cd api/python && {{ misp_virtualenv }}/bin/python setup.py install || :",
-            t: '/var/www/_MISP/venv/lib/python3.6/site-packages/lief-0.9.0-py2.7-linux.egg'
+            t: '/var/www/_MISP/venv/lib/python3.6/site-packages/lief-0.9.0-py2.7-linux.egg',
+            u: "{{ www_user }}"
           }
         - { c: 'make install', t: '/share/LIEF/examples/c/elf_reader.c' }
         - { c: 'make package', t: '/var/lief/build/LIEF-0.9.0-Linux.tar.gz' }
