@@ -102,6 +102,7 @@ script:
   - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug || (cat $HOME/.kitchen/logs/${suite}-${distribution}-${version//./}.log; find /tmp/kitchen)"
 
 after_script:
+  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'pip freeze'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c '/var/www/_MISP/venv/bin/python --version'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c '/var/www/_MISP/venv/bin/pip freeze'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'find /var/www/_MISP/venv/ -type f'"
