@@ -71,7 +71,7 @@
       async_status:
         jid: "{{ liefbuild.ansible_job_id }}"
       register: job_result
-      until: job_result.finished or dpkgbuild.finished
+      until: job_result.finished or liefbuild.finished
       retries: 30
       delay: 60
       when: liefbuild is changed
