@@ -5,7 +5,6 @@
   pip:
     name: lief
     state: present
-    executable: "{{ python3_pip }}"
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
   when: ansible_os_family == 'Debian'
