@@ -62,6 +62,7 @@ misp_pkg_list:
     - zbar
     - poppler-cpp-devel
     - libXrender
+    - libstdc++6
 
 easy_install_bin: easy_install-3.6
 python3_bin: python3.6
