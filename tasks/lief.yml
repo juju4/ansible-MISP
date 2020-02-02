@@ -85,7 +85,7 @@
 
     - name: Install LIEF python bindings
       pip:
-        name: "file://{{ misp_lief_rootdir }}/build/api/python"
+        name: "file://{{ misp_lief_rootdir }}/build/api/python/lief_pybind11-prefix/src/lief_pybind11"
         state: present
         virtualenv: "{{ misp_virtualenv }}"
         virtualenv_python: "{{ python3_bin }}"
