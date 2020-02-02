@@ -91,6 +91,7 @@
       command: "{{ item.c }}"
       args:
         creates: "{{ item.t }}"
+      with_items:
         - { c: 'make install', t: '/share/LIEF/examples/c/elf_reader.c' }
         - { c: 'make package', t: '/var/lief/build/LIEF-0.9.0-Linux.tar.gz' }
 
