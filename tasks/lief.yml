@@ -94,6 +94,17 @@
       become: yes
       become_user: "{{ www_user }}"
 
+    - name: Install PyLIEF
+      pip:
+        name: https://github.com/lief-project/packages/raw/lief-master-latest/pylief-0.9.0.dev.zip
+        state: present
+        virtualenv: "{{ misp_virtualenv }}"
+        virtualenv_python: "{{ python3_bin }}"
+      register: pkg_result
+      until: pkg_result is success
+      become: yes
+      become_user: "{{ www_user }}"
+
     - name: Install LIEF
       command: "{{ item.c }}"
       args:
