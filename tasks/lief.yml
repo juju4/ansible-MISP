@@ -76,6 +76,13 @@
       delay: 60
       when: liefbuild is changed
 
+   - name: Ensure pip cache permissions are correct
+     file:
+       dest: /usr/share/httpd/.cache/pip/http
+       state: directory
+       mode: '0755'
+       owner: "{{ www_user }}"
+
     - name: Install LIEF python bindings
       pip:
         name: "file://{{ misp_lief_rootdir }}/build/api/python"
