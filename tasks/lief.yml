@@ -94,6 +94,21 @@
       become: yes
       become_user: "{{ www_user }}"
 
+    - name: Ensure updated version of pip and setuptools
+      pip:
+        name: "{{ item.n }}"
+        version: "{{ item.v }}"
+        state: present
+        virtualenv: "{{ misp_virtualenv }}"
+        virtualenv_python: "{{ python3_bin }}"
+      register: pkg_result
+      until: pkg_result is success
+      become: yes
+      become_user: "{{ www_user }}"
+      with_items:
+        - { n: pip, v: '20.0.2' }
+        - { n: setuptools, v: '45.1.0' }
+
     - name: Install PyLIEF
       pip:
         name: https://github.com/lief-project/packages/raw/lief-master-latest/pylief-0.9.0.dev.zip
