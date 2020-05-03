@@ -27,10 +27,8 @@ provisioner:
   ansible_omnibus_url: https://raw.githubusercontent.com/juju4/omnibus-ansible/master/ansible_install.sh
 
 platforms:
+  - name: ubuntu-20.04
   - name: ubuntu-18.04
-#  - name: ubuntu-16.04
-#  - name: ubuntu-14.04
-#  - name: ubuntu-12.04
   - name: centos-8
   - name: centos-7
 ## httpd/centos7/capability issue on lxc
@@ -39,8 +37,6 @@ platforms:
     driver:
       config:
         security.privileged: true
-#  - name: centos-6
-#  - name: centos-6
 #  - name: alpine-3.4
 
 suites:

@@ -12,6 +12,10 @@ env:
     version: 7
     suite: default
   - distribution: ubuntu
+    version: 20.04
+    suite: default
+    if: branch =~ /^devel*/
+  - distribution: ubuntu
     version: 18.04
     suite: default
 #  - distribution: ubuntu

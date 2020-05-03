@@ -22,21 +22,10 @@ provisioner:
   ansible_cfg_path: test/vagrant/ansible.cfg
 
 platforms:
+  - name: ubuntu-20.04
   - name: ubuntu-18.04
-#  - name: ubuntu-16.04
-#    driver_config:
-#      network:
-#        - ["forwarded_port", {guest: 80, host: 8588}]
-#  - name: ubuntu-14.04
-#    driver_config:
-#      network:
-#        - ["forwarded_port", {guest: 80, host: 8588}]
-## No package matching 'php5-redis' is available
-#  - name: ubuntu-12.04
-## test for agent windows/wixl ? no image available
-#  - name: ubuntu-15.10
-## mig-scheduler issue w rights on database
-  - name: centos-7.1
+  - name: centos-8
+  - name: centos-7
     driver_config:
       network:
         - ["forwarded_port", {guest: 80, host: 8589}]
