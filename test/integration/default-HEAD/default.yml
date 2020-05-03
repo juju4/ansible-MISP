@@ -34,13 +34,13 @@
           - { d: /usr/share/httpd/.cache/pip, s: directory, m: '0755', o: "{{ www_user }}" }
           - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/build", s: directory, m: '0755', o: "{{ www_user }}" }
           - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/pyfaup.egg-info", s: directory, m: '0755', o: "{{ www_user }}" }
-      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
+      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0]|int >= 7
     - set_fact:
         faup_ownership:
           - { d: /var/www/.cache/pip, s: directory, m: '0755', o: "{{ www_user }}" }
           - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/build", s: directory, m: '0755', o: "{{ www_user }}" }
           - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/pyfaup.egg-info", s: directory, m: '0755', o: "{{ www_user }}" }
-      when: ansible_distribution == "Ubuntu" and ansible_distribution_version.split('.')[0] == '20'
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_version.split('.')[0]|int >= 18
   roles:
 #    - geerlingguy.apache
     - juju4.harden_apache
