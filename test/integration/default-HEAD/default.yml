@@ -31,15 +31,15 @@
         harden_php_allow_url_fopen: On
         harden_php_disable_functions: 'pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,chown,diskfreespace,disk_free_space,disk_total_space,dl,exec,escapeshellarg,escapeshellcmd,fileinode,highlight_file,max_execution_time,passthru,pclose,phpinfo,popen,proc_nice,proc_terminate,set_time_limit,shell_exec,show_source,system,__construct, __destruct, __call,__wakeup'
         faup_ownership:
-          - { d: /usr/share/httpd/.cache/pip, s: directory, m: '0755', o: "{{ www_user }}" }
-          - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/build", s: directory, m: '0755', o: "{{ www_user }}" }
-          - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/pyfaup.egg-info", s: directory, m: '0755', o: "{{ www_user }}" }
+          - { d: /usr/share/httpd/.cache/pip, s: directory, m: '0755', o: "apache" }
+          - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/build", s: directory, m: '0755', o: "apache" }
+          - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/pyfaup.egg-info", s: directory, m: '0755', o: "apache" }
       when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0]|int >= 7
     - set_fact:
         faup_ownership:
-          - { d: /var/www/.cache/pip, s: directory, m: '0755', o: "{{ www_user }}" }
-          - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/build", s: directory, m: '0755', o: "{{ www_user }}" }
-          - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/pyfaup.egg-info", s: directory, m: '0755', o: "{{ www_user }}" }
+          - { d: /var/www/.cache/pip, s: directory, m: '0755', o: "www-data" }
+          - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/build", s: directory, m: '0755', o: "www-data" }
+          - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/pyfaup.egg-info", s: directory, m: '0755', o: "www-data" }
       when: ansible_distribution == "Ubuntu" and ansible_distribution_version.split('.')[0]|int >= 18
   roles:
 #    - geerlingguy.apache
