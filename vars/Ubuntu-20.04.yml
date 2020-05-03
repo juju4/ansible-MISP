@@ -12,10 +12,10 @@ misp_pkg_list:
  - git
  - redis-server
  - make
- - python-dev
- - python-pip
- - python-virtualenv
- - python-setuptools
+ - python3-dev
+ - python3-pip
+ - python3-virtualenv
+ - python3-setuptools
  - libxml2-dev
  - libxslt1-dev
  - zlib1g-dev
@@ -24,11 +24,10 @@ misp_pkg_list:
  - gnupg
 #
  - php-redis
- - python-mysqldb
+ - python3-mysqldb
  - rng-tools
 # misp-modules
  - python3
- - python3-pip
  - libpq5
  - acl
  - sudo
