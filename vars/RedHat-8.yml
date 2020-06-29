@@ -25,7 +25,7 @@ misp_pkg_list:
     - curl
     - gnupg
 #
-    - rng-tools
+    - "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rng-tools{% endif %}"
     - wget
 # misp-modules
     - python36
@@ -66,7 +66,7 @@ misp_webserver_nginx:
   - php-fpm
 
 mysql_svc: mariadb
-rng_svc: rngd
+rng_svc: "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rngd{% endif %}"
 redis_svc: redis
 redis_conf: /etc/redis.conf
 misp_services:
