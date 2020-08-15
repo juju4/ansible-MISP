@@ -28,6 +28,8 @@
     regexp: "{{ item.re }}"
     line: "{{ item.l }}"
     create: yes
+    mode: '0640'
+    group: "{{ www_user }}"
   with_items:
     - { re: "^misp_url = .*", l: "misp_url = \"{{ misp_base_url }}\"" }
     - { re: "^misp_key = .*", l: "misp_key = \"{{ userkey }}\"" }
