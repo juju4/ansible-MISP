@@ -20,6 +20,7 @@ provisioner:
 #  ansible_version: 2.7.7
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
   ansible_cfg_path: test/vagrant/ansible.cfg
+  ansible_version: 2.9.11
   require_ansible_omnibus: true
 #  require_chef_for_busser: false
   enable_yum_epel: true
