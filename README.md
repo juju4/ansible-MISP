@@ -1,5 +1,5 @@
-[![Build Status - Master](https://travis-ci.org/juju4/ansible-MISP.svg?branch=master)](https://travis-ci.org/juju4/ansible-MISP)
-[![Build Status - Devel](https://travis-ci.org/juju4/ansible-MISP.svg?branch=devel)](https://travis-ci.org/juju4/ansible-MISP/branches)
+[![Build Status - Master](https://travis-ci.com/juju4/ansible-MISP.svg?branch=master)](https://travis-ci.com/juju4/ansible-MISP)
+[![Build Status - Devel](https://travis-ci.com/juju4/ansible-MISP.svg?branch=devel)](https://travis-ci.com/juju4/ansible-MISP/branches)
 # MISP ansible role
 
 Ansible role to setup MISP, Malware Information Sharing Platform & Threat Sharing
