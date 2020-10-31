@@ -1,5 +1,10 @@
 ---
 
+- name: review misp error.log
+  command: "tail {{ misp_rootdir }}/app/tmp/logs/error.log"
+  changed_when: false
+  failed_when: false
+
 - include: travis.yml
 
 - name: install testing tools
@@ -127,3 +132,8 @@
     regexp: '^curl -([iH].)'
     replace: 'curl -k -\1'
     backup: yes
+
+- name: review misp error.log 2
+  command: "tail {{ misp_rootdir }}/app/tmp/logs/error.log"
+  changed_when: false
+  failed_when: false
