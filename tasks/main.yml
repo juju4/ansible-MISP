@@ -582,6 +582,10 @@
   patch:
     src: patch-cakephp-snuffleupagus-strict
     basedir: "{{ misp_rootdir }}/app/Lib"
+- name: patch Module.php warning
+  patch:
+    src: patch-app-Model-Module.php
+    basedir: "{{ misp_rootdir }}"
 
 - include: lief.yml
   when: misp_lief_enable
