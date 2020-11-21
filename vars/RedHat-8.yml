@@ -21,6 +21,7 @@ misp_pkg_list:
     - make
     - libxml2-devel
     - libxslt-devel
+    - mesa-libGL-devel
     - zlib-devel
     - curl
     - gnupg

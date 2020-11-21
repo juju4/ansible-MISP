@@ -27,6 +27,7 @@ misp_pkg_list:
     - python-pip
     - libxml2-devel
     - libxslt-devel
+    - mesa-libGL-devel
     - zlib-devel
     - curl
     - gnupg
