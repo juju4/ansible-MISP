@@ -38,6 +38,6 @@
   service: name=rng-tools state=restarted
 
 - name: updating existing MISP submodules - minor releases
-  command: "git submodule update --init --force"
+  command: "git submodule update --init --force"  # noqa 303
   args:
     chdir: "{{ misp_rootdir }}"

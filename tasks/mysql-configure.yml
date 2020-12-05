@@ -12,6 +12,7 @@
     dest: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
     regexp: "ENGINE=\\w+"
     replace: "ENGINE=MyISAM"
+    mode: '0644'
     backup: yes
   when: ansible_distribution_release == 'trusty' or ansible_distribution_major_version == '7'
 
@@ -19,7 +20,10 @@
   mysql_db: name=misp state=import target={{ misp_rootdir }}/INSTALL/MYSQL.sql
   when: not mispdbloaded.stat.exists
 - name: Add marker for mysql import
-  file: dest=/root/.mysql_misp_imported state=touch
+  file:
+    dest: /root/.mysql_misp_imported
+    mode: '0600'
+    state: touch
   when: not mispdbloaded.stat.exists
 - name: creating mysql misp db user
   mysql_user:

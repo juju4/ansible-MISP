@@ -1,83 +1,84 @@
 ---
 
 misp_pkg_list:
-    - openssh-server
-    - httpd
-    - mariadb
-    - mariadb-server
-    - python3-PyMySQL
-    - php
-    - php-mysqlnd
-    - php-mbstring
-    - php-devel
-#    - php-redis
-    - php-opcache
-    - php-json
-    - postfix
-    - "@Development tools"
-    - zip
-    - git
-    - redis
-    - make
-    - libxml2-devel
-    - libxslt-devel
-    - mesa-libGL-devel
-    - zlib-devel
-    - curl
-    - gnupg
-#
-    - "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rng-tools{% endif %}"
-    - wget
-# misp-modules
-    - python36
-    - python36-devel
-    - python3-pip
-    - python3-setuptools
-    - python3-virtualenv
-    - libpq
-## misc
-    - acl
-    - sudo
-    - crontabs
-    - libjpeg-turbo-devel
-    - openssl
-    - hostname
-## kitchen/ss
-    - iproute
-    - ssdeep-devel
-    - ssdeep-libs
-#    - openjpeg-devel
-#    - rubygem-rouge
-#    - rubygem-asciidoctor
-    - libSM
-#    - zbar
-    - libXrender
-##    CentOS PowerTools x86_64
-    - poppler-cpp-devel
+ - openssh-server
+ - httpd
+ - mysql
+ - mysql-server
+ - MySQL-python
+ - php
+ - php-mysql
+ - php-mbstring
+ - php-devel
+ # - php-redis
+ - php-opcache
+ - php-json
+ - postfix
+ - "@Development tools"
+ - zip
+ - git
+ - redis
+ - make
+ - python-devel
+ - python-pip
+ - libxml2-devel
+ - libxslt-devel
+ - zlib-devel
+ - curl
+ - gnupg
+ #
+ - "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rng-tools{% endif %}"
+ - wget
+ # misp-modules
+ - python36
+ - python36-devel
+ - python3-pip
+ - python36-setuptools
+ - python-virtualenv
+ - libpq
+ ## misc
+ - acl
+ - sudo
+ - crontabs
+ - libjpeg-turbo-devel
+ - openssl
+ - hostname
+ ## kitchen/ss
+ - iproute
+ - ssdeep-devel
+ - ssdeep-libs
+ # - openjpeg-devel
+ # - rubygem-rouge
+ # - rubygem-asciidoctor
+ - libSM
+ # - zbar
+ - libXrender
+ ## CentOS PowerTools x86_64
+ - poppler-cpp-devel
 
 easy_install_bin: easy_install-3.6
 python3_bin: python3.6
 python3_pip: /usr/local/bin/pip3
 
 misp_webserver_apache2:
-    - httpd
+ - httpd
 
 misp_webserver_nginx:
-  - nginx
-  - php-fpm
+ - nginx
+ - php-fpm
 
 mysql_svc: mariadb
 rng_svc: "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rngd{% endif %}"
 redis_svc: redis
 redis_conf: /etc/redis.conf
 misp_services:
-    - "{{ apache_svc }}"
-    - "{{ mysql_svc }}"
-    - "{{ rng_svc }}"
-    - php-fpm
+ - "{{ apache_svc }}"
+ - "{{ mysql_svc }}"
+ - "{{ rng_svc }}"
+ - php-fpm
 
 misp_testing_pkg:
-    - rubygem-rake
+ - rubygem-rake
 
 nginx_sock: /var/run/php-fpm/php-fpm.sock
 php_confdir: /etc/php.d

@@ -1,9 +1,9 @@
 ---
 driver:
   name: docker
-## https://github.com/test-kitchen/kitchen-docker/issues/54
+  ## https://github.com/test-kitchen/kitchen-docker/issues/54
   use_sudo: false
-## resources limit
+  ## resources limit
   cpu: 2
   memory: 1GB
   run_options: --cpus=0.8
@@ -15,15 +15,15 @@ provisioner:
   name: ansible_playbook
   roles_path: ../
   hosts: all
-#  ansible_verbose: true
+  # ansible_verbose: true
   ansible_verbose: false
   ansible_verbosity: 4
-#  ansible_version: 2.7.7
+  # ansible_version: 2.7.7
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
   ansible_cfg_path: test/vagrant/ansible.cfg
-#  require_chef_omnibus: false
+  # require_chef_omnibus: false
   require_ansible_omnibus: true
-#  require_chef_for_busser: false
+  # require_chef_for_busser: false
   enable_yum_epel: true
   ansible_connection: ssh
 
@@ -31,11 +31,10 @@ platforms:
   - name: ubuntu-20.04
   - name: ubuntu-18.04
     driver_config:
-# https://github.com/test-kitchen/kitchen-docker/issues/285
+      # https://github.com/test-kitchen/kitchen-docker/issues/285
       provision_command: mkdir -p /run/sshd
   - name: centos-8
   - name: centos-7
-#  - name: alpine-3.6
 
 suites:
   - name: default

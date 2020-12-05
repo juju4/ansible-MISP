@@ -37,6 +37,7 @@
   file:
     src: "{{ apache_sitedir }}/misp.conf"
     dest: /etc/apache2/sites-enabled/misp.conf
+    mode: '0644'
     state: link
   notify:
     - restart webserver

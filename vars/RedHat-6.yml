@@ -1,69 +1,69 @@
 ---
 
 misp_pkg_list:
-    - openssh-server
-    - httpd
-    - mysql
-    - mysql-server
-    - MySQL-python
-    - php
-    - php-mysql
-    - php-mbstring
-    - php-devel
-    - php-redis
-#    - php56
-#    - php56-php-mysqlnd
-#    - php56-php-mbstring
-#    - php56-php-devel
-#    - php56-php-redis
-    - postfix
-    - "@Development tools"
-    - zip
-    - git
-    - redis
-    - make
-    - python-devel
-    - python-pip
-    - libxml2-devel
-    - libxslt-devel
-    - zlib-devel
-    - curl
-    - gnupg
-#
-    - rng-tools
-    - wget
-# misp-modules
-#    - python34
-## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
-#    - python3-pip
-    - acl
-    - sudo
-    - crontabs
-## pillow? not needed
-#    - libjpeg-turbo-devel
-    - openssl
+ - openssh-server
+ - httpd
+ - mysql
+ - mysql-server
+ - MySQL-python
+ - php
+ - php-mysql
+ - php-mbstring
+ - php-devel
+ - php-redis
+ # - php56
+ # - php56-php-mysqlnd
+ # - php56-php-mbstring
+ # - php56-php-devel
+ # - php56-php-redis
+ - postfix
+ - "@Development tools"
+ - zip
+ - git
+ - redis
+ - make
+ - python-devel
+ - python-pip
+ - libxml2-devel
+ - libxslt-devel
+ - zlib-devel
+ - curl
+ - gnupg
+ #
+ - rng-tools
+ - wget
+ # misp-modules
+ # - python34
+ ## http://stackoverflow.com/questions/32618686/how-to-install-pip-in-centos-7
+ # - python3-pip
+ - acl
+ - sudo
+ - crontabs
+ ## pillow? not needed
+ # - libjpeg-turbo-devel
+ - openssl
 
 python3_bin: python3?
 
 misp_webserver_apache2:
-    - httpd
+ - httpd
 
 misp_webserver_nginx:
-  - nginx
-  - php-fpm
+ - nginx
+ - php-fpm
 
 mysql_svc: mysqld
 rng_svc: rngd
 redis_svc: redis
 redis_conf: /etc/redis.conf
 misp_services:
-    - "{{ apache_svc }}"
-    - "{{ mysql_svc }}"
-    - "{{ rng_svc }}"
-    - php-fpm
+ - "{{ apache_svc }}"
+ - "{{ mysql_svc }}"
+ - "{{ rng_svc }}"
+ - php-fpm
 
 misp_testing_pkg:
-    - rubygem-rake
+ - rubygem-rake
 
 nginx_sock: /var/run/php-fpm/php-fpm.sock
 php_confdir: /etc/php.d

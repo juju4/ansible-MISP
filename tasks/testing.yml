@@ -19,6 +19,7 @@
     dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
     regexp: 'http:\/\/misp.local'
     replace: "{{ misp_base_url }}"
+    mode: '0644'
     backup: yes
 - name: check tool version for debugging
   command: "{{ item }}"
@@ -50,32 +51,33 @@
     - "{{ misp_testing_user_home }}"
     - /home
 
-   # Get authkey
+# Get authkey
 - name: check world-writeable permissions
   file: "dest={{ item }} mode=0777 owner={{ misp_testing_user }} recurse=yes"
   with_items:
     - "{{ misp_rootdir }}/build"
     - "{{ misp_rootdir }}/tests"
-#- name: use MISP travis bootstrap
-#  copy:
-#    src: "{{ misp_rootdir }}/travis/bootstrap.php"
-#    dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
-#    backup: yes
-#    force: yes
+
+# - name: use MISP travis bootstrap
+#   copy:
+#     src: "{{ misp_rootdir }}/travis/bootstrap.php"
+#     dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
+#     backup: yes
+#     force: yes
 
 - include: misp-key-file.yml
 
 - name: MISP tree permissions
-## break .gnupg if applied to whole tree
-#  file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755 recurse=yes"
+  ## break .gnupg if applied to whole tree
+  # file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755 recurse=yes"
   file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=0755"
   become: yes
 - name: MISP tree permissions
   file: "dest={{ item }} owner={{ www_user }} mode=0755"
-## Note: recurse is only valid if directory and can't select them from fileglob
-#  with_fileglob:
-#    - "{{ misp_rootdir }}/*"
-## Not doing root files, build/tests/PyMISP addressed in their own tasks, INSTALL/travis ignored
+  ## Note: recurse is only valid if directory and can't select them from fileglob
+  # with_fileglob:
+  #   - "{{ misp_rootdir }}/*"
+  ## Not doing root files, build/tests/PyMISP addressed in their own tasks, INSTALL/travis ignored
   with_items:
     - "{{ misp_rootdir }}/app"
     - "{{ misp_rootdir }}/format"
@@ -106,7 +108,12 @@
 - debug: var=misp_base_url
 - debug: var=userInit
 - name: set local variables in PyMISP/tests/keys.py
-  lineinfile: "dest={{ misp_rootdir }}/PyMISP/tests/keys.py line='{{ item }}' create=yes owner={{ misp_testing_user }}"
+  lineinfile:
+    dest: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
+    line: "{{ item }}"
+    mode: '0600'
+    owner: "{{ misp_testing_user }}"
+    create: yes
   with_items:
     - "url = \"{{ misp_base_url }}\""
     - "key = \"{{ userkey }}\""
@@ -115,6 +122,7 @@
   file:
     src: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
     dest: "{{ misp_rootdir }}/PyMISP/examples/events/keys.py"
+    mode: '0600'
     owner: "{{ misp_testing_user }}"
     state: link
     force: yes
@@ -122,6 +130,7 @@
   file:
     src: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
     dest: "{{ misp_rootdir }}/PyMISP/keys.py"
+    mode: '0600'
     owner: "{{ misp_testing_user }}"
     state: link
     force: yes
@@ -131,6 +140,7 @@
     dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
     regexp: '^curl -([iH].)'
     replace: 'curl -k -\1'
+    mode: '0644'
     backup: yes
 
 - name: review misp error.log 2

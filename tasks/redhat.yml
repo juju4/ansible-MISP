@@ -15,6 +15,7 @@
     section: PowerTools
     option: enabled
     value: 1
+    mode: '0644'
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
 
 - name: yum | MISP dependencies install
@@ -29,7 +30,12 @@
 
 - block:
     - name: set php-fpm to use socket file
-      replace: "dest=/etc/php-fpm.d/www.conf regexp={{ item.re }} replace={{ item.rep }} backup=yes"
+      replace:
+        dest: /etc/php-fpm.d/www.conf
+        regexp: "{{ item.re }}"
+        replace: "{{ item.rep }}"
+        mode: '0644'
+        backup: yes
       with_items:
         - { re: '^listen = .*$', rep: 'listen = /var/run/php-fpm/php-fpm.sock' }
         - { re: '^;listen.owner = nobody', rep: 'listen.owner = {{ fpm_user }}' }
@@ -43,7 +49,12 @@
       file: dest=/var/run/php-fpm state=directory owner=nobody group=nobody mode=0755
 
     - name: set php-fpm user/group to nginx
-      replace: "dest=/etc/php-fpm.d/www.conf regexp={{ item.re }} replace={{ item.rep }} backup=yes"
+      replace:
+        dest: /etc/php-fpm.d/www.conf
+        regexp: "{{ item.re }}"
+        replace: "{{ item.rep }}"
+        mode: '0644'
+        backup: yes
       with_items:
         - { re: '^user = .*$', rep: 'user = nginx' }
         - { re: '^group = .*$', rep: 'group = nginx' }

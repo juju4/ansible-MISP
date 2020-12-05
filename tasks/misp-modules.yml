@@ -32,6 +32,7 @@
     dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     regexp: '^-e git\+https:\/\/github.com\/MISP\/PyMISP.git.*'
     replace: '-e git+https://github.com/MISP/PyMISP.git#egg=pymisp'
+    mode: '0644'
     backup: yes
   when: misp_latest_pymisp
 
@@ -66,11 +67,11 @@
 
 ## centos7: pip points to python3x
 - name: redhat | install dependencies for MISP modules (pip)
-#  pip:
-#    requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-#    virtualenv: "{{ misp_virtualenv }}"
-#    virtualenv_python: "{{ python3_bin }}"
-#    chdir: "{{ mispmodules_rootdir }}/misp-modules"
+  # pip:
+  #   requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
+  #   virtualenv: "{{ misp_virtualenv }}"
+  #   virtualenv_python: "{{ python3_bin }}"
+  #   chdir: "{{ mispmodules_rootdir }}/misp-modules"
   command: "{{ item.c }}"
   args:
     creates: "{{ item.t | default(omit) }}"
@@ -118,6 +119,7 @@
     dest: /etc/rc.local
     regexp: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules .* &"
     line: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.boot 2>&1 &"
+    mode: '0755'
     insertbefore: "^exit 0"
     backup: yes
 
@@ -136,6 +138,7 @@
   file:
     src: /usr/lib64/libpcre.so.1
     dest: /usr/lib64/libpcre.so.3
+    mode: '0644'
     state: link
   when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
 
@@ -147,6 +150,7 @@
   file:
     src: "{{ mispmodules_libyarapath }}/libyara.so"
     dest: /usr/lib/libyara.so
+    mode: '0644'
     state: link
   ignore_errors: true
   when: ansible_distribution == 'Ubuntu' and not libyaraso.stat.exists

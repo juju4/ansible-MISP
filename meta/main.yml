@@ -11,22 +11,22 @@ galaxy_info:
   # platform on this list, let us know and we'll get it added!
   #
   platforms:
-  - name: EL
-    versions:
-     - 8
-     - 7
-  - name: Ubuntu
-    versions:
-    - bionic
-    - xenial
-    - trusty
+    - name: EL
+      versions:
+        - 8
+        - 7
+    - name: Ubuntu
+      versions:
+        - bionic
+        - xenial
+        - trusty
   #
   # Below are all categories currently available. Just as with
   # the platforms above, uncomment those that apply to your role.
   #
   galaxy_tags:
-  - system
-  - security
+    - system
+    - security
 dependencies:
   - juju4.redhat_epel
 ## eventual dependencies for fine tuning but integration needed

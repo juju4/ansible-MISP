@@ -10,7 +10,11 @@
 
 - block:
     - name: debian | enable misp configuration
-      file: src=/etc/nginx/sites-available/misp.conf dest=/etc/nginx/sites-enabled/misp.conf state=link
+      file:
+        src: /etc/nginx/sites-available/misp.conf
+        dest: /etc/nginx/sites-enabled/misp.conf
+        mode: '0644'
+        state: link
       notify:
         - restart webserver
     - name: debian | disable default configuration

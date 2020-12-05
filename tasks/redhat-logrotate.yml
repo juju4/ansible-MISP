@@ -22,7 +22,7 @@
   with_items:
     - { c: "checkmodule -M -m -o /root/misplogrotate.mod {{ misp_rootdir }}/INSTALL/misplogrotate.te",
         t: "/root/misplogrotate.mod"
-      }
+    }
     - { c: "semodule_package -o /root/misplogrotate.pp -m /root/misplogrotate.mod", t: "/root/misplogrotate.pp" }
     - { c: "semodule -i /root/misplogrotate.pp", t: "/tmp/doesnotexist" }
   when: ansible_selinux.status is defined and ansible_selinux.status != 'disabled'

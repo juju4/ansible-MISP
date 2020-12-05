@@ -12,6 +12,6 @@
         - { u: dupont@admin.test, p: dupont_passphrase. }
         - { u: dupond@admin.test, p: dupond_passphrase. }
   roles:
-#    - geerlingguy.nginx
+    # - geerlingguy.apache
     - juju4.misp
     - juju4.harden_nginx

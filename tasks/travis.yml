@@ -13,9 +13,9 @@
     certificate_cn: "testing-travis.internal"
     travisci: true
     rolesroot: '/etc/ansible/roles'
-#    misp_testing_user: travis
-#    misp_testing_user_home: "/home/{{ misp_testing_user }}"
-#    misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
+    # misp_testing_user: travis
+    # misp_testing_user_home: "/home/{{ misp_testing_user }}"
+    # misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
   when: ansible_env['TRAVIS'] is defined and ansible_env['TRAVIS'] == 'true'
 
 - name: Check if /home/kitchen/.gem exists

@@ -6,13 +6,13 @@ backupdir: /var/_backup
 install_archives: /var/_install
 
 ## branch or tags to use
-#misp_version: 'HEAD'
+# misp_version: 'HEAD'
 misp_version: '2.4'
 misp_rootdir: /var/www/_MISP/MISP
 misp_virtualenv: /var/www/_MISP/venv
 mispmodules_rootdir: /opt
 misp_webserver: 'apache2'
-#misp_webserver: 'nginx'
+# misp_webserver: 'nginx'
 misp_fcgi_enable: false
 misp_lief_enable: true
 misp_lief_rootdir: /var/lief
@@ -45,7 +45,7 @@ misp_gpg_pass: gpg_pass_to_change_fast
 misp_SecureAuth_expire: 300
 misp_passreq_lenth: 8
 ## not mapped currently
-#misp_passreq_complexity: ''
+# misp_passreq_complexity: ''
 ## leave empty when no proxy
 misp_proxy_scheme: ''
 misp_proxy_host: ''
@@ -62,20 +62,20 @@ misp_web_pass: admin_pass_to_change_fast
 ## orgid (default): 1/ORGNAME
 ## roleid (default): 1/admin, 2/OrgAdmin, 3/user, 4/publisher, 5/sync user, 6/readonly
 misp_webusers_list: []
-#misp_webusers_list:
-# - { u: dupont@admin.test, p: 'dupont_passphrase.', email: dupont@localhost, org: 1, role: 2 }
-# - { u: dupond@admin.test, p: 'dupond_passphrase.', email: dupond@localhost, org: 1, role: 4 }
+# misp_webusers_list:
+#   - { u: dupont@admin.test, p: 'dupont_passphrase.', email: dupont@localhost, org: 1, role: 2 }
+#   - { u: dupond@admin.test, p: 'dupond_passphrase.', email: dupond@localhost, org: 1, role: 4 }
 ## TODO: either fixed for serverspec test, either random if not defined/empty
-#misp_web_apikey:
+# misp_web_apikey:
 
 misp_email_contact: email@address.com
 
 ## default provided feeds. you need to know their id
 misp_enable_feeds:
-# - CIRCL OSINT Feed
- - 1
-# - The Botvrij.eu Data
- - 2
+  # - CIRCL OSINT Feed
+  - 1
+  # - The Botvrij.eu Data
+  - 2
 
 misp_disable_feeds: []
 
@@ -96,11 +96,11 @@ misp_no_log: true
 # if adding ::1, ensure IPv6 is functional. https://github.com/antirez/redis/issues/3241
 misp_redis_bind: '127.0.0.1'
 # FIXME! https://github.com/MISP/MISP/issues/3452
-#misp_redis_password: redis_password_to_change
+# misp_redis_password: redis_password_to_change
 misp_redis_securecommands:
-    - { re: '^rename-command FLUSHDB .*', l: 'rename-command FLUSHDB ""' }
-    - { re: '^rename-command FLUSHALL .*', l: 'rename-command FLUSHALL ""' }
-    - { re: '^rename-command DEBUG .*', l: 'rename-command DEBUG ""' }
-    - { re: '^rename-command SHUTDOWN .*', l: 'rename-command SHUTDOWN SHUTDOWN_MISP1234' }
-    - { re: '^rename-command CONFIG .*', l: 'rename-command CONFIG CONFIG_MISP1234' }
-    - { re: '^rename-command MONITOR .*', l: 'rename-command MONITOR MONITOR_MISP1234' }
+  - { re: '^rename-command FLUSHDB .*', l: 'rename-command FLUSHDB ""' }
+  - { re: '^rename-command FLUSHALL .*', l: 'rename-command FLUSHALL ""' }
+  - { re: '^rename-command DEBUG .*', l: 'rename-command DEBUG ""' }
+  - { re: '^rename-command SHUTDOWN .*', l: 'rename-command SHUTDOWN SHUTDOWN_MISP1234' }
+  - { re: '^rename-command CONFIG .*', l: 'rename-command CONFIG CONFIG_MISP1234' }
+  - { re: '^rename-command MONITOR .*', l: 'rename-command MONITOR MONITOR_MISP1234' }

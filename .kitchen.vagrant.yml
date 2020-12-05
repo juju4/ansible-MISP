@@ -7,15 +7,15 @@ transport:
   name: sftp
 
 driver_config:
-    customize:
-#      cpus: 2
-      memory: 1024
+  customize:
+    # cpus: 2
+    memory: 1024
 
 provisioner:
   name: ansible_playbook
   roles_path: ../
   hosts: all
-#  ansible_verbose: true
+  # ansible_verbose: true
   ansible_verbose: false
   ansible_verbosity: 3
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
@@ -40,4 +40,4 @@ suites:
   - name: nginx
     run_list:
     attributes:
-        misp_webserver: 'nginx'
+      misp_webserver: 'nginx'

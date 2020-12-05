@@ -11,14 +11,17 @@
   become_user: "{{ www_user }}"
   when: not ap.stat.exists
 - name: Admin pass set marker
-  file: dest="{{ misp_rootdir }}/.admin_pass_set" state=touch
+  file:
+    dest: "{{ misp_rootdir }}/.admin_pass_set"
+    mode: '0600'
+    state: touch
   when: not ap.stat.exists
 
-#- block:
-#    - name: set extra users
-#      command: "{{ misp_rootdir }}/app/Console/cake Password {{ item.u }} \"{{ item.p }}\""
-#      with_items: "{{ misp_webusers_list }}"
-#  when: misp_webusers_list is defined and misp_webusers_list
+# - block:
+#     - name: set extra users
+#       command: "{{ misp_rootdir }}/app/Console/cake Password {{ item.u }} \"{{ item.p }}\""
+#       with_items: "{{ misp_webusers_list }}"
+#   when: misp_webusers_list is defined and misp_webusers_list
 
 - include: misp-key-file.yml
 

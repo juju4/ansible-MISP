@@ -24,22 +24,22 @@ misp_pkg_list:
  - php-dev
  - curl
  - gnupg
-#
+ #
  - php-redis
  - python3-mysqldb
  - rng-tools
-# misp-modules
+ # misp-modules
  - python3
  - libpq5
  - acl
  - sudo
-## pillow
+ ## pillow
  - libtiff5-dev
  - libjpeg8-dev
  - zlib1g-dev
  - libfreetype6-dev
-## if pyzmq?
-# - libczmq-dev
+ ## if pyzmq?
+ # - libczmq-dev
  - openssl
  - libfuzzy-dev
  - ruby-pygments.rb
@@ -59,29 +59,29 @@ rng_svc: rng-tools
 redis_svc: redis
 redis_conf: /etc/redis/redis.conf
 misp_services:
-    - "{{ apache_svc }}"
-    - "{{ mysql_svc }}"
-    - "{{ rng_svc }}"
+ - "{{ apache_svc }}"
+ - "{{ mysql_svc }}"
+ - "{{ rng_svc }}"
 
 misp_services_nginx:
-    - "{{ apache_svc }}"
-    - "{{ mysql_svc }}"
-    - "{{ rng_svc }}"
-    - php7.4-fpm
+ - "{{ apache_svc }}"
+ - "{{ mysql_svc }}"
+ - "{{ rng_svc }}"
+ - php7.4-fpm
 
 misp_testing_pkg:
-    - ruby
-    - rake
+ - ruby
+ - rake
 
 misp_webserver_apache2:
-    - apache2
-    - libapache2-mod-php
-## travis: "No package matching 'libapache2-mod-fastcgi' is available"
-# - libapache2-mod-fastcgi
+ - apache2
+ - libapache2-mod-php
+ ## travis: "No package matching 'libapache2-mod-fastcgi' is available"
+ # - libapache2-mod-fastcgi
 
 misp_webserver_nginx:
-  - nginx
-  - php-fpm
+ - nginx
+ - php-fpm
 
 php_confdir: /etc/php/7.4/mods-available
 php_confext: ini

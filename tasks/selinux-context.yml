@@ -1,11 +1,11 @@
 ---
 
 - name: RedHat | Ensure selinux context for MISP httpd directories
-  command: "chcon -R -t httpd_sys_rw_content_t {{ item }}"
-#  sefcontext:
-#    target: "{{ item }}(/.*)?"
-#    setype: httpd_sys_rw_content_t
-#    state: present
+  command: "chcon -R -t httpd_sys_rw_content_t {{ item }}"  # noqa 301
+  # sefcontext:
+  #   target: "{{ item }}(/.*)?"
+  #   setype: httpd_sys_rw_content_t
+  #   state: present
   with_items:
     - "{{ misp_rootdir }}/app/files"
     - "{{ misp_rootdir }}/app/files/terms"

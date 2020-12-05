@@ -7,6 +7,7 @@
     dest: "{{ redis_conf }}"
     regexp: '^bind .*'
     line: "bind {{ misp_redis_bind }}"
+    mode: '0644'
     backup: yes
 
 - name: redis | require password
@@ -14,6 +15,7 @@
     dest: "{{ redis_conf }}"
     regexp: '^requirepass .*'
     line: "requirepass {{ misp_redis_password }}"
+    mode: '0644'
     backup: yes
   when: misp_redis_password is defined and misp_redis_password
 
@@ -22,5 +24,6 @@
     dest: "{{ redis_conf }}"
     regexp: "{{ item.re }}"
     line: "{{ item.l }}"
+    mode: '0644'
   with_items: "{{ misp_redis_securecommands }}"
   when: misp_redis_securecommands is defined and misp_redis_securecommands != []

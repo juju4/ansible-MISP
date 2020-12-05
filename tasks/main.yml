@@ -25,6 +25,7 @@
     dest: /etc/default/rng-tools
     regexp: '^HRNGDEVICE=.*'
     line: 'HRNGDEVICE=/dev/urandom'
+    mode: '0644'
     backup: yes
   notify:
     - restart rng-tools
@@ -83,8 +84,8 @@
 # possible git clone issues else
 - name: RedHat | Ensure latest nss curl libcurl
   package:
-    name: [ 'nss', 'curl', 'libcurl' ]
-    state: latest
+    name: ['nss', 'curl', 'libcurl']
+    state: latest  # noqa 403
   when: ansible_os_family == "RedHat"
   register: pkg_result
   until: pkg_result is success
@@ -150,12 +151,12 @@
     version: "{{ misp_version }}"
     update: no
     force: no
-## check if commit signed. only partially the case at Jan 2017. require git 2.1.0+ + import key
-#    verify_commit: yes
-#    track_submodules: yes
-#  when: not m.stat.exists
+    ## check if commit signed. only partially the case at Jan 2017. require git 2.1.0+ + import key
+    # verify_commit: yes
+    # track_submodules: yes
   become: yes
   become_user: "{{ www_user }}"
+  # when: not m.stat.exists
 
 - name: update git submodules
   command: "{{ item }}"
@@ -170,18 +171,18 @@
 
 ## https://github.com/MISP/MISP/blob/e763e7646f7bbae5183ab93df840501d88c47119/INSTALL/UPDATE.txt
 - name: updating existing MISP - minor releases
+  # command: "git pull origin {{ misp_version }}"
+  # args:
+  #   chdir: "{{ misp_rootdir }}"
+  # command: "git pull origin {{ misp_version }} --verify-signatures chdir={{ misp_rootdir }}"
+  # register: gitpull_result
+  # changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
   git:
     repo: https://github.com/MISP/MISP.git
     dest: "{{ misp_rootdir }}"
     version: "{{ misp_version }}"
     update: yes
     force: yes
-#  command: "git pull origin {{ misp_version }}"
-#  args:
-#    chdir: "{{ misp_rootdir }}"
-#  command: "git pull origin {{ misp_version }} --verify-signatures chdir={{ misp_rootdir }}"
-#  register: gitpull_result
-#  changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
   when: m.stat.exists
   notify:
     - updating existing MISP submodules - minor releases
@@ -204,10 +205,8 @@
     virtualenv_python: "{{ python3_bin }}"
   with_items:
     - { n: redis, v: '2.10.5' }
-#    - { n: pyzmq, v: '16.0.2' }
+    # - { n: pyzmq, v: '16.0.2' }
     - { n: 'pymisp', v: "{{ misp_pymisp_version }}" }
-## required for users API
-#  when: ansible_distribution_release == 'xenial'
   environment:
     PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   become: yes
@@ -215,7 +214,7 @@
 
 - name: install python dependencies with pip - python, latest
   pip:
-    name: [ 'git+https://github.com/kbandla/pydeep.git', 'python-magic']
+    name: ['git+https://github.com/kbandla/pydeep.git', 'python-magic']
     extra_args: '--exists-action=w'
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
@@ -243,19 +242,20 @@
 
 ### https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
 ### FIXME! pecl/redis requires PHP (version >= 7.0.0, version <= 7.1.0, excluded versions: 6.0.0)
-#- name: Install PECL libaries.
-#  shell: "yes \"\" | pecl install {{ item }}"
-#  register: pecl_result
-#  changed_when: "pecl_result.rc == 0"
-#  failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
-#  with_items:
-#    - redis
-#  when: ansible_os_family == "RedHat"
+# - name: Install PECL libaries.
+#   shell: "yes \"\" | pecl install {{ item }}"
+#   register: pecl_result
+#   changed_when: "pecl_result.rc == 0"
+#   failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
+#   with_items:
+#     - redis
+#   when: ansible_os_family == "RedHat"
 
 - name: setup MISP Cake config
   copy:
     src: "{{ misp_rootdir }}/INSTALL/setup/config.php"
     dest: "{{ misp_rootdir }}/app/Plugin/CakeResque/Config/config.php"
+    mode: '0644'
     remote_src: true
     backup: yes
 
@@ -276,10 +276,10 @@
     group: "{{ www_user }}"
     state: directory
     mode: '02755'
-#  with_fileglob:
-#    - {{ misp_rootdir }}/app/files/scripts/tmp/*
-#    - {{ misp_rootdir }}/app/files/scripts/tmp/cache/*
-#    - {{ misp_rootdir }}/app/files/scripts/tmp/cached_exports/*
+  # with_fileglob:
+  #   - {{ misp_rootdir }}/app/files/scripts/tmp/*
+  #   - {{ misp_rootdir }}/app/files/scripts/tmp/cache/*
+  #   - {{ misp_rootdir }}/app/files/scripts/tmp/cached_exports/*
   with_items:
     - "{{ misp_rootdir }}/app/tmp/"
     - "{{ misp_rootdir }}/app/tmp/sessions"
@@ -321,13 +321,21 @@
     - restart webserver - docker,debian
     - restart webserver - docker,redhat
 - name: Enforce Timezone in php.ini
-  replace: "dest={{ php_ini }} regexp='^;date.timezone =' replace='date.timezone = {{ tz }}'"
+  replace:
+    dest: "{{ php_ini }}"
+    regexp: '^;date.timezone ='
+    replace: 'date.timezone = {{ tz }}'
+    mode: '0644'
   notify:
     - restart webserver
     - restart webserver - docker,debian
     - restart webserver - docker,redhat
 - name: enabling MISP php settings
-  file: "src={{ php_confdir }}/misp-php.ini dest={{ php_confenable }}/99-misp.ini state=link"
+  file:
+    src: "{{ php_confdir }}/misp-php.ini"
+    dest: "{{ php_confenable }}/99-misp.ini"
+    mode: '0644'
+    state: link
   notify:
     - restart webserver
     - restart webserver - docker,debian
@@ -343,25 +351,27 @@
   copy:
     src: "{{ misp_rootdir }}/app/Config/{{ item }}.default.php"
     dest: "{{ misp_rootdir }}/app/Config/{{ item }}.php"
+    mode: '0644'
     owner: "{{ www_user }}"
     remote_src: true
   with_items:
     - bootstrap
     - database
     - core
-## done later
-#    - config
+    ## done later
+    # - config
   when: not conffiles.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 - name: create config files from default
   copy:
     src: "{{ misp_rootdir }}/app/Config/{{ item }}.default.php"
     dest: "{{ misp_rootdir }}/app/Config/{{ item }}.php"
+    mode: '0644'
     remote_src: true
   with_items:
     - bootstrap
     - database
     - core
-#    - config
+    # - config
   when: not conffiles.stat.exists and not (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 - name: ensure right permissions for conf files
   file: "dest={{ misp_rootdir }}/app/Config/{{ item }}.php owner={{ www_user }} mode=0600"
@@ -369,13 +379,14 @@
     - bootstrap
     - database
     - core
-#    - config
+    # - config
 
 - name: update database settings
   replace:
     dest: "{{ misp_rootdir }}/app/Config/database.php"
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
+    mode: '0644'
   with_items:
     - { regexp: 'db login', replace: "{{ misp_db_user }}" }
     - { regexp: 'db password', replace: "{{ misp_db_pass }}" }
@@ -384,21 +395,26 @@
   lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
     line: "CakePlugin::loadAll(array( 'CakeResque' => array('bootstrap' => true) ));"
+    mode: '0644'
 - name: set Cache::Config - mask acceptable for snuffleupagus
   lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
-#             Cache::config('default', array('engine' => 'File'));
     regexp: "^Cache::config.'default', array.'engine' => 'File'.*.;"
     line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
+    mode: '0644'
     backup: yes
 - name: set Cache::Config whole cakephp - mask acceptable for snuffleupagus
   lineinfile:
     dest: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php"
     regexp: "^\t\t\t'mask' => .*"
     line: "\t\t\t'mask' => 0600"
+    mode: '0644'
     backup: yes
 - name: add vendor/autoload.php to core
-  lineinfile: 'dest={{ misp_rootdir }}/app/Config/core.php line="{{ item }}"'
+  lineinfile:
+    dest: "{{ misp_rootdir }}/app/Config/core.php"
+    line: "{{ item }}"
+    mode: '0644'
   with_items:
     - "require_once dirname(__DIR__) . '/Vendor/autoload.php';"
 
@@ -423,7 +439,7 @@
   register: salt2
   no_log: "{{ misp_no_log }}"
   when: s.stat.exists
-- name: Set salt
+- name: Set salt  # noqa 503
   set_fact:
     salt: "{{ salt1.stdout }}"
   no_log: "{{ misp_no_log }}"
@@ -465,13 +481,13 @@
   with_items:
     - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --gen-key --batch /var/tmp/gpg-template",
         c: "{{ misp_rootdir }}/.gnupg/misp.pub"
-      }
+    }
     - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ misp_rootdir }}/.gnupg/misp.pub",
         c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
-      }
-#    - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ gnupg_privdir }}/misp.sec",
-#        c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
-#      }
+    }
+    # - { s: "gpg --homedir {{ misp_rootdir }}/.gnupg --batch --import {{ gnupg_privdir }}/misp.sec",
+    #     c: "{{ misp_rootdir }}/app/webroot/gpg.asc"
+    # }
   become: yes
   become_user: "{{ www_user }}"
 - name: create gnupg key for {{ misp_email }}
@@ -483,15 +499,15 @@
   become: yes
   become_user: "{{ www_user }}"
 ## it seems to be done by gpg
-#- command: wipe -q -y /var/tmp/gpg-template
-#  when: not gkey.stat.exists
+# - command: wipe -q -y /var/tmp/gpg-template
+#   when: not gkey.stat.exists
 - name: check permissions of gpg files
   file:
     dest: "{{ item.d }}"
     mode: "{{ item.m }}"
   with_items:
     - { d: "{{ misp_rootdir }}/.gnupg/misp.pub", m: '0400' }
-#    - { d: "{{ gnupg_privdir }}/misp.sec", m: '0400' }
+    # - { d: "{{ gnupg_privdir }}/misp.sec", m: '0400' }
     - { d: "{{ misp_rootdir }}/.gnupg/pubring.gpg", m: '0600' }
     - { d: "{{ misp_rootdir }}/.gnupg/secring.gpg", m: '0600' }
   when: >
@@ -511,11 +527,16 @@
 
 - block:
     - name: docker redis workaround ???
-      replace: "dest=/etc/systemd/system/redis.service regexp={{ item.re }} replace={{ item.rep }} backup=yes"
+      replace:
+        dest: /etc/systemd/system/redis.service
+        regexp: "{{ item.re }}"
+        replace: "{{ item.rep }}"
+        mode: '0644'
+        backup: yes
       with_items:
         - { re: '^PrivateTmp=yes', rep: 'PrivateTmp=no' }
         - { re: '^PrivateDevices=yes', rep: 'PrivateDevices=no' }
-#        - { re: '^', rep: '' }
+        # - { re: '^', rep: '' }
   when: >
     ansible_virtualization_type is defined and ansible_virtualization_type == "docker"
     and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
@@ -540,7 +561,7 @@
   command: "ps axu"
   register: ps
   changed_when: false
-#- debug: var=ps.stdout_lines
+# - debug: var=ps.stdout_lines
 - name: start MISP worker
   command: "bash {{ misp_rootdir }}/app/Console/worker/start.sh"
   become: yes
@@ -551,13 +572,14 @@
   lineinfile:
     dest: /etc/rc.local
     line: "sudo -H -u {{ www_user }} bash {{ misp_rootdir }}/app/Console/worker/start.sh"
+    mode: '0755'
     insertbefore: "^exit 0"
     backup: yes
     create: yes
 
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
-  command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -name config.php -exec chmod 0444 {} \\;"
+  command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -name config.php -exec chmod 0444 {} \\;"  # noqa 301
   with_items:
     - '*.php'
     - '*.ctp'
@@ -576,6 +598,7 @@
   copy:
     src: "{{ misp_rootdir }}/app/Controller/AppController.php"
     dest: "{{ misp_rootdir }}/app/Controller/AppController.php.orig"
+    mode: '0644'
     remote_src: true
   when: misp_testing is defined and misp_testing
 - name: patch cakephp with stricter casting to support sp.global_strict

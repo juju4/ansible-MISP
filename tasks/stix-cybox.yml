@@ -2,7 +2,7 @@
 
 ## https://github.com/ansible/ansible-modules-core/issues/2697
 - name: install python dependencies with pip - version enforced
-#  pip: name="{{ item }}" extra_args='--no-input'
+  # pip: name="{{ item }}" extra_args='--no-input'
   pip:
     name: "{{ item.n }}"
     version: "{{ item.v }}"
@@ -19,7 +19,7 @@
 
 - name: install python dependencies with pip - latest
   pip:
-    name: [ 'mixbox', 'maec' ]
+    name: ['mixbox', 'maec']
     extra_args: "--exists-action=w"
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"

@@ -1,6 +1,6 @@
 ---
 
-#- debug: var=list
+# - debug: var=list
 - name: add user {{ user.email }}
   command: "{{ misp_virtualenv }}/bin/python ./add_user.py -e {{ user.email }} -o {{ user.org }} -r {{ user.role }}"
   become: yes
@@ -11,4 +11,4 @@
     PYTHONPATH: /usr/local/lib/python3.6/site-packages
   when: list.stdout.find(user.email) == -1 and user.email is defined
   register: out
-#- debug: var=out
+# - debug: var=out
