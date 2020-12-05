@@ -1,0 +1,90 @@
+---
+name: AnsibleCI
+
+on:
+  push:
+  pull_request:
+  schedule:  # run weekly, every monday 06:00
+    - cron: '0 6 * * 1'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+    env:
+      ANSIBLE_CALLBACK_WHITELIST: profile_tasks
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: juju4.misp
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install ansible-lint flake8 yamllint
+          ansible --version
+          cd $GITHUB_WORKSPACE/juju4.misp
+          [ -f get-dependencies.sh ] && sh -x get-dependencies.sh
+          { echo '[defaults]'; echo 'callback_whitelist = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
+      - name: yamllint
+        run: |
+          pwd
+          find -ls
+          cd $GITHUB_WORKSPACE/juju4.misp && yamllint .
+      - name: ansible-lint
+        run: |
+          cd $GITHUB_WORKSPACE/juju4.misp && ansible-lint
+      - name: run test
+        run: |
+          cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+      - name: idempotency run
+        run: |
+          cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)
+      - name: After script - rules
+        run: |
+          pip freeze
+          pip3 freeze
+          /var/www/_MISP/venv/bin/python --version
+          /var/www/_MISP/venv/bin/pip freeze
+        continue-on-error: true
+      - name: After script - MISP files
+        run: |
+          find /var/www/_MISP/venv/ -type f | tail -500
+          cat /opt/misp-modules/REQUIREMENTS
+          /var/www/_MISP/venv/bin/misp-modules -t
+          ls -la /var/www/_MISP/MISP/
+          ls -la /var/www/.cache/pip/http/
+          cat /var/www/_MISP/MISP/app/Config/bootstrap.php
+          ls -la /var/www/_MISP/MISP/app/tmp/cache/models/
+          getfacl /var/www/_MISP/MISP/app/tmp/cache/models
+          find /usr -iname "*libyara*.so"
+        continue-on-error: true
+      - name: After script - MISP error logs
+        run: |
+          cat /var/log/apache2/misp.local_error.log
+          cat /var/www/_MISP/MISP/app/tmp/logs/error.log
+        continue-on-error: true
+      - name: After script - curl
+        run: |
+          curl -vk http://localhost:6666
+        continue-on-error: true
+      - name: After script - system
+        run: |
+          netstat -anp
+          ss -nlp
+          systemctl -l --no-pager status apache2
+          systemctl -l --no-pager status httpd
+          systemctl -l --no-pager status httpd-init
+          systemctl -l --no-pager status
+          journalctl -xe --no-pager
+        continue-on-error: true
