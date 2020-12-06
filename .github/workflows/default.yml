@@ -35,7 +35,7 @@ jobs:
           { echo '[defaults]'; echo 'callback_whitelist = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
           # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu1804-README.md#mysql
           sudo systemctl start mysql.service
-          echo "[client]\nuser=root\npassword=root" > ~/.my.cnf
+          echo "[mysql]\nuser=root\npassword=root" > ~/.my.cnf
       - name: yamllint
         run: |
           pwd
