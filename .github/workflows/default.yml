@@ -16,6 +16,7 @@ jobs:
       max-parallel: 4
     env:
       ANSIBLE_CALLBACK_WHITELIST: profile_tasks
+      ANSIBLE_EXTRA_VARS: "-e misp_mysql_user=root -e misp_mysql_pass=root"
 
     steps:
       - uses: actions/checkout@v2
@@ -46,13 +47,13 @@ jobs:
           cd $GITHUB_WORKSPACE/juju4.misp && ansible-lint
       - name: run test
         run: |
-          cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml
+          cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS}
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
       - name: idempotency run
         run: |
-          cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)
+          cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS} | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)
       - name: After script - rules
         run: |
           pip freeze

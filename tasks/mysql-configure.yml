@@ -1,7 +1,11 @@
 ---
 
 - name: creating mysql misp db
-  mysql_db: name=misp state=present
+  mysql_db:
+    name: misp
+    state: present
+    login_user: "{{ misp_mysql_user | default(omit) }}"
+    login_password: "{{ misp_mysql_pass | default(omit) }}"
 - name: Check if mysql import done
   stat: path=/root/.mysql_misp_imported
   register: mispdbloaded
@@ -17,7 +21,12 @@
   when: ansible_distribution_release == 'trusty' or ansible_distribution_major_version == '7'
 
 - name: importing mysql misp db template
-  mysql_db: name=misp state=import target={{ misp_rootdir }}/INSTALL/MYSQL.sql
+  mysql_db:
+    name: misp
+    state: import
+    target: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
+    login_user: "{{ misp_mysql_user | default(omit) }}"
+    login_password: "{{ misp_mysql_pass | default(omit) }}"
   when: not mispdbloaded.stat.exists
 - name: Add marker for mysql import
   file:
@@ -31,6 +40,8 @@
     password: "{{ misp_db_pass }}"
     priv: "*.*:USAGE/misp.*:ALL"
     state: present
+    login_user: "{{ misp_mysql_user | default(omit) }}"
+    login_password: "{{ misp_mysql_pass | default(omit) }}"
 
 - block:
     - name: Temporary workaround - mysql57 disable strict mode
