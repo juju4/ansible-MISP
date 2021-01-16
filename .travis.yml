@@ -1,31 +1,73 @@
 ---
-dist: xenial
 sudo: required
 rvm:
   - 2.6
 
-env:
-  - distribution: centos
-    version: 8
-    suite: default
-  - distribution: centos
-    version: 7
-    suite: default
-  - distribution: ubuntu
-    version: 20.04
-    suite: default
-  - distribution: ubuntu
-    version: 18.04
-    suite: default
-  - distribution: ubuntu
-    version: 18.04
-    suite: default-HEAD
-  - distribution: centos
-    version: 8
-    suite: default-HEAD
-  - distribution: centos
-    version: 7
-    suite: default-HEAD
+jobs:
+  include:
+    - stage: ansible-lint
+      name: Ansible Lint
+      before_install:
+        - pip3 install ansible-lint
+      script:
+        - ansible-lint tasks/main.yml || true
+      after_script: true
+    - stage: deploy
+      name: Deploy on Ubuntu Focal
+      env:
+        - distribution: ubuntu
+          version: 20.04
+          suite: default
+      script:
+        - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
+    - stage: deployalt
+      name: Centos 8
+      env:
+        - distribution: centos
+          version: 8
+          suite: default
+      script:
+        - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
+    - stage: deployalt
+      name: Centos 7
+      env:
+        - distribution: centos
+          version: 7
+          suite: default
+      script:
+        - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
+    - stage: deployalt
+      name: Ubuntu 18.04
+      env:
+        - distribution: ubuntu
+          version: 18.04
+          suite: default
+      script:
+        - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
+    - stage: deploy-HEAD
+      name: Centos 8
+      env:
+        - distribution: centos
+          version: 8
+          suite: default-HEAD
+      script:
+        - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
+    - stage: deploy-HEAD
+      name: Centos 7
+      env:
+        - distribution: centos
+          version: 7
+          suite: default-HEAD
+      script:
+        - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
+    - stage: deploy-HEAD
+      name: Ubuntu 18.04
+      env:
+        - distribution: ubuntu
+          version: 18.04
+          suite: default-HEAD
+      script:
+        - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
 
 before_install:
   - env
@@ -89,9 +131,7 @@ before_install:
   # - sudo -E -u $USER kitchen diagnose --all
 
 script:
-  - ansible-lint tasks/main.yml || true
-  # - KITCHEN_LOCAL_YAML=.kitchen.local.yml bundle exec kitchen verify ${INSTANCE}
-  - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug || (cat $HOME/.kitchen/logs/${suite}-${distribution}-${version//./}.log; find /tmp/kitchen)"
+  - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
 
 after_script:
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'pip freeze'"
