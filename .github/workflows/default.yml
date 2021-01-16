@@ -54,6 +54,22 @@ jobs:
       - name: idempotency run
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS} | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)
+      - name: On failure
+        run: |
+          ansible -i inventory --connection=local -m setup localhost
+          systemctl -l --no-pager status
+          systemctl -l --no-pager --failed
+          ls -l /usr/bin/ | egrep '(python|pip|ansible)'
+          pip freeze
+          pip3 freeze
+          ip addr
+          cat /etc/resolv.conf
+          host www.google.com
+          ping -c 1 www.google.com
+          ping -c 1 8.8.8.8
+          cat /var/log/apache2/misp.local_error.log
+          cat /var/www/_MISP/MISP/app/tmp/logs/error.log
+        if: ${{ failure() }}
       - name: After script - python
         run: |
           pip freeze
