@@ -65,8 +65,8 @@ jobs:
           ip addr
           cat /etc/resolv.conf
           host www.google.com
-          ping -c 1 www.google.com
-          ping -c 1 8.8.8.8
+          ping -c 1 www.google.com || true
+          ping -c 1 8.8.8.8 || true
           cat /var/log/apache2/misp.local_error.log
           cat /var/www/_MISP/MISP/app/tmp/logs/error.log
         if: ${{ failure() }}
