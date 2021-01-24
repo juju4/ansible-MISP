@@ -1,6 +1,11 @@
 ---
 # https://github.com/MISP/MISP/blob/2.4/INSTALL/INSTALL.rhel7.txt#L368
 
+- name: Ensure lief dependencies are present
+  package:
+    name: cmake
+    state: present
+
 - name: Install lief with pip
   pip:
     name: lief
