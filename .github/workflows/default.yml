@@ -67,8 +67,9 @@ jobs:
           host www.google.com
           ping -c 1 www.google.com || true
           ping -c 1 8.8.8.8 || true
+          ls -l /usr/bin/php* /usr/local/bin/php*
           php --version
-          ls /etc/apache2/mods-enabled/
+          sudo ls /etc/apache2/mods-enabled/
           cat /var/log/apache2/misp.local_error.log || true
           cat /var/www/_MISP/MISP/app/tmp/logs/error.log || true
         if: ${{ failure() }}
