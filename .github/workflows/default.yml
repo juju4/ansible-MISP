@@ -76,14 +76,15 @@ jobs:
           echo "# image list"
           sudo lxc image list
           ## configure network
-          ifconfig -a
+          ifconfig -a || true
+          ip addr || true
           sudo lxc info
           sudo lxc network list
           sudo lxc network create lxdbr0
           sudo lxc network show lxdbr0
           sudo lxc network attach-profile lxdbr0 default ens4
           sudo lxc profile device get default ens4 nictype || true
-          sudo service lxd restart
+          sudo service lxd restart || true
           ps ax | grep dnsmasq
           systemctl status -l --no-pager lxd || true
           cat /etc/network/interfaces.d/50-cloud-init.cfg || true
