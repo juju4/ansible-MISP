@@ -45,6 +45,9 @@ jobs:
       - name: ansible-lint
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp && ansible-lint
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
       - name: run test
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS}
