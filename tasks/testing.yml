@@ -19,7 +19,7 @@
     dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
     regexp: 'http:\/\/misp.local'
     replace: "{{ misp_base_url }}"
-    mode: '0644'
+    mode: '0755'
     backup: yes
 - name: check tool version for debugging
   command: "{{ item }}"
@@ -140,7 +140,7 @@
     dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
     regexp: '^curl -([iH].)'
     replace: 'curl -k -\1'
-    mode: '0644'
+    mode: '0755'
     backup: yes
 
 - name: review misp error.log 2
