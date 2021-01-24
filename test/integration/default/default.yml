@@ -2,6 +2,7 @@
 
 - hosts: all
   vars:
+    - misp_lief_version: 0.10.1
     - misp_testing: true
     - misp_testing_user: _misp
     - misp_testing_user_home: "/home/{{ misp_testing_user }}"

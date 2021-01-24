@@ -10,6 +10,7 @@
   pip:
     name: lief
     state: present
+    version: "{{ misp_lief_version | default(omit) }}"
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
   when: >
