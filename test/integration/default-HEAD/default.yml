@@ -35,7 +35,8 @@
           - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/build", s: directory, m: '0755', o: "apache" }
           - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/pyfaup.egg-info", s: directory, m: '0755', o: "apache" }
       when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0]|int >= 7
-    - set_fact:
+    - name: Ubuntu Bionic+ | set fact
+      set_fact:
         faup_ownership:
           - { d: /var/www/.cache/pip, s: directory, m: '0755', o: "www-data" }
           - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/build", s: directory, m: '0755', o: "www-data" }

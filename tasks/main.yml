@@ -403,7 +403,7 @@
     line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
     mode: '0644'
     backup: yes
-- name: set Cache::Config whole cakephp - mask acceptable for snuffleupagus
+- name: set Cache::Config whole cakephp - mask acceptable for snuffleupagus  # noqa no-tabs
   lineinfile:
     dest: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php"
     regexp: "^\t\t\t'mask' => .*"
