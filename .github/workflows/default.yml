@@ -14,6 +14,16 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 4
+      matrix:
+        include:
+          - distribution: ubuntu
+            version: '20.04'
+            version2: 2004
+            suite: default
+          - distribution: ubuntu
+            version: '18.04'
+            version2: 1804
+            suite: default
     env:
       ANSIBLE_CALLBACK_WHITELIST: profile_tasks
       ANSIBLE_EXTRA_VARS: "-e misp_mysql_user=root -e misp_mysql_pass=root"
@@ -40,83 +50,132 @@ jobs:
           cd $GITHUB_WORKSPACE/juju4.misp
           [ -f get-dependencies.sh ] && sh -x get-dependencies.sh
           { echo '[defaults]'; echo 'callback_whitelist = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
-          # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu1804-README.md#mysql
-          sudo systemctl start mysql.service
-          echo "[mysql]\nuser=root\npassword=root" > ~/.my.cnf
-      - name: yamllint
+      - name: Environment
         run: |
           pwd
+          env
           find -ls
+      - name: yamllint
+        run: |
           cd $GITHUB_WORKSPACE/juju4.misp && yamllint .
       - name: ansible-lint
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp && ansible-lint
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.4'
-      - name: run test
+      - name: Install lxd requirements
         run: |
-          cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS}
+          sudo apt-get update -qq
+          sudo apt-get -y install lxd acl dnsmasq-base zfsutils-linux -q
+          whoami
+          grep lxd /etc/group
+          echo "# remote list"
+          lxc remote list
+          echo "# image list"
+          sudo lxc image list
+          echo "# download image"
+          sudo lxc image copy ubuntu:${{ matrix.version }} local: --alias=${{ matrix.distribution }}-${{ matrix.version }}
+          echo "# image list"
+          sudo lxc image list
+          ## configure network
+          ifconfig -a
+          sudo lxc info
+          sudo lxc network list
+          sudo lxc network create lxdbr0
+          sudo lxc network show lxdbr0
+          sudo lxc network attach-profile lxdbr0 default ens4
+          sudo lxc profile device get default ens4 nictype || true
+          sudo service lxd restart
+          ps ax | grep dnsmasq
+          systemctl status -l --no-pager lxd || true
+          cat /etc/network/interfaces.d/50-cloud-init.cfg || true
+          sudo lxc network list
+          # configure storage pool
+          sudo lxc storage list
+          sudo lxc storage create pool1 zfs
+          sudo lxc storage list
+          sudo zpool list
+          sudo lxc profile device add default root disk path=/ pool=pool1
+          sudo lxc profile show default
+      - name: Install kitchen requirements
+        run: |
+          sudo gem install test-kitchen --version "=1.25.0"
+          sudo gem install kitchen-ansible
+          sudo gem install kitchen-sync
+          sudo gem install kitchen-lxd_cli
+          ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
+          cd $GITHUB_WORKSPACE/juju4.misp && sudo kitchen diagnose --all
+      # https://github.com/actionshub/test-kitchen
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Kitchen Converge
+        run: |
+          cd $GITHUB_WORKSPACE/juju4.misp && sudo kitchen converge ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -l debug
         env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-      - name: idempotency run
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_LOCAL_YAML: $GITHUB_WORKSPACE/juju4.misp/.kitchen.yml
+          TERM: xterm-256color
+      - name: Kitchen Verify
         run: |
-          cd $GITHUB_WORKSPACE/juju4.misp && ansible-playbook -i localhost, --connection=local --become -vvv test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS} | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)
+          cd $GITHUB_WORKSPACE/juju4.misp && sudo kitchen verify ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }}
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_LOCAL_YAML: $GITHUB_WORKSPACE/juju4.misp/.kitchen.yml
+          TERM: xterm-256color
+
       - name: On failure
         run: |
-          ansible -i inventory --connection=local -m setup localhost
-          systemctl -l --no-pager status
-          systemctl -l --no-pager --failed
-          ls -l /usr/bin/ | egrep '(python|pip|ansible)'
-          pip freeze
-          pip3 freeze
-          ip addr
-          cat /etc/resolv.conf
-          host www.google.com
-          ping -c 1 www.google.com || true
-          ping -c 1 8.8.8.8 || true
-          ls -l /usr/bin/php* /usr/local/bin/php*
-          php --version
-          sudo ls /etc/apache2/mods-enabled/
-          cat /var/log/apache2/misp.local_error.log || true
-          cat /var/www/_MISP/MISP/app/tmp/logs/error.log || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ansible -i inventory --connection=local -m setup localhost' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'systemctl -l --no-pager status' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'systemctl -l --no-pager --failed' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ls -l /usr/bin/ | egrep "(python|pip|ansible)"' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip freeze' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip3 freeze' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ip addr' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /etc/resolv.conf' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'host www.google.com' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ping -c 1 www.google.com' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ping -c 1 8.8.8.8' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ls -l /usr/bin/php* /usr/local/bin/php*' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'php --version' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ls /etc/apache2/mods-enabled/' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/apache2/misp.local_error.log' || true
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log' || true
         if: ${{ failure() }}
+        continue-on-error: true
       - name: After script - python
         run: |
-          pip freeze
-          pip3 freeze
-          /var/www/_MISP/venv/bin/python --version
-          /var/www/_MISP/venv/bin/pip freeze
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip freeze'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip3 freeze'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/python --version'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/pip freeze'
         continue-on-error: true
       - name: After script - MISP files
         run: |
-          find /var/www/_MISP/venv/ -type f | tail -500
-          cat /opt/misp-modules/REQUIREMENTS
-          /var/www/_MISP/venv/bin/misp-modules -t
-          ls -la /var/www/_MISP/MISP/
-          ls -la /var/www/.cache/pip/http/
-          cat /var/www/_MISP/MISP/app/Config/bootstrap.php
-          ls -la /var/www/_MISP/MISP/app/tmp/cache/models/
-          getfacl /var/www/_MISP/MISP/app/tmp/cache/models
-          find /usr -iname "*libyara*.so"
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'find /var/www/_MISP/venv/ -type f | tail -500'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /opt/misp-modules/REQUIREMENTS'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/misp-modules -t'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ls -la /var/www/_MISP/MISP/'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ls -la /var/www/.cache/pip/http/'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/www/_MISP/MISP/app/Config/bootstrap.php'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ls -la /var/www/_MISP/MISP/app/tmp/cache/models/'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'getfacl /var/www/_MISP/MISP/app/tmp/cache/models'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'find /usr -iname "*libyara*.so"'
         continue-on-error: true
       - name: After script - MISP error logs
         run: |
-          cat /var/log/apache2/misp.local_error.log
-          cat /var/www/_MISP/MISP/app/tmp/logs/error.log
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/apache2/misp.local_error.log'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log'
         continue-on-error: true
       - name: After script - curl
         run: |
-          curl -vk http://localhost:6666
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'curl -vk http://localhost:6666'
         continue-on-error: true
       - name: After script - system
         run: |
-          netstat -anp
-          ss -nlp
-          systemctl -l --no-pager status apache2
-          systemctl -l --no-pager status httpd
-          systemctl -l --no-pager status httpd-init
-          systemctl -l --no-pager status
-          journalctl -xe --no-pager
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'netstat -anp'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ss -nlp'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'systemctl -l --no-pager status apache2'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'systemctl -l --no-pager status httpd'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'systemctl -l --no-pager status httpd-init'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'systemctl -l --no-pager status'
+          kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'journalctl -xe --no-pager'
         continue-on-error: true
