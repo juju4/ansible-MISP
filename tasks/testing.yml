@@ -30,7 +30,7 @@
   ignore_errors: true
 - name: pip dependencies for testing
   pip:
-    name: ['coveralls', 'codecov', 'nose', 'requests-mock']
+    name: ['coveralls', 'codecov', 'nose', 'requests-mock', 'poetry']
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
   environment:
