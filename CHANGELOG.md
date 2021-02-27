@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Github Action
+
+### Changed
+- lint
+- test/default: use lief 0.10.1 instead of recent 0.11 - bionic only
+- system and pip packages dependencies update
+- misp-add-users permissions review
+
+### Removed
+- Travis-ci
+
+## [1.1.0] - 2020-07-19
+
+### Added
+- Ubuntu 20.04
+
+## [1.0.0] - 2020-02-23
+
+### Added
 - add test/support for RedHat/Centos 8
 
 ### Changed
@@ -20,6 +39,7 @@ https://blog.travis-ci.com/2018-11-08-xenial-release
 - update patch to support php strict
 - more linting
 - handlers to manage services inside docker
+- lief with python3
 
 ## [0.9.0] - 2019-02-17
 
