@@ -403,6 +403,7 @@
     line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
     mode: '0644'
     backup: yes
+  when: misp_php_snuffleupagus_enable
 - name: set Cache::Config whole cakephp - mask acceptable for snuffleupagus  # noqa no-tabs
   lineinfile:
     dest: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php"
@@ -410,6 +411,7 @@
     line: "\t\t\t'mask' => 0600"
     mode: '0644'
     backup: yes
+  when: misp_php_snuffleupagus_enable
 - name: add vendor/autoload.php to core
   lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/core.php"
@@ -583,6 +585,7 @@
   with_items:
     - '*.php'
     - '*.ctp'
+  when: misp_php_snuffleupagus_enable
 - name: Ensure config.php is writeable
   file:
     dest: "{{ misp_rootdir }}/app/Config/config.php"
@@ -605,6 +608,7 @@
   patch:
     src: patch-cakephp-snuffleupagus-strict
     basedir: "{{ misp_rootdir }}/app/Lib"
+  when: misp_php_snuffleupagus_enable
 
 - include: lief.yml
   when: misp_lief_enable

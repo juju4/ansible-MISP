@@ -92,6 +92,7 @@ misp_git_signing_keys_local:
 
 misp_pymisp_verifycert: False
 misp_no_log: true
+misp_php_snuffleupagus_enable: true
 
 # if adding ::1, ensure IPv6 is functional. https://github.com/antirez/redis/issues/3241
 misp_redis_bind: '127.0.0.1'
