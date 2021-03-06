@@ -154,6 +154,7 @@ jobs:
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip3 freeze'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/python --version'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/pip freeze'
+        if: ${{ always() }}
         continue-on-error: true
       - name: After script - MISP files
         run: |
@@ -166,15 +167,18 @@ jobs:
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ls -la /var/www/_MISP/MISP/app/tmp/cache/models/'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'getfacl /var/www/_MISP/MISP/app/tmp/cache/models'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'find /usr -iname "*libyara*.so"'
+        if: ${{ always() }}
         continue-on-error: true
       - name: After script - MISP error logs
         run: |
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/apache2/misp.local_error.log'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log'
+        if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
         run: |
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'curl -vk http://localhost:6666'
+        if: ${{ always() }}
         continue-on-error: true
       - name: After script - system
         run: |
@@ -185,4 +189,5 @@ jobs:
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'systemctl -l --no-pager status httpd-init'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'systemctl -l --no-pager status'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'journalctl -xe --no-pager'
+        if: ${{ always() }}
         continue-on-error: true
