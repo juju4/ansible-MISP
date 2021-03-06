@@ -24,6 +24,10 @@ jobs:
             version: '18.04'
             version2: 1804
             suite: default
+          - distribution: ubuntu
+            version: '20.04'
+            version2: 2004
+            suite: default-nosnuffle
     env:
       ANSIBLE_CALLBACK_WHITELIST: profile_tasks
       ANSIBLE_EXTRA_VARS: "-e misp_mysql_user=root -e misp_mysql_pass=root"

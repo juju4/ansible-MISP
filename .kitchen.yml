@@ -45,5 +45,6 @@ suites:
   - name: default-HEAD
     run_list:
     attributes:
-  - name: nginx
+  - name: default-nosnuffle
     run_list:
+    attributes:
