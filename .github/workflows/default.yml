@@ -150,6 +150,7 @@ jobs:
         continue-on-error: true
       - name: After script - python
         run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip freeze'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip3 freeze'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/python --version'
@@ -158,6 +159,7 @@ jobs:
         continue-on-error: true
       - name: After script - MISP files
         run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'find /var/www/_MISP/venv/ -type f | tail -500'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /opt/misp-modules/REQUIREMENTS'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/misp-modules -t'
@@ -171,17 +173,20 @@ jobs:
         continue-on-error: true
       - name: After script - MISP error logs
         run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/apache2/misp.local_error.log'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log'
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
         run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'curl -vk http://localhost:6666'
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - system
         run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'netstat -anp'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ss -nlp'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'systemctl -l --no-pager status apache2'
