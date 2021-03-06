@@ -609,6 +609,11 @@
     src: patch-cakephp-snuffleupagus-strict
     basedir: "{{ misp_rootdir }}/app/Lib"
   when: misp_php_snuffleupagus_enable
+- name: patch kamisama/php-resque-ex with stricter casting to support sp.global_strict
+  patch:
+    src: patch-php-resque-ex-master-lib-Resque-Redis.php
+    basedir: "{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex/lib/Resque"
+  when: misp_php_snuffleupagus_enable
 
 - include: lief.yml
   when: misp_lief_enable
