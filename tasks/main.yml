@@ -619,6 +619,7 @@
     basedir: "{{ item.b }}"
   with_items:
     - { s: patch-app-Model-Server_php, b: "{{ misp_rootdir }}/app/Model" }
+    - { s: patch-app-Model-AppModel_php, b: "{{ misp_rootdir }}/app/Model" }
     - { s: patch-app-Controller-AppController_php, b: "{{ misp_rootdir }}/app/Controller" }
   when: misp_php_snuffleupagus_enable
 
