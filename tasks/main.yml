@@ -613,10 +613,13 @@
     src: patch-php-resque-ex-master-lib-Resque-Redis.php
     basedir: "{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex/lib/Resque"
   when: misp_php_snuffleupagus_enable
-- name: patch app/Model/Server.php
+- name: patch MISP app for snuffleupagus
   patch:
-    src: patch-app-Model-Server_php
-    basedir: "{{ misp_rootdir }}/app/Model"
+    src: "{{ item.s }}"
+    basedir: "{{ item.b }}"
+  with_items:
+    - { s: patch-app-Model-Server_php, b: "{{ misp_rootdir }}/app/Model" }
+    - { s: patch-app-Controller-AppController_php, b: "{{ misp_rootdir }}/app/Controller" }
   when: misp_php_snuffleupagus_enable
 
 - include: lief.yml
