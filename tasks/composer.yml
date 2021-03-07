@@ -1,8 +1,5 @@
 ---
 
-- name: define composer.json to use composer install module
-  copy: src=composer.json dest={{ misp_rootdir }}/app/composer.json mode=0644
-
 ## No gpg signature: https://github.com/composer/composer/issues/38
 ## https://composer.github.io/pubkeys.html
 ## https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
