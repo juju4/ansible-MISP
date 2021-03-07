@@ -44,3 +44,5 @@
     working_dir: "{{ misp_rootdir }}/app"
   register: pkg_result
   until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
