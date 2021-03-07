@@ -605,8 +605,11 @@
   when: misp_testing is defined and misp_testing
 - name: patch cakephp with stricter casting to support sp.global_strict
   patch:
-    src: patch-cakephp-snuffleupagus-strict
-    basedir: "{{ misp_rootdir }}/app/Lib"
+    src: "{{ item.s }}"
+    basedir: "{{ item.b }}"
+  with_items:
+    - { s: patch-cakephp-snuffleupagus-strict, b: "{{ misp_rootdir }}/app/Lib" }
+    - { s: patch-app-Lib-cakephp-lib-Cake-Model-Datasource-Database, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource/Database" }
   when: misp_php_snuffleupagus_enable
 - name: patch kamisama/php-resque-ex with stricter casting to support sp.global_strict
   patch:

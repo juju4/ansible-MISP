@@ -1,0 +1,11 @@
+--- Mysql.php.0	2021-03-07 21:51:50.195652983 +0000
++++ Mysql.php	2021-03-07 21:52:43.940540686 +0000
+@@ -831,7 +831,7 @@
+  */
+ 	public function value($data, $column = null, $null = true) {
+ 		$value = parent::value($data, $column, $null);
+-		if (is_numeric($value) && substr($column, 0, 3) === 'set') {
++		if (is_numeric($value) && substr((string) $column, 0, 3) === 'set') {
+ 			return $this->_connection->quote($value);
+ 		}
+ 		return $value;
