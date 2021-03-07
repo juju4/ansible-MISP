@@ -621,6 +621,7 @@
     src: "{{ item.s }}"
     basedir: "{{ item.b }}"
   with_items:
+    - { s: patch-app-Lib-Tools, b: "{{ misp_rootdir }}/app/Lib/Tools" }
     - { s: patch-app-Model-Server_php, b: "{{ misp_rootdir }}/app/Model" }
     - { s: patch-app-Model-AppModel_php, b: "{{ misp_rootdir }}/app/Model" }
     - { s: patch-app-Controller-AppController_php, b: "{{ misp_rootdir }}/app/Controller" }
