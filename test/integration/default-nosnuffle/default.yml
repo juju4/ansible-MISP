@@ -33,4 +33,5 @@
   roles:
     # - geerlingguy.apache
     - juju4.harden_apache
+    - juju4.faup
     - juju4.misp
