@@ -205,7 +205,6 @@
     virtualenv_python: "{{ python3_bin }}"
   with_items:
     - { n: redis, v: '2.10.5' }
-    # - { n: pyzmq, v: '16.0.2' }
     - { n: 'pymisp', v: "{{ misp_pymisp_version }}" }
   environment:
     PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
@@ -214,7 +213,7 @@
 
 - name: install python dependencies with pip - python, latest
   pip:
-    name: ['git+https://github.com/kbandla/pydeep.git', 'python-magic']
+    name: ['git+https://github.com/kbandla/pydeep.git', 'python-magic', 'zmq', 'plyara']
     extra_args: '--exists-action=w'
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
