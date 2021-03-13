@@ -1,7 +1,9 @@
 ---
 
-- debug: var=apache_sitedir
-- debug: var=ansible_distribution
+- name: Debug | apache_sitedir var
+  debug: var=apache_sitedir
+- name: Debug | ansible_distribution var
+  debug: var=ansible_distribution
 
 - name: set misp nginx configuration
   template: src=nginx-misp.conf.j2 dest={{ apache_sitedir }}/misp.conf mode=0644

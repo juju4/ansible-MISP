@@ -107,8 +107,10 @@
     state: directory
     recurse: yes
 
-- debug: var=misp_base_url
-- debug: var=userInit
+- name: Debug | misp_base_url var
+  debug: var=misp_base_url
+- name: Debug | userInit var
+  debug: var=userInit
 - name: set local variables in PyMISP/tests/keys.py
   lineinfile:
     dest: "{{ misp_rootdir }}/PyMISP/tests/keys.py"

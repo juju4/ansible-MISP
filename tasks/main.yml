@@ -16,7 +16,8 @@
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
 
-- debug: var=misp_webserver
+- name: Debug | misp_webserver var
+  debug: var=misp_webserver
 - include: nginx.yml
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
