@@ -16,6 +16,14 @@ jobs:
       max-parallel: 4
       matrix:
         include:
+          - distribution: centos
+            version: 8
+            version2: 8
+            suite: default
+          - distribution: centos
+            version: 7
+            version2: 7
+            suite: default
           - distribution: ubuntu
             version: '20.04'
             version2: 2004
@@ -76,7 +84,8 @@ jobs:
           echo "# image list"
           sudo lxc image list
           echo "# download image"
-          sudo lxc image copy ubuntu:${{ matrix.version }} local: --alias=${{ matrix.distribution }}-${{ matrix.version }}
+          [ ${{ matrix.distribution }} == ubuntu ] || sudo lxc image copy images:${{ matrix.distribution }}/${{ matrix.version }}/amd64 local: --alias=${{ matrix.distribution }}-${{ matrix.version }}-nossh || true
+          [ ${{ matrix.distribution }} == ubuntu ] && sudo lxc image copy ubuntu:${{ matrix.version }} local: --alias=${{ matrix.distribution }}-${{ matrix.version }} || true
           echo "# image list"
           sudo lxc image list
           ## configure network
@@ -100,6 +109,7 @@ jobs:
           sudo zpool list
           sudo lxc profile device add default root disk path=/ pool=pool1
           sudo lxc profile show default
+          [ "X${{ matrix.distribution }}" == "Xcentos" ] && cd $GITHUB_WORKSPACE/juju4.orchestrator && sudo sh -x ./test/lxd/centos-ssh-image.sh ${{ matrix.version }} || true
       - name: Install kitchen requirements
         run: |
           sudo gem install test-kitchen --version "=1.25.0"
