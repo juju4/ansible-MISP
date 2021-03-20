@@ -11,6 +11,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -20,22 +21,27 @@ jobs:
             version: 8
             version2: 8
             suite: default
+            experimental: true
           - distribution: centos
             version: 7
             version2: 7
             suite: default
+            experimental: true
           - distribution: ubuntu
             version: '20.04'
             version2: 2004
             suite: default
+            experimental: false
           - distribution: ubuntu
             version: '18.04'
             version2: 1804
             suite: default
+            experimental: false
           - distribution: ubuntu
             version: '20.04'
             version2: 2004
             suite: default-nosnuffle
+            experimental: false
     env:
       ANSIBLE_CALLBACK_WHITELIST: profile_tasks
       ANSIBLE_EXTRA_VARS: "-e misp_mysql_user=root -e misp_mysql_pass=root"
