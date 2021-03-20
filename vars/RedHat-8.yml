@@ -5,24 +5,29 @@ misp_pkg_list:
  - httpd
  - mysql
  - mysql-server
- - MySQL-python
  - php
- - php-mysql
+ - php-mysqlnd
  - php-mbstring
  - php-devel
+ - php-pear
+ - php-fpm
  # - php-redis
  - php-opcache
  - php-xml
  - php-gd
  - php-json
+ - php-zip
  - postfix
  - "@Development tools"
  - zip
  - git
  - redis
  - make
- - python-devel
- - python-pip
+ - python3-devel
+ - python3-pip
+ - python3-virtualenv
+ - python3-policycoreutils
+ - policycoreutils-python-utils
  - libxml2-devel
  - libxslt-devel
  - zlib-devel
@@ -34,9 +39,6 @@ misp_pkg_list:
  # misp-modules
  - python36
  - python36-devel
- - python3-pip
- - python36-setuptools
- - python-virtualenv
  - libpq
  ## misc
  - acl
