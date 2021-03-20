@@ -13,14 +13,18 @@
   ini_file:
     dest: /etc/yum.repos.d/CentOS-PowerTools.repo
     section: PowerTools
-    option: enabled
-    value: '1'
+    option: "{{ item.o }}"
+    value: "{{ item.v }}"
     mode: '0644'
+  with_items:
+    - { o: enabled, v: '1' }
+    - { o: baseurl, v: 'http://mirror.centos.org/$contentdir/$releasever/PowerTools/$basearch/os/' }
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
 
 - name: Check available repositories
   command: dnf repolist
   changed_when: false
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
 
 - name: yum | MISP dependencies install
   yum:
