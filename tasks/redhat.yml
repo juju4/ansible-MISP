@@ -76,6 +76,7 @@
     creates: /usr/local/bin/pip3
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8
 
 # https://github.com/ansible/ansible/issues/16612
 - block:
