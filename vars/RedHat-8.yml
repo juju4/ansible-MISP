@@ -3,8 +3,8 @@
 misp_pkg_list:
  - openssh-server
  - httpd
- - mysql
- - mysql-server
+ - mariadb
+ - mariadb-server
  - php
  - php-mysqlnd
  - php-mbstring
