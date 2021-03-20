@@ -3,8 +3,8 @@
 misp_pkg_list:
  - openssh-server
  - httpd
- - mysql
- - mysql-server
+ - mariadb
+ - mariadb-server
  - MySQL-python
  - php
  - php-mysql
@@ -12,11 +12,8 @@ misp_pkg_list:
  - php-devel
  - php-redis
  - php-opcache
- # - php56
- # - php56-php-mysqlnd
- # - php56-php-mbstring
- # - php56-php-devel
- # - php56-php-redis
+ - php-xml
+ - php-gd
  - postfix
  - "@Development tools"
  - zip
