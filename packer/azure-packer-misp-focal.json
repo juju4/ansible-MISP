@@ -14,13 +14,14 @@
       "type": "shell",
       "inline": [
         "whoami",
-        "env",
-        "sudo yum -y update"
+        "ifconfig -a",
+        "env"
       ]
     },
     {
       "type": "ansible",
-      "playbook_file": "../test/integration/default/default.yml"
+      "playbook_file": "../test/integration/default/default.yml",
+      "extra_arguments": [ "--become" ]
     }
   ],
   "builders": [
@@ -37,12 +38,12 @@
       "vm_size": "Standard_D1",
 
       "managed_image_resource_group_name": "Testing",
-      "managed_image_name": "juju4.misp-centos7-{{isotime \"2006-01-02\"}}",
+      "managed_image_name": "juju4.misp-focal-{{isotime \"2006-01-02\"}}",
 
       "os_type": "Linux",
-      "image_publisher": "OpenLogic",
-      "image_offer": "CentOS",
-      "image_sku": "7.6",
+      "image_publisher": "Canonical",
+      "image_offer": "0001-com-ubuntu-server-focal",
+      "image_sku": "20_04-lts",
       "image_version": "latest"
     }
   ]
