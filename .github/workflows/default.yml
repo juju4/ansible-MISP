@@ -21,12 +21,12 @@ jobs:
             version: 8
             version2: 8
             suite: default
-            experimental: true
+            experimental: false
           - distribution: centos
             version: 7
             version2: 7
             suite: default
-            experimental: true
+            experimental: false
           - distribution: ubuntu
             version: '20.04'
             version2: 2004
