@@ -25,5 +25,4 @@
   command: "python -c 'import lief'"
   environment:
     PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-  ignore_errors: true
   changed_when: false

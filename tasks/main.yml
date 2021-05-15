@@ -51,7 +51,6 @@
         mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1
       args:
         creates: /tmp/mysql_install_db.out
-      ignore_errors: true
       become: yes
       become_user: mysql
   when: >
@@ -64,7 +63,6 @@
         /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1
       args:
         creates: /tmp/mysql_install_db.out
-      ignore_errors: true
       become: yes
       become_user: mysql
   when: >
@@ -78,7 +76,6 @@
       args:
         creates: /tmp/mysqld_safe.out
         chdir: /var/lib/mysql
-      ignore_errors: true
   when: >
     (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
@@ -481,7 +478,6 @@
   become: yes
   become_user: "{{ www_user }}"
   when: not gkey.stat.exists and (ansible_os_family == "RedHat") and misp_webserver == 'nginx'
-  ignore_errors: true
 - name: create gnupg key for {{ misp_email }}
   command: "{{ item.s }}"
   args:
@@ -563,7 +559,6 @@
   become_flags: -H
   args:
     creates: /tmp/redis.out
-  ignore_errors: true
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: check if worker active

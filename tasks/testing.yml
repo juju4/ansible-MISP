@@ -27,7 +27,6 @@
     - php --version
     - composer --version
   changed_when: false
-  ignore_errors: true
   become: yes
   become_user: "{{ www_user }}"
 - name: pip dependencies for testing

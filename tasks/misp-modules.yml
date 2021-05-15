@@ -152,5 +152,4 @@
     dest: /usr/lib/libyara.so
     mode: '0644'
     state: link
-  ignore_errors: true
   when: ansible_distribution == 'Ubuntu' and not libyaraso.stat.exists
