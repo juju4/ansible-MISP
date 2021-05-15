@@ -13,7 +13,7 @@
   git:
     repo: https://github.com/MISP/misp-modules.git
     dest: "{{ mispmodules_rootdir }}/misp-modules"
-    version: "{{ mispmodules_version | default('e6f4503763300f5c99a998a3cab58802a9c30b4b') }}"
+    version: "{{ mispmodules_version | default('d495ca7366560fbcd449d39cf049d2b7a3e91d3b') }}"
     update: no
     force: no
   become: yes
