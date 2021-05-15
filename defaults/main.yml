@@ -77,6 +77,7 @@ misp_enable_feeds:
   - 1
   # - The Botvrij.eu Data
   - 2
+misp_fetch_feeds: []
 
 misp_disable_feeds: []
 

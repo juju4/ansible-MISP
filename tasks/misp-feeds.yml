@@ -18,6 +18,18 @@
 
 # - debug: var=enableresults
 
+- name: fetch from feeds
+  uri:
+    url: "{{ misp_local_base_url | default(misp_base_url) }}/feeds/fetchFromFeed/{{ item }}"
+    method: GET
+    headers:
+      Authorization: "{{ userkey }}"
+      Accept: application/json
+      Content-Type: application/json
+    validate_certs: False
+  with_items: "{{ misp_fetch_feeds }}"
+  register: fetchresults
+
 - name: disable feeds
   uri:
     url: "{{ misp_local_base_url | default(misp_base_url) }}/feeds/disable/{{ item }}"
