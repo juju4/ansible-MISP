@@ -142,6 +142,13 @@
     state: directory
     mode: '0755'
 
+- name: Ensure ansible user temp directory is writeable
+  file:
+    path: /var/www/.ansible
+    owner: "{{ www_user }}"
+    mode: '0700'
+    state: directory
+
 - name: Check if MISP folder already present
   stat: path={{ misp_rootdir }}/INSTALL
   register: m
