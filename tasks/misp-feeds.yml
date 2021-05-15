@@ -6,7 +6,7 @@
 ## FIXME! not idempotent, no way to list feeds with their status
 - name: enable feeds
   uri:
-    url: "{{ misp_base_url }}/feeds/enable/{{ item }}"
+    url: "{{ misp_local_base_url | default(misp_base_url) }}/feeds/enable/{{ item }}"
     method: POST
     headers:
       Authorization: "{{ userkey }}"
@@ -20,7 +20,7 @@
 
 - name: disable feeds
   uri:
-    url: "{{ misp_base_url }}/feeds/disable/{{ item }}"
+    url: "{{ misp_local_base_url | default(misp_base_url) }}/feeds/disable/{{ item }}"
     method: POST
     headers:
       Authorization: "{{ userkey }}"
