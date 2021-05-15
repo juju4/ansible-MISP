@@ -184,7 +184,7 @@
     version: "{{ misp_version }}"
     update: yes
     force: yes
-  when: m.stat.exists
+  when: m.stat.exists and misp_git_update_force
   notify:
     - updating existing MISP submodules - minor releases
   become: yes
