@@ -43,7 +43,7 @@ misp_gpg_email: "{{ misp_email }}"
 misp_gpg_homedir: "{{ misp_rootdir }}/.gnupg"
 misp_gpg_pass: gpg_pass_to_change_fast
 misp_SecureAuth_expire: 300
-misp_passreq_lenth: 8
+misp_passreq_lenth: 12
 ## not mapped currently
 # misp_passreq_complexity: ''
 ## leave empty when no proxy
