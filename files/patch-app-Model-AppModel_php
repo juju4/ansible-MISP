@@ -2,7 +2,7 @@
 +++ AppModel.php	2021-03-07 21:20:50.979650970 +0000
 @@ -2492,7 +2492,7 @@
          $pass = Configure::read('MISP.redis_password');
- 
+
          $redis = new Redis();
 -        if (!$redis->connect($host, $port)) {
 +        if (!$redis->connect($host, (int) $port)) {

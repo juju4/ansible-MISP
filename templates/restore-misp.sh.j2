@@ -21,4 +21,3 @@ mysql -u misp < $tmpdir{{ backupdir }}/mysqldump-misp.sql
 for d in $dirs; do
     rsync -rvl $tmpdir/$d $d
 done
-

@@ -17,4 +17,3 @@ tar czf $destfile $dirs $dest/mysqldump-misp.sql
 rm $dest/mysqldump-misp.sql
 tar tzf $destfile > /dev/null
 openssl dgst -sha512 $destfile > $destfile.distinfo
-

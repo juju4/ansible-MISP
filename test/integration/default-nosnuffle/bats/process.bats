@@ -9,5 +9,3 @@ setup() {
     [ "$status" -eq 0 ]
     [[ "$output" =~ "Users - MISP" ]]
 }
-
-

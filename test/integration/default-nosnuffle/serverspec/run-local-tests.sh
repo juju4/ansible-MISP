@@ -29,4 +29,3 @@ if [ "X$USER" != "Xroot" -a "X$USER" != "X" ]; then
 else
     bash -l -c "env rvmsudo_secure_path=1 rvmsudo -u nobody bundle exec rake spec"
 fi
-

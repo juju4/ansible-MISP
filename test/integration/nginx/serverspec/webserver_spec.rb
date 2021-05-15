@@ -50,4 +50,3 @@ end
 #end
 ## enumerate ciphers? multiple openssl s_client, nmap, sslscan, ...
 #http://superuser.com/questions/109213/how-do-i-list-the-ssl-tls-cipher-suites-a-particular-website-offers
-

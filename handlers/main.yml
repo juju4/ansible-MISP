@@ -16,7 +16,6 @@
     APACHE_LOCK_DIR: /var/lock/apache2
     APACHE_LOG_DIR: /var/log/apache2
     LANG: C
-  ignore_errors: true
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "Debian"
@@ -26,7 +25,6 @@
   with_items:
     - pkill httpd
     - /usr/sbin/httpd -k start
-  ignore_errors: true
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "RedHat"

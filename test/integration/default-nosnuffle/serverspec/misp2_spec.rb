@@ -17,7 +17,7 @@ describe command("cd #{misp_rootdir}/tests && ./curl_tests.sh `cat /var/www/_MIS
   let(:sudo_options) { '-u _misp -H' }
 end
 
-## FIXME! 
+## FIXME!
 ##	xenial: fail first run, ok second
 ##	trusty: fail all the time
 ##	centos7: fail, ok second
@@ -40,7 +40,7 @@ end
 #  let(:sudo_options) { '-u _misp -H' }
 #end
 
-## FIXME! 
+## FIXME!
 ##	trusty: fail
 ##	centos6: fail
 describe command("cd #{misp_rootdir}/PyMISP && #{misp_virtualenv}/bin/poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport -E email && #{misp_virtualenv}/bin/poetry run python tests/test_mispevent.py"), :if => os[:release] == '20.04' do

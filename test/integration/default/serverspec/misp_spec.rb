@@ -8,7 +8,7 @@ set :backend, :exec
 #  its(:args) { should match /manage.py runserver\b/ }
 #  it "is listening on port 8000" do
 #    expect(port(8000)).to be_listening
-#  end 
+#  end
 #end
 
 curl_args='-sSvLk'
@@ -18,4 +18,3 @@ misp_url = 'https://localhost'
 describe command("curl #{curl_args} #{misp_url}") do
   its(:stdout) { should match /Users - MISP/ }
 end
-

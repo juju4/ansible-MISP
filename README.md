@@ -66,7 +66,7 @@ $ vagrant ssh
 ```
 
 Role has also a packer config which allows to create image for virtualbox, vmware, eventually digitalocean, lxc and others.
-When building it, it's advise to do it outside of roles directory as all the directory is upload to the box during building 
+When building it, it's advise to do it outside of roles directory as all the directory is upload to the box during building
 and it's currently not possible to exclude packer directory from it (https://github.com/mitchellh/packer/issues/1811)
 ```
 $ cd /path/to/packer-build
@@ -172,4 +172,3 @@ https://asciinema.org/a/28845
 ## License
 
 BSD 2-clause
-

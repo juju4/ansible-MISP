@@ -8,7 +8,7 @@ diff -urN cakephp.orig/lib/Cake/basics.php cakephp/lib/Cake/basics.php
 -		return htmlspecialchars($text, ENT_QUOTES, ($charset) ? $charset : $defaultCharset, $double);
 +		return htmlspecialchars((string)$text, ENT_QUOTES, ($charset) ? $charset : $defaultCharset, $double);
  	}
- 
+
  }
 @@ -323,7 +323,7 @@
  			if (isset($_SERVER['HTTPS'])) {
@@ -17,13 +17,13 @@ diff -urN cakephp.orig/lib/Cake/basics.php cakephp/lib/Cake/basics.php
 -			return (strpos(env('SCRIPT_URI'), 'https://') === 0);
 +			return (strpos((string)env('SCRIPT_URI'), 'https://') === 0);
  		}
- 
+
  		if ($key === 'SCRIPT_NAME') {
 diff -urN cakephp.orig/lib/Cake/Core/Configure.php cakephp/lib/Cake/Core/Configure.php
 --- cakephp.orig/lib/Cake/Core/Configure.php	2018-12-17 22:55:59.049819951 +0000
 +++ cakephp/lib/Cake/Core/Configure.php	2018-12-17 22:55:59.730159926 +0000
 @@ -167,9 +167,9 @@
- 
+
  		if (isset($config['debug']) && function_exists('ini_set')) {
  			if (static::$_values['debug']) {
 -				ini_set('display_errors', 1);
@@ -78,7 +78,7 @@ diff -urN cakephp.orig/lib/Cake/Model/Datasource/DboSource.php cakephp/lib/Cake/
 +					(substr_count((string)$key, '?') === count($value) || substr_count((string)$key, ':') === count($value))
  				);
  			}
- 
+
 @@ -2783,7 +2783,7 @@
  			} elseif (is_numeric($key) && is_string($value)) {
  				$out[] = $this->_quoteFields($value);
@@ -120,7 +120,7 @@ diff -urN cakephp.orig/lib/Cake/Network/CakeResponse.php cakephp/lib/Cake/Networ
 +		return strpos((string)env('HTTP_ACCEPT_ENCODING'), 'gzip') !== false
  			&& (ini_get("zlib.output_compression") === '1' || in_array('ob_gzhandler', ob_list_handlers()));
  	}
- 
+
 diff -urN cakephp.orig/lib/Cake/Core/App.php cakephp/lib/Cake/Core/App.php
 --- cakephp.orig/lib/Cake/Core/App.php	2019-04-07 15:37:04.862876497 +0000
 +++ cakephp/lib/Cake/Core/App.php	2019-04-07 18:26:19.944928262 +0000

@@ -1,7 +1,7 @@
 --- app.orig/Controller/AppController.php	2018-12-18 06:15:57.464044001 +0000
 +++ app/Controller/AppController.php	2018-12-18 06:23:33.259828000 +0000
 @@ -478,7 +478,7 @@
- 
+
      private function __convertEmailToName($email)
      {
 -        $name = explode('@', $email);

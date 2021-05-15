@@ -12,7 +12,7 @@ describe command('cd /var/www/MISP/tests && ./curl_tests.sh `cat $HOME/build/key
   let(:sudo_options) { '-u _misp -H' }
 end
 
-## FIXME! 
+## FIXME!
 ##	xenial: fail first run, ok second
 ##	trusty: fail all the time
 ##	centos7: fail, ok second
@@ -35,7 +35,7 @@ end
 #  let(:sudo_options) { '-u _misp -H' }
 #end
 
-## FIXME! 
+## FIXME!
 ##	nginx-centos7: fail
 describe command('cd /var/www/MISP/PyMISP && /var/www/MISP/venv/bin/coverage run setup.py test 2>&1 | tee /tmp/coverage.out'), :if => os[:release] != '14.04' && os[:release] != '6' do
   its(:stdout) { should match /version/ }
@@ -48,4 +48,3 @@ describe command('cd /var/www/MISP/PyMISP && /var/www/MISP/venv/bin/coverage run
   its(:exit_status) { should eq 0 }
   let(:sudo_options) { '-u _misp -H' }
 end
-
