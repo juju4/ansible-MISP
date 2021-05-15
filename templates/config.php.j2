@@ -3,16 +3,7 @@
 
 $config = array (
   'debug' => 0,
-  'site_admin_debug' => false,
-  'Security' => 
-  array (
-    'level' => 'medium',
-    'salt' => '{{ salt }}',
-    'cipherSeed' => '',
-    'password_policy_length' => {{ misp_passreq_lenth }},
-    //'auth'=>array('CertAuth.Certificate'), // additional authentication methods
-  ),
-  'MISP' => 
+  'MISP' =>
   array (
     'baseurl' => '{{ misp_base_url }}',
     'footermidleft' => '',
@@ -54,10 +45,12 @@ $config = array (
     'block_old_event_alert' => false,
     'block_old_event_alert_age' => 180,
     'incoming_tags_disabled_by_default' => false,
-#    'newUserText' => ,
-#    'passwordResetText' => ,
+    'uuid' => '{{ lookup('password', '/dev/null chars=ascii_letters,digits') | to_uuid }}',
+    'external_baseurl' => '{{ misp_external_base_url | default(misp_base_url) }}',
+    'osuser' => '{{ www_user }}',
+    'default_event_tag_collection' => 0,
   ),
-  'GnuPG' => 
+  'GnuPG' =>
   array (
     'onlyencrypted' => false,
     'email' => '{{ misp_gpg_email }}',
@@ -74,45 +67,27 @@ $config = array (
     'user' => '{{ misp_proxy_user }}',
     'password' => '{{ misp_proxy_pass }}',
   ),
-  'SecureAuth' => 
+  'SecureAuth' =>
   array (
     'amount' => 5,
     'expire' => {{ misp_SecureAuth_expire }},
   ),
-  'CertAuth' => NULL,
-  // Uncomment the following to enable client SSL certificate authentication
-  /*
-  'CertAuth' => 
-  array(
-    'ca'    => array( 'FIRST.Org' ), // allowed CAs
-    'caId'          => 'O',          // which attribute will be used to verify the CA
-    'userModel'     => 'User',       // name of the User class to check if user exists 
-    'userModelKey'  => 'nids_sid',   // User field that will be used for querying 
-    'map'           => array(        // maps client certificate attributes to User properties
-      'O'           => 'org',
-      'emailAddress'=>'email',
-    ),
-    'syncUser'      => true,         // should the User be synchronized with an external REST API
-    'userDefaults'=> array(          // default user attributes, only used when creating new users
-      'role_id'   => 4,
-    ),
-    'restApi'       => array(        // API parameters
-      'url'         => 'https://example.com/data/users',  // URL to query
-      'headers'     => array(),                           // additional headers, used for authentication
-      'param'       => array( 'email' => 'email'),        // query parameters to add to the URL, mapped to USer properties 
-      'map'         =>  array(                            // maps REST result to the User properties
-        'uid'       => 'nids_sid',
-        'team'      => 'org',
-        'email'     => 'email',
-        'pgp_public'=> 'gpgkey',
-      ),
-    ),
+  'Security' =>
+  array (
+    'level' => 'medium',
+    'salt' => '{{ salt }}',
+    'cipherSeed' => '',
+    'password_policy_length' => {{ misp_passreq_lenth }},
+    'csp_enforce' => {{ misp_csp_enforce | default('true') }},
+    'advanced_authkeys' => {{ misp_advanced_authkeys | default('false') }},
+    //'auth'=>array('CertAuth.Certificate'), // additional authentication methods
   ),
-  */
   'Session.defaults' => 'php',
   'Session.timeout' => 60,
-  'Session.cookie_timeout' => 360,
+  'Session.cookieTimeout' => 60,
   'Session.autoRegenerate' => false,
+  'Session.checkAgent' => false,
+  'site_admin_debug' => false,
   'Plugin' =>
   array (
     'Enrichment_services_enable' => true,
@@ -136,7 +111,11 @@ $config = array (
     'Sightings_range' => 365,
     'Sightings_anonymise' => false,
     'Sightings_policy' => 0,
+    'Enrichment_hover_popover_only' => false,
   ),
+  'CertAuth' => NULL,
   'ApacheShibbAuth' => NULL,
   'ApacheSecureAuth' => NULL,
+  'OidcAuth' => NULL,
+  'AadAuth' => NULL,
 );
