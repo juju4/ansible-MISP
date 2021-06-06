@@ -141,15 +141,3 @@
     mode: '0644'
     state: link
   when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
-
-- name: Ubuntu | check libyara.so location
-  stat:
-    path: /usr/lib/libyara.so
-  register: libyaraso
-- name: Ubuntu | libyara.so symlink for python yara module
-  file:
-    src: "{{ mispmodules_libyarapath }}/libyara.so"
-    dest: /usr/lib/libyara.so
-    mode: '0644'
-    state: link
-  when: ansible_distribution == 'Ubuntu' and not libyaraso.stat.exists
