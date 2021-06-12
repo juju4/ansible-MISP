@@ -29,6 +29,8 @@
   changed_when: false
   become: yes
   become_user: "{{ www_user }}"
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 - name: pip dependencies for testing
   pip:
     name: ['coveralls', 'codecov', 'nose', 'requests-mock', 'poetry']
