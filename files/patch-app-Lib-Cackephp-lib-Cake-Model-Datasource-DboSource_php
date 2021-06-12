@@ -1,0 +1,11 @@
+--- DboSource.php.0	2021-06-09 23:36:30.077421439 +0000
++++ DboSource.php	2021-06-09 23:36:42.145616865 +0000
+@@ -386,7 +386,7 @@
+ 				return $this->_connection->quote($this->boolean($data, true), PDO::PARAM_BOOL);
+ 			case 'string':
+ 			case 'text':
+-				return $this->_connection->quote($data, PDO::PARAM_STR);
++				return $this->_connection->quote((string)$data, PDO::PARAM_STR);
+ 			default:
+ 				if ($data === '') {
+ 					return $null ? 'NULL' : '""';

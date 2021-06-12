@@ -1,0 +1,11 @@
+--- CakeRequest.php.0	2021-06-09 11:04:19.550610527 +0000
++++ CakeRequest.php	2021-06-09 11:04:42.150976864 +0000
+@@ -919,7 +919,7 @@
+  */
+ 	protected static function _parseAcceptWithQualifier($header) {
+ 		$accept = array();
+-		$header = explode(',', $header);
++		$header = explode(',', (string)$header);
+ 		foreach (array_filter($header) as $value) {
+ 			$prefValue = '1.0';
+ 			$value = trim($value);

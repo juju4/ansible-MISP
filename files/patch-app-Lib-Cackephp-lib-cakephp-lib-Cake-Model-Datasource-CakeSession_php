@@ -1,0 +1,11 @@
+--- CakeSession.php.0	2021-06-09 11:23:42.169455802 +0000
++++ CakeSession.php	2021-06-09 11:23:57.657706856 +0000
+@@ -578,7 +578,7 @@
+ 		if (empty($_SESSION) && !headers_sent() && (!function_exists('session_status') || session_status() !== PHP_SESSION_ACTIVE)) {
+ 			if (!empty($sessionConfig['ini']) && is_array($sessionConfig['ini'])) {
+ 				foreach ($sessionConfig['ini'] as $setting => $value) {
+-					if (ini_set($setting, $value) === false) {
++					if (ini_set($setting, (string)$value) === false) {
+ 						throw new CakeSessionException(__d('cake_dev', 'Unable to configure the session, setting %s failed.', $setting));
+ 					}
+ 				}

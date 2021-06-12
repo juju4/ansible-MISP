@@ -1,0 +1,14 @@
+--- Configure.php.0	2021-06-09 10:43:34.802433991 +0000
++++ Configure.php	2021-06-09 10:44:17.339123481 +0000
+@@ -170,9 +170,9 @@
+ 
+ 		if (isset($config['debug']) && function_exists('ini_set')) {
+ 			if (static::$_values['debug']) {
+-				ini_set('display_errors', 1);
++				ini_set('display_errors', '1');
+ 			} else {
+-				ini_set('display_errors', 0);
++				ini_set('display_errors', '0');
+ 			}
+ 		}
+ 		return true;
