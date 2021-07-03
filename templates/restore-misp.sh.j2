@@ -11,13 +11,13 @@ else
     backupfile={{ backupdir }}/backup-misp.tar.gz
 fi
 
-tmpdir=`mktemp -d /tmp/restore.XXXXXX || exit 1`
+tmpdir=$(mktemp -d "/tmp/restore.XXXXXX" || exit 1)
 dirs="{{ misp_rootdir }}/app/files {{ misp_rootdir }}/app/Config"
 
-tar xzf $backupfile -C $tmpdir
+tar xzf "${backupfile}" -C "${tmpdir}"
 
-mysql -u misp < $tmpdir{{ backupdir }}/mysqldump-misp.sql
+mysql -u misp < "${tmpdir}{{ backupdir }}/mysqldump-misp.sql"
 
-for d in $dirs; do
-    rsync -rvl $tmpdir/$d $d
+for d in ${dirs}; do
+    rsync -rvl "${tmpdir}/${d}" "${d}"
 done

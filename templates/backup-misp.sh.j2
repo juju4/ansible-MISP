@@ -5,15 +5,15 @@
 export PATH=/usr/sbin:/usr/bin:/sbin:/bin
 umask 022
 
-date=`date +%Y-%m-%d`
+date=$(date +%Y-%m-%d)
 dest={{ backupdir }}
 [ ! -d "$dest" ] && install -d -m 0700 -o root "$dest"
 destfile=$dest/backup-misp-$date.tar.gz
 
 dirs="{{ misp_rootdir }}/app/files {{ misp_rootdir }}/app/Config"
-mysqldump -u misp --opt --single-transaction misp > $dest/mysqldump-misp.sql
+mysqldump -u misp --opt --single-transaction misp > "${dest}/mysqldump-misp.sql"
 
-tar czf $destfile $dirs $dest/mysqldump-misp.sql
-rm $dest/mysqldump-misp.sql
-tar tzf $destfile > /dev/null
-openssl dgst -sha512 $destfile > $destfile.distinfo
+tar czf "${destfile}" "${dirs}" "${dest}/mysqldump-misp.sql"
+rm "${dest}/mysqldump-misp.sql"
+tar tzf "${destfile}" > /dev/null
+openssl dgst -sha512 "${destfile}" > "${destfile}.distinfo"
