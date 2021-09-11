@@ -27,12 +27,14 @@
     backup: yes
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
 
-- name: Ubuntu 18.04 | Disable Trustar - Python 3.8+ required
+- name: Ubuntu 18.04, RHEL8 | Downgrade Trustar - Python 3.8+ required
   lineinfile:
     dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     regexp: '^trustar==.*'
     line: 'trustar==0.3.33'
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
+  when: >
+    (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04') or
+    (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int == 8)
 
 - name: Enforce latest PyMISP
   replace:
