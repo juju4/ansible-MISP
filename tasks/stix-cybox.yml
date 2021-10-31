@@ -32,7 +32,7 @@
 
 - name: install cti-python-stix2
   pip:
-    name: "file://{{ misp_rootdir }}/cti-python-stix2"
+    name: "file://{{ misp_rootdir }}/app/files/scripts/cti-python-stix2"
     extra_args: "--exists-action=w"
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
