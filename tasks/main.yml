@@ -583,16 +583,22 @@
 
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
-  command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -name config.php ! -name include_paths.php ! -name bootstrap.php ! -name database.php ! -name core.php -exec chmod 0444 {} \\;"  # noqa 301
+  command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php -exec chmod 0444 {} \\;"  # noqa 301
   with_items:
     - '*.php'
     - '*.ctp'
   when: misp_php_snuffleupagus_enable
-- name: Ensure config.php is writeable
+- name: Ensure config files are writeable by www user
   file:
-    dest: "{{ misp_rootdir }}/app/Config/config.php"
+    dest: "{{ item }}"
     owner: "{{ www_user }}"
     mode: '0644'
+  loop:
+    - "{{ misp_rootdir }}/app/Config/bootstrap.php"
+    - "{{ misp_rootdir }}/app/Config/config.php"
+    - "{{ misp_rootdir }}/app/Config/core.php"
+    - "{{ misp_rootdir }}/app/Config/database.php"
+  when: misp_php_snuffleupagus_enable
 - name: Backup cakephp
   command: >
     cp -R {{ misp_rootdir }}/app/Lib/cakephp {{ misp_rootdir }}/app/Lib/cakephp.orig
