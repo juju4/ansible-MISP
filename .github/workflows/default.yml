@@ -187,14 +187,25 @@ jobs:
       - name: After script - MISP error logs
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp
+          set -x
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/apache2/misp.local_access.log' || true
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/apache2/misp.local_error.log' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/httpd/misp.local_access.log' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/httpd/misp.local_error.log' || true
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/www/_MISP/MISP/app/tmp/logs/debug.log' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'curl -vk http://localhost:6666'
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - PyMISP
+        run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/python /var/www/_MISP/MISP/PyMISP/examples/users_list.py'
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - system
