@@ -187,8 +187,8 @@ jobs:
       - name: After script - MISP error logs
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp
-          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/apache2/misp.local_error.log'
-          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log'
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/apache2/misp.local_error.log' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
