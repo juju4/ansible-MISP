@@ -83,14 +83,20 @@
       debug: var=ansible_selinux
     - name: RedHat7- | Ensure selinux dependencies are present
       package:
-        name: libselinux-python
+        name:
+          - libselinux-python
+          - libsemanage-python
+          - policycoreutils-python
         state: present
       register: pkg_result
       until: pkg_result is success
       when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8
     - name: RedHat8+ | Ensure selinux dependencies are present
       package:
-        name: python3-libselinux
+        name:
+          - python3-libselinux
+          - python3-libsemanage
+          - python3-policycoreutils
         state: present
       register: pkg_result
       until: pkg_result is success
@@ -101,17 +107,6 @@
       debug: var=ansible_selinux
   when: ansible_os_family == "RedHat"
 - block:
-    - name: RedHat | Ensure selinux dependencies are present
-      package:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - libselinux-python
-        - libsemanage-python
-        - policycoreutils-python
-      register: pkg_result
-      until: pkg_result is success
-
     - name: RedHat | Allow proxy to network connect in selinux
       seboolean:
         name: httpd_can_network_connect
