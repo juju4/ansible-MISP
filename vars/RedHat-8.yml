@@ -39,6 +39,7 @@ misp_pkg_list:
  # misp-modules
  - python36
  - python36-devel
+ - python3-PyMySQL
  - libpq
  ## misc
  - acl
