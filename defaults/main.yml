@@ -7,7 +7,7 @@ install_archives: /var/_install
 
 ## branch or tags to use
 # misp_version: 'HEAD'
-misp_version: '2.4'
+misp_version: 'f4a013a5f7b774844a07fe3d5b893b637f643ab2'
 misp_rootdir: /var/www/_MISP/MISP
 misp_virtualenv: /var/www/_MISP/venv
 mispmodules_rootdir: /opt
