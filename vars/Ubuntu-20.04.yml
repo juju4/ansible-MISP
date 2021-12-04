@@ -54,7 +54,10 @@ misp_pkg_list:
  - ruby-pygments.rb
  - libsm6
  - libzbar0
+ - libzbar-dev
+ - tesseract-ocr
  - libpoppler-cpp-dev
+ - imagemagick
  - libxrender1
 
 misp_gem_list:
