@@ -202,6 +202,7 @@ jobs:
           set -x
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'ls -lA /var/log/redis/' || true
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/redis/redis.log' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cat /var/log/redis/redis-server.log' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
