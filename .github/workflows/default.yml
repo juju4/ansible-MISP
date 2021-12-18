@@ -21,7 +21,7 @@ jobs:
             version: 8
             version2: 8
             suite: default
-            experimental: false
+            experimental: true
           - distribution: ubuntu
             version: '20.04'
             version2: 2004
