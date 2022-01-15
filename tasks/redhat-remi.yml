@@ -30,15 +30,22 @@
   when: ansible_distribution_major_version == "7" and 'remi-release' not in ansible_facts.packages
   register: pkg_result
   until: pkg_result is success
+- name: RedHat8 | Install Remi repo
+  yum: name=http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+       state=present
+  when: ansible_distribution_major_version == "8" and 'remi-release' not in ansible_facts.packages
+  register: pkg_result
+  until: pkg_result is success
+
 
 - name: check if remi-php repo is enabled
-  command: "grep '^enabled=' /etc/yum.repos.d/remi-php72.repo"
+  command: "grep '^enabled=' /etc/yum.repos.d/remi-php{{ php_remi_version }}.repo"
   register: remistate
   changed_when: false
 
 # https://github.com/ansible/ansible-modules-extras/issues/2384
-- name: enable remi repository for php72
-  command: "yum-config-manager --enable remi-php72"
+- name: enable remi repository for php
+  command: "yum-config-manager --enable remi-php{{ php_remi_version }}"
   # yum_repository:
   #   name: remi-php56
   #   enable: yes

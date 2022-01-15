@@ -11,7 +11,10 @@ misp_pkg_list:
  - php-devel
  - php-pear
  - php-fpm
- # - php-redis
+ # php-pecl-* from remi repository
+ - php-pecl-redis
+ - php-pecl-ssdeep
+ - php-pecl-gnupg
  - php-opcache
  - php-xml
  - php-gd
@@ -89,6 +92,7 @@ nginx_sock: /var/run/php-fpm/php-fpm.sock
 php_confdir: /etc/php.d
 php_confext: ini
 php_ini: /etc/php.ini
+php_remi_version: 74
 fpm_user: nobody
 
 gnupg_privdir: "{{ misp_rootdir }}/.gnupg"
