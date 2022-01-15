@@ -110,8 +110,8 @@
 
 - name: Debug | misp_base_url var
   debug: var=misp_base_url
-- name: Debug | userInit var
-  debug: var=userInit
+- name: Debug | userinit var
+  debug: var=userinit
 - name: set local variables in PyMISP/tests/keys.py
   lineinfile:
     dest: "{{ misp_rootdir }}/PyMISP/tests/keys.py"

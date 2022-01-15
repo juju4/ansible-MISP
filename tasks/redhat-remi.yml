@@ -45,7 +45,7 @@
 
 # https://github.com/ansible/ansible-modules-extras/issues/2384
 - name: enable remi repository for php
-  command: "yum-config-manager --enable remi-php{{ php_remi_version }}"
+  command: "yum-config-manager --enable remi-php{{ php_remi_version }}"
   # yum_repository:
   #   name: remi-php56
   #   enable: yes

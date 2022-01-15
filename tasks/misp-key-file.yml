@@ -11,25 +11,25 @@
       shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
       become: yes
       become_user: "{{ www_user }}"
-      register: userInit
+      register: userinit
       no_log: "{{ misp_no_log }}"
-      failed_when: "'Error' in userInit.stderr"
+      failed_when: "'Error' in userinit.stderr"
       ignore_errors: true
-    # - debug: var=userInit
+    # - debug: var=userinit
     - name: Set fact userkey
       set_fact:
-        userkey: "{{ userInit.stdout }}"
+        userkey: "{{ userinit.stdout }}"
       no_log: "{{ misp_no_log }}"
   when: not skey.stat.exists or skey.stat.size == 0
 - block:
     - name: get existing key file
       command: "cat {{ misp_key_file }}"
       changed_when: false
-      register: userInit2
+      register: userinit2
       no_log: "{{ misp_no_log }}"
     - name: Set fact userkey
       set_fact:
-        userkey: "{{ userInit2.stdout }}"
+        userkey: "{{ userinit2.stdout }}"
   when: skey.stat.exists
 
 # - debug: var=userkey
