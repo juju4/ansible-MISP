@@ -37,11 +37,11 @@
   register: pkg_result
   until: pkg_result is success
 
-
 - name: check if remi-php repo is enabled
   command: "grep '^enabled=' /etc/yum.repos.d/remi-php{{ php_remi_version }}.repo"
   register: remistate
   changed_when: false
+  when: ansible_distribution_major_version|int < 8
 
 # https://github.com/ansible/ansible-modules-extras/issues/2384
 - name: enable remi repository for php
@@ -49,4 +49,13 @@
   # yum_repository:
   #   name: remi-php56
   #   enable: yes
-  when: not ('enabled=1' in remistate.stdout)
+  when: not ('enabled=1' in remistate.stdout) and ansible_distribution_major_version|int < 8
+
+# https://github.com/ansible/ansible-modules-extras/issues/2384
+- name: RHEL8 | enable remi repository for php
+  ini_file:
+    dest: /etc/yum.repos.d/remi.repo
+    section: remi
+    option: enabled
+    value: 1
+  when: ansible_distribution_major_version|int >= 8
