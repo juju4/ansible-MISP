@@ -54,6 +54,12 @@
     - remistate.stdout is defined
     - not ('enabled=1' in remistate.stdout)
 
+- name: RHEL8 | reset php stream to use remi latest
+  command: "dnf module reset php -y"
+  when:
+    - ansible_distribution_major_version|int >= 8
+    - ansible_facts.packages['php-fpm']
+    - ansible_facts.packages['php-fpm'][0]['version'] is version_compare('7.4', '<')
 - name: RHEL8 | enable remi repository for php
   command: "dnf module enable php:remi-7.4 -y"
   when: ansible_distribution_major_version|int >= 8
