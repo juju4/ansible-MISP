@@ -73,7 +73,7 @@
   changed_when: false
 
 - block:
-    - import_tasks: misp-add-user.yml
+    - include_tasks: misp-add-user.yml
       vars:
         user: "{{ item }}"
         list: "{{ listusers }}"
