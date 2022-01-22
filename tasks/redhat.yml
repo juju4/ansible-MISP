@@ -6,7 +6,7 @@
   until: pkg_result is success
 
 ## for php-redis
-- include: redhat-remi.yml
+- import_tasks: redhat-remi.yml
   when: ansible_os_family == "RedHat"
 
 - name: RedHat8+ | Enable PowerTools repo

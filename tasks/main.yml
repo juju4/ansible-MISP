@@ -10,15 +10,15 @@
 - name: Include webserver+distribution-specific variables
   include_vars: "{{ misp_webserver }}-{{ ansible_distribution }}.yml"
 
-- include: debian.yml
+- import_tasks: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-- include: redhat.yml
+- import_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
 
 - name: Debug | misp_webserver var
   debug: var=misp_webserver
-- include: nginx.yml
+- import_tasks: nginx.yml
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
 - name: Ensure Random source is configured
@@ -88,7 +88,7 @@
   register: pkg_result
   until: pkg_result is success
 
-- include: redis-secure.yml
+- import_tasks: redis-secure.yml
 
 - name: ensure archives folder exists
   file:
@@ -230,7 +230,7 @@
   become_user: "{{ www_user }}"
 
 ## must be after git cloning MISP
-- include: apache2.yml
+- import_tasks: apache2.yml
   when: misp_webserver is not defined or misp_webserver == 'apache2'
 
 - name: setting core.filemode for git
@@ -240,9 +240,9 @@
     scope: local
     repo: "{{ misp_rootdir }}"
 
-- include: stix-cybox.yml
+- import_tasks: stix-cybox.yml
 
-- include: composer.yml
+- import_tasks: composer.yml
 
 ### https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
 ### FIXME! pecl/redis requires PHP (version >= 7.0.0, version <= 7.1.0, excluded versions: 6.0.0)
@@ -316,7 +316,7 @@
     state: touch
   when: not debuglog.stat.exists
 
-- include: mysql-configure.yml
+- import_tasks: mysql-configure.yml
 
 - name: extra php settings
   template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.{{ php_confext }} mode=0644"
@@ -524,10 +524,10 @@
 - name: validate worker start.sh permissions
   file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
 
-- include: redhat-logrotate.yml
+- import_tasks: redhat-logrotate.yml
   when: ansible_os_family == "RedHat"
 
-- include: selinux-context.yml
+- import_tasks: selinux-context.yml
   when: ansible_os_family == "RedHat" and ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
 
 - block:
@@ -642,18 +642,18 @@
     - { s: patch-app-Controller-AppController_php, b: "{{ misp_rootdir }}/app/Controller" }
   when: misp_php_snuffleupagus_enable
 
-- include: lief.yml
+- import_tasks: lief.yml
   when: misp_lief_enable
 
-- include: misp-modules.yml
-- include: misp-gem.yml
+- import_tasks: misp-modules.yml
+- import_tasks: misp-gem.yml
 
-- include: testing.yml
+- import_tasks: testing.yml
   when: misp_testing is defined and misp_testing
 
-- include: misp-add-users.yml
+- import_tasks: misp-add-users.yml
 
-- include: misp-feeds.yml
+- import_tasks: misp-feeds.yml
 
 ## or use tools/misp-backup/misp-backup.sh ?
 - name: Ensure scriptsdir directory exists

@@ -5,7 +5,7 @@
   changed_when: false
   failed_when: false
 
-- include: travis.yml
+- import_tasks: travis.yml
 
 - name: install testing tools
   package:
@@ -68,7 +68,7 @@
 #     backup: yes
 #     force: yes
 
-- include: misp-key-file.yml
+- import_tasks: misp-key-file.yml
 
 - name: MISP tree permissions
   ## break .gnupg if applied to whole tree

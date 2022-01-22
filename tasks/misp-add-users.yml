@@ -23,7 +23,7 @@
 #       with_items: "{{ misp_webusers_list }}"
 #   when: misp_webusers_list is defined and misp_webusers_list
 
-- include: misp-key-file.yml
+- import_tasks: misp-key-file.yml
 
 - name: set local variables in PyMISP/examples/keys.py
   lineinfile:
@@ -73,6 +73,9 @@
   changed_when: false
 
 - block:
-    - include: "misp-add-user.yml user={{ item }} list={{ listusers }}"
+    - import_tasks: misp-add-user.yml
+      vars:
+        user: "{{ item }}"
+        list: "{{ listusers }}"
       with_items: "{{ misp_webusers_list }}"
   when: misp_webusers_list is defined and misp_webusers_list != []
