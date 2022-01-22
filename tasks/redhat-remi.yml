@@ -54,11 +54,6 @@
     - remistate.stdout is defined
     - not ('enabled=1' in remistate.stdout)
 
-# https://github.com/ansible/ansible-modules-extras/issues/2384
 - name: RHEL8 | enable remi repository for php
-  ini_file:
-    dest: /etc/yum.repos.d/remi.repo
-    section: remi
-    option: enabled
-    value: 1
+  command: "dnf module enable php:remi-7.4 -y"
   when: ansible_distribution_major_version|int >= 8
