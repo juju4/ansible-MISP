@@ -11,7 +11,7 @@
 
 - name: RedHat8+ | Enable PowerTools repo
   ini_file:
-    dest: /etc/yum.repos.d/CentOS-PowerTools.repo
+    dest: /etc/yum.repos.d/CentOS-Stream-PowerTools.repo
     section: PowerTools
     option: "{{ item.o }}"
     value: "{{ item.v }}"
