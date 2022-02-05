@@ -29,7 +29,7 @@ provisioner:
 platforms:
   - name: ubuntu-20.04
   - name: ubuntu-18.04
-  - name: centos-8
+  - name: centos-8-Stream
   - name: centos-7
     ## httpd/centos7/capability issue on lxc
     ## https://github.com/lxc/lxd/issues/1245	= only choice is privileged
