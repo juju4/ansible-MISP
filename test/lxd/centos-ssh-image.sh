@@ -2,7 +2,7 @@
 # add ssh to default lxd image
 
 if [ "X$1" = "X8" -o "X$1" = "X8-Stream" ]; then
-  image=centos-8
+  image=centos-8-Stream
 else
   image=centos-7
 fi
