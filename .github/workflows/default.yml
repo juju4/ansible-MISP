@@ -236,3 +236,10 @@ jobs:
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'journalctl -xe --no-pager' || true
         if: ${{ always() }}
         continue-on-error: true
+      - name: After script - redhat
+        run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'sudo dnf repolist' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'find /etc/yum.repos.d/ -exec cat {} \;' || true
+        if: ${{ always() }}
+        continue-on-error: true
