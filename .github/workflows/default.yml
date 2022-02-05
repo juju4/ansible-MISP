@@ -18,8 +18,8 @@ jobs:
       matrix:
         include:
           - distribution: centos
-            version: 8
-            version2: 8
+            version: 8-Stream
+            version2: 8-Stream
             suite: default
             experimental: false
           - distribution: ubuntu
@@ -70,6 +70,7 @@ jobs:
           find -ls
       - name: Install lxd requirements
         run: |
+          set -x
           sudo apt-get update -qq
           sudo apt-get -y install lxd acl dnsmasq-base zfsutils-linux -q
           whoami
