@@ -62,7 +62,7 @@ jobs:
           ansible --version
           cd $GITHUB_WORKSPACE/juju4.misp
           [ -f get-dependencies.sh ] && sh -x get-dependencies.sh
-          { echo '[defaults]'; echo 'callback_whitelist = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
+          { echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
       - name: Environment
         run: |
           pwd
