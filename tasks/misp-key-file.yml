@@ -9,6 +9,8 @@
 - block:
     - name: generate key file - cake userInit
       shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
+      args:
+        creates: "{{ misp_key_file }}"
       become: yes
       become_user: "{{ www_user }}"
       register: userinit
