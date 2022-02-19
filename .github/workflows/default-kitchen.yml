@@ -1,5 +1,5 @@
 ---
-name: AnsibleCI
+name: default-kitchen
 
 on:
   push:
