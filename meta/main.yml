@@ -17,6 +17,7 @@ galaxy_info:
         - 7
     - name: Ubuntu
       versions:
+        - focal
         - bionic
         - xenial
         - trusty
@@ -27,6 +28,8 @@ galaxy_info:
   galaxy_tags:
     - system
     - security
+    - threatintelligence
+    - informationsharing
 dependencies:
   - juju4.redhat_epel
 ## eventual dependencies for fine tuning but integration needed
