@@ -3,7 +3,7 @@
 ## https://github.com/ansible/ansible-modules-core/issues/2697
 - name: install python dependencies with pip - version enforced
   # pip: name="{{ item }}" extra_args='--no-input'
-  pnsible.builtin.ip:
+  ansible.builtin.pip:
     name: "{{ item.n }}"
     version: "{{ item.v }}"
     extra_args: "--exists-action=w"
