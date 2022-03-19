@@ -6,6 +6,7 @@
     state: present
     login_user: "{{ misp_mysql_user | default(omit) }}"
     login_password: "{{ misp_mysql_pass | default(omit) }}"
+  no_log: "{{ misp_no_log }}"
 - name: Check if mysql import done
   ansible.builtin.stat: path=/root/.mysql_misp_imported
   register: mispdbloaded
@@ -27,6 +28,7 @@
     target: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
     login_user: "{{ misp_mysql_user | default(omit) }}"
     login_password: "{{ misp_mysql_pass | default(omit) }}"
+  no_log: "{{ misp_no_log }}"
   when: not mispdbloaded.stat.exists
 - name: Add marker for mysql import
   ansible.builtin.file:
@@ -42,6 +44,7 @@
     state: present
     login_user: "{{ misp_mysql_user | default(omit) }}"
     login_password: "{{ misp_mysql_pass | default(omit) }}"
+  no_log: "{{ misp_no_log }}"
 
 - block:
     - name: Temporary workaround - mysql57 disable strict mode
