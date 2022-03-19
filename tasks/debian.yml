@@ -3,7 +3,7 @@
 # deb http://http.debian.net/debian wheezy-backports main
 
 - name: apt | MISP dependencies install
-  apt:
+  ansible.builtin.apt:
     name: "{{ misp_pkg_list + webserver }}"
     state: present
     update_cache: yes

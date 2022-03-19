@@ -4,7 +4,7 @@
 ## https://composer.github.io/pubkeys.html
 ## https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
 - name: Download Composer installer.
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ item.u }}"
     dest: "{{ item.d }}"
     mode: "{{ item.m }}"
@@ -13,27 +13,27 @@
     - { u: 'https://composer.github.io/installer.sig', d: '/tmp/installer.sig', m: '0400' }
 
 - name: get installer checksum
-  stat:
+  ansible.builtin.stat:
     path: /tmp/composer-installer.php
     checksum_algorithm: sha384
   register: installer
 - name: get signature hash
-  command: cat /tmp/installer.sig
+  ansible.builtin.command: cat /tmp/installer.sig
   register: installersig
   changed_when: false
   ignore_errors: true
 
 - block:
     - name: Debug | installer var
-      debug: var=installer.stat.checksum
+      ansible.builtin.debug: var=installer.stat.checksum
     - name: Debug | installersig var
-      debug: var=installersig.stdout
+      ansible.builtin.debug: var=installersig.stdout
     - name: check composer signature
-      fail: msg="FATAL! composer signature not matching."
+      ansible.builtin.fail: msg="FATAL! composer signature not matching."
   when: installer.stat.checksum != installersig.stdout
 
 - name: install composer
-  command: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
+  ansible.builtin.command: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
   args:
     creates: /usr/local/bin/composer
 

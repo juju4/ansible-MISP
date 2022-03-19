@@ -2,7 +2,7 @@
 
 ## FIXME! or ssl ?
 - name: Configure apache
-  template:
+  ansible.builtin.template:
     src: apache2-misp.conf.j2
     dest: "{{ apache_sitedir }}/misp.conf"
     mode: '0644'
@@ -13,7 +13,7 @@
     - restart webserver - docker,redhat
 
 - name: Debian | Disable default apache config
-  file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
+  ansible.builtin.file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
   notify:
     - restart webserver
     - restart webserver - docker,debian
@@ -34,7 +34,7 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Debian | Enable misp apache config
-  file:
+  ansible.builtin.file:
     src: "{{ apache_sitedir }}/misp.conf"
     dest: /etc/apache2/sites-enabled/misp.conf
     mode: '0644'

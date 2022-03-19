@@ -3,7 +3,7 @@
 ## https://github.com/ansible/ansible-modules-core/issues/2697
 - name: install python dependencies with pip - version enforced
   # pip: name="{{ item }}" extra_args='--no-input'
-  pip:
+  pnsible.builtin.ip:
     name: "{{ item.n }}"
     version: "{{ item.v }}"
     extra_args: "--exists-action=w"
@@ -18,7 +18,7 @@
   become_user: "{{ www_user }}"
 
 - name: install python dependencies with pip - latest
-  pip:
+  ansible.builtin.pip:
     name: ['mixbox', 'maec']
     extra_args: "--exists-action=w"
     virtualenv: "{{ misp_virtualenv }}"
@@ -31,7 +31,7 @@
   become_user: "{{ www_user }}"
 
 - name: install cti-python-stix2
-  pip:
+  ansible.builtin.pip:
     name: "file://{{ misp_rootdir }}/app/files/scripts/cti-python-stix2"
     extra_args: "--exists-action=w"
     virtualenv: "{{ misp_virtualenv }}"

@@ -3,15 +3,15 @@
 ## FIXME! how to do it once only!
 ## Note: more a reset as next login, will ask to change password...
 - name: Check if admin pass already set
-  stat: path="{{ misp_rootdir }}/.admin_pass_set"
+  ansible.builtin.stat: path="{{ misp_rootdir }}/.admin_pass_set"
   register: ap
 - name: set admin password
-  command: "{{ misp_rootdir }}/app/Console/cake Password \"{{ misp_web_user }}\" \"{{ misp_web_pass }}\""
+  ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Password \"{{ misp_web_user }}\" \"{{ misp_web_pass }}\""
   become: yes
   become_user: "{{ www_user }}"
   when: not ap.stat.exists
 - name: Admin pass set marker
-  file:
+  ansible.builtin.file:
     dest: "{{ misp_rootdir }}/.admin_pass_set"
     mode: '0600'
     state: touch
@@ -26,7 +26,7 @@
 - import_tasks: misp-key-file.yml
 
 - name: set local variables in PyMISP/examples/keys.py
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/PyMISP/examples/keys.py"
     regexp: "{{ item.re }}"
     line: "{{ item.l }}"
@@ -40,16 +40,16 @@
   no_log: "{{ misp_no_log }}"
 
 - name: flush handlers as we need service up for API call
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: wait for MISP port to be opened
-  wait_for:
+  ansible.builtin.wait_for:
     host: "{{ misp_base_ip }}"
     port: "{{ misp_base_port }}"
     timeout: 300
 
 - name: ensure PyMISP API working
-  command: "{{ misp_virtualenv }}/bin/python ./last.py -l 10"
+  ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./last.py -l 10"
   become: yes
   become_user: "{{ www_user }}"
   args:
@@ -62,7 +62,7 @@
   ignore_errors: true
 
 - name: list current users
-  command: "{{ misp_virtualenv }}/bin/python ./users_list.py"
+  ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./users_list.py"
   become: yes
   become_user: "{{ www_user }}"
   args:

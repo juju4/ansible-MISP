@@ -1,7 +1,7 @@
 ---
 
 - name: yum | remi yum-utils
-  yum: name=yum-utils state=present update_cache=yes
+  ansible.builtin.yum: name=yum-utils state=present update_cache=yes
   register: pkg_result
   until: pkg_result is success
 
@@ -22,12 +22,12 @@
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
 
 - name: Check available repositories
-  command: dnf repolist
+  ansible.builtin.command: dnf repolist
   changed_when: false
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
 
 - name: yum | MISP dependencies install
-  yum:
+  ansible.builtin.yum:
     name: "{{ misp_pkg_list + webserver }}"
     state: present
     update_cache: yes
@@ -38,7 +38,7 @@
 
 - block:
     - name: set php-fpm to use socket file
-      replace:
+      ansible.builtin.replace:
         dest: /etc/php-fpm.d/www.conf
         regexp: "{{ item.re }}"
         replace: "{{ item.rep }}"
@@ -54,10 +54,10 @@
         - restart php-fpm
 
     - name: ensure socket dir exists
-      file: dest=/var/run/php-fpm state=directory owner=nobody group=nobody mode=0755
+      ansible.builtin.file: dest=/var/run/php-fpm state=directory owner=nobody group=nobody mode=0755
 
     - name: set php-fpm user/group to nginx
-      replace:
+      ansible.builtin.replace:
         dest: /etc/php-fpm.d/www.conf
         regexp: "{{ item.re }}"
         replace: "{{ item.rep }}"
@@ -71,7 +71,7 @@
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
 - name: redhat | ensure python36 site-packages directory exists
-  file:
+  ansible.builtin.file:
     dest: /usr/local/lib/python3.6/site-packages
     owner: root
     mode: '0755'
@@ -80,9 +80,9 @@
 # https://github.com/ansible/ansible/issues/16612
 - block:
     - name: Debug | ansible_selinux var
-      debug: var=ansible_selinux
+      ansible.builtin.debug: var=ansible_selinux
     - name: RedHat7- | Ensure selinux dependencies are present
-      package:
+      ansible.builtin.package:
         name:
           - libselinux-python
           - libsemanage-python
@@ -92,7 +92,7 @@
       until: pkg_result is success
       when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8
     - name: RedHat8+ | Ensure selinux dependencies are present
-      package:
+      ansible.builtin.package:
         name:
           - python3-libselinux
           - python3-libsemanage
@@ -102,9 +102,9 @@
       until: pkg_result is success
       when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
     - name: re-collect facts
-      action: setup
+      ansible.builtin.setup:
     - name: Debug | ansible_selinux var
-      debug: var=ansible_selinux
+      ansible.builtin.debug: var=ansible_selinux
   when: ansible_os_family == "RedHat"
 - block:
     - name: RedHat | Allow proxy to network connect in selinux

@@ -2,7 +2,7 @@
 ## https://github.com/MISP/misp-modules
 
 - name: Ensure misp-modules directory exists
-  file:
+  ansible.builtin.file:
     dest: "{{ mispmodules_rootdir }}/misp-modules"
     owner: "{{ www_user }}"
     group: "{{ www_user }}"
@@ -10,7 +10,7 @@
     mode: '0755'
 
 - name: git clone MISP modules
-  git:
+  ansible.builtin.git:
     repo: https://github.com/MISP/misp-modules.git
     dest: "{{ mispmodules_rootdir }}/misp-modules"
     version: "{{ mispmodules_version | default('eaff5700de16a2a24c4a8f6f4a7e06f903223eba') }}"
@@ -20,7 +20,7 @@
   become_user: "{{ www_user }}"
 
 - name: Ubuntu 16.04 | Disable PyIntel471 - Python 3.6+ required
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     regexp: '^git\+https:\/\/github.com\/MISP\/PyIntel471.git'
     state: absent
@@ -28,7 +28,7 @@
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
 
 - name: Ubuntu 18.04, RHEL8 | Disable Trustar - trustar-python#100
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     regexp: '^trustar==.*'
     state: absent
@@ -37,7 +37,7 @@
     (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int == 8)
 
 - name: Enforce latest PyMISP
-  replace:
+  ansible.builtin.replace:
     dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     regexp: '^-e git\+https:\/\/github.com\/MISP\/PyMISP.git.*'
     replace: '-e git+https://github.com/MISP/PyMISP.git#egg=pymisp'
@@ -46,7 +46,7 @@
   when: misp_latest_pymisp
 
 - name: Ensure pip cache directory exists
-  file:
+  ansible.builtin.file:
     dest: "/var/www/.cache/pip/http"
     owner: "{{ www_user }}"
     group: "{{ www_user }}"
@@ -54,7 +54,7 @@
     mode: '0755'
 
 - name: debian | install pillow dependency for MISP modules (pip3)
-  pip:
+  ansible.builtin.pip:
     name: pillow
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
@@ -66,7 +66,7 @@
   become_user: "{{ www_user }}"
 
 - name: debian | install dependencies for MISP modules (pip3)
-  pip:
+  ansible.builtin.pip:
     requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
@@ -78,7 +78,7 @@
   become_user: "{{ www_user }}"
 
 - name: RedHat | ensure permissions for pip cache
-  file:
+  ansible.builtin.file:
     dest: /usr/share/httpd/.cache/pip/http
     state: directory
     owner: "{{ www_user }}"
@@ -88,12 +88,12 @@
 
 ## centos7: pip points to python3x
 - name: redhat | install dependencies for MISP modules (pip)
-  # pip:
+  # ansible.builtin.pip:
   #   requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
   #   virtualenv: "{{ misp_virtualenv }}"
   #   virtualenv_python: "{{ python3_bin }}"
   #   chdir: "{{ mispmodules_rootdir }}/misp-modules"
-  command: "{{ item.c }}"
+  ansible.builtin.command: "{{ item.c }}"
   args:
     creates: "{{ item.t | default(omit) }}"
     chdir: "{{ mispmodules_rootdir }}/misp-modules"
@@ -111,7 +111,7 @@
   become_flags: -H
 
 - name: redhat8+ | install zbar-py dependencies for MISP modules (pip)
-  command: "{{ misp_virtualenv }}/bin/pip install zbar-py"
+  ansible.builtin.command: "{{ misp_virtualenv }}/bin/pip install zbar-py"
   args:
     chdir: "{{ mispmodules_rootdir }}/misp-modules"
   when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8
@@ -124,7 +124,7 @@
   become_flags: -H
 
 - name: install MISP modules (pip3)
-  pip:
+  ansible.builtin.pip:
     name: "file://{{ mispmodules_rootdir }}/misp-modules"
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
@@ -136,7 +136,7 @@
   become_user: "{{ www_user }}"
 
 - name: debian | install dependencies for MISP modules (pip3) - post-install
-  pip:
+  ansible.builtin.pip:
     name:
       - censys
       - pyfaup
@@ -150,7 +150,7 @@
   become_user: "{{ www_user }}"
 
 - name: add MISP modules script for boot
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/rc.local
     regexp: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules .* &"
     line: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.boot 2>&1 &"
@@ -159,18 +159,18 @@
     backup: yes
 
 - name: check if misp modules is running
-  shell: "ps axu |grep misp-modules"
+  ansible.builtin.shell: "ps axu |grep misp-modules"
   register: ps
   changed_when: false
   ignore_errors: true
 - name: start MISP modules app
-  shell: "{{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.start 2>&1 &"
+  ansible.builtin.shell: "{{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.start 2>&1 &"
   become: yes
   become_user: "{{ www_user }}"
   when: "'misp-modules' not in ps.stdout"
 
 - name: Redhat7 | libpcre symlink for python yara module
-  file:
+  ansible.builtin.file:
     src: /usr/lib64/libpcre.so.1
     dest: /usr/lib64/libpcre.so.3
     mode: '0644'

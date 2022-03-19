@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure misp web logs are rotated
-  copy:
+  ansible.builtin.copy:
     src: "{{ misp_rootdir }}/INSTALL/misp.logrotate"
     dest: "/etc/logrotate.d/misp"
     mode: '0644'
@@ -16,7 +16,7 @@
   when: ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
 
 - name: Allow logrotate to read /var/www
-  command: "{{ item.c }}"
+  ansible.builtin.command: "{{ item.c }}"
   args:
     creates: "{{ item.t }}"
   with_items:

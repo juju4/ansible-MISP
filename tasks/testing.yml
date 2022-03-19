@@ -1,28 +1,28 @@
 ---
 
 - name: review misp error.log
-  command: "tail {{ misp_rootdir }}/app/tmp/logs/error.log"
+  ansible.builtin.command: "tail {{ misp_rootdir }}/app/tmp/logs/error.log"
   changed_when: false
   failed_when: false
 
 - import_tasks: travis.yml
 
 - name: install testing tools
-  package:
+  ansible.builtin.package:
     name: "{{ misp_testing_pkg }}"
     state: present
   register: pkg_result
   until: pkg_result is success
 
 - name: replace misp.local hostname
-  replace:
+  ansible.builtin.replace:
     dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
     regexp: 'http:\/\/misp.local'
     replace: "{{ misp_base_url }}"
     mode: '0755'
     backup: yes
 - name: check tool version for debugging
-  command: "{{ item }}"
+  ansible.builtin.command: "{{ item }}"
   with_items:
     - php --version
     - composer --version
@@ -32,7 +32,7 @@
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 - name: pip dependencies for testing
-  pip:
+  ansible.builtin.pip:
     name: ['coveralls', 'codecov', 'nose', 'requests-mock', 'poetry']
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
@@ -44,11 +44,11 @@
   become_user: "{{ www_user }}"
 
 - name: ensure test user in group of web server
-  user: "user={{ misp_testing_user }} groups={{ www_user }} append=yes"
+  ansible.builtin.user: "user={{ misp_testing_user }} groups={{ www_user }} append=yes"
   become: yes
 
 - name: check home permissions
-  file: dest={{ item }} mode=0755 state=directory
+  ansible.builtin.file: dest={{ item }} mode=0755 state=directory
   with_items:
     - "{{ misp_testing_user_home }}/build"
     - "{{ misp_testing_user_home }}"
@@ -56,7 +56,7 @@
 
 # Get authkey
 - name: check world-writeable permissions
-  file: "dest={{ item }} mode=0777 owner={{ misp_testing_user }} recurse=yes"
+  ansible.builtin.file: "dest={{ item }} mode=0777 owner={{ misp_testing_user }} recurse=yes"
   with_items:
     - "{{ misp_rootdir }}/build"
     - "{{ misp_rootdir }}/tests"
@@ -73,10 +73,10 @@
 - name: MISP tree permissions
   ## break .gnupg if applied to whole tree
   # file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755 recurse=yes"
-  file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=0755"
+  ansible.builtin.file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=0755"
   become: yes
 - name: MISP tree permissions
-  file: "dest={{ item }} owner={{ www_user }} mode=0755"
+  ansible.builtin.file: "dest={{ item }} owner={{ www_user }} mode=0755"
   ## Note: recurse is only valid if directory and can't select them from fileglob
   # with_fileglob:
   #   - "{{ misp_rootdir }}/*"
@@ -87,7 +87,7 @@
     - "{{ misp_rootdir }}/tools"
   become: yes
 - name: PyMISP world-writeable permissions
-  file:
+  ansible.builtin.file:
     dest: "{{ misp_rootdir }}/PyMISP"
     mode: '0777'
     owner: "{{ misp_testing_user }}"
@@ -95,13 +95,13 @@
   become: yes
 ## FIXME! for some reason .coverage still own by root during serverspec test
 - name: PyMISP .coverage permissions
-  file:
+  ansible.builtin.file:
     dest: "{{ misp_rootdir }}/PyMISP/.coverage"
     mode: '0777'
     owner: "{{ misp_testing_user }}"
     state: touch
 - name: PyMISP pymisp.egg-info permissions
-  file:
+  ansible.builtin.file:
     dest: "{{ misp_rootdir }}/PyMISP/pymisp.egg-info"
     mode: '0777'
     owner: "{{ misp_testing_user }}"
@@ -109,11 +109,11 @@
     recurse: yes
 
 - name: Debug | misp_base_url var
-  debug: var=misp_base_url
+  ansible.builtin.debug: var=misp_base_url
 - name: Debug | userinit var
-  debug: var=userinit
+  ansible.builtin.debug: var=userinit
 - name: set local variables in PyMISP/tests/keys.py
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
     line: "{{ item }}"
     mode: '0600'
@@ -124,7 +124,7 @@
     - "key = \"{{ userkey }}\""
   no_log: "{{ misp_no_log }}"
 - name: symlink key file in examples/events
-  file:
+  ansible.builtin.file:
     src: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
     dest: "{{ misp_rootdir }}/PyMISP/examples/events/keys.py"
     mode: '0600'
@@ -132,7 +132,7 @@
     state: link
     force: yes
 - name: symlink key file in PyMISP
-  file:
+  ansible.builtin.file:
     src: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
     dest: "{{ misp_rootdir }}/PyMISP/keys.py"
     mode: '0600'
@@ -141,7 +141,7 @@
     force: yes
 
 - name: allow self-signed certificates in curl_tests.sh
-  replace:
+  ansible.builtin.replace:
     dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
     regexp: '^curl -([iH].)'
     replace: 'curl -k -\1'
@@ -149,6 +149,6 @@
     backup: yes
 
 - name: review misp error.log 2
-  command: "tail {{ misp_rootdir }}/app/tmp/logs/error.log"
+  ansible.builtin.command: "tail {{ misp_rootdir }}/app/tmp/logs/error.log"
   changed_when: false
   failed_when: false

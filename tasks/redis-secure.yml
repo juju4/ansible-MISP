@@ -3,7 +3,7 @@
 # https://www.digitalocean.com/community/tutorials/how-to-secure-your-redis-installation-on-ubuntu-18-04
 
 - name: redis | configure network binding
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ redis_conf }}"
     regexp: '^bind .*'
     line: "bind {{ misp_redis_bind }}"
@@ -11,7 +11,7 @@
     backup: yes
 
 - name: redis | require password
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ redis_conf }}"
     regexp: '^requirepass .*'
     line: "requirepass {{ misp_redis_password }}"
@@ -20,7 +20,7 @@
   when: misp_redis_password is defined and misp_redis_password
 
 - name: redis | rename dangerous commands
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ redis_conf }}"
     regexp: "{{ item.re }}"
     line: "{{ item.l }}"

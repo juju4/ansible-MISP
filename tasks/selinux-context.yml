@@ -1,7 +1,7 @@
 ---
 
 - name: RedHat | Ensure selinux context for MISP httpd directories
-  command: "chcon -R -t httpd_sys_rw_content_t {{ item }}"  # noqa 301
+  ansible.builtin.command: "chcon -R -t httpd_sys_rw_content_t {{ item }}"  # noqa 301
   # sefcontext:
   #   target: "{{ item }}(/.*)?"
   #   setype: httpd_sys_rw_content_t

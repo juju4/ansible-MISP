@@ -1,14 +1,14 @@
 ---
 
 - name: Include version-specific variables for Ubuntu.
-  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
   when: ansible_distribution == 'Ubuntu'
 - name: Include version-specific variables for RedHat
-  include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  ansible.builtin.include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
   when: ansible_os_family == "RedHat"
 ## must be last to override previous vars
 - name: Include webserver+distribution-specific variables
-  include_vars: "{{ misp_webserver }}-{{ ansible_distribution }}.yml"
+  ansible.builtin.include_vars: "{{ misp_webserver }}-{{ ansible_distribution }}.yml"
 
 - import_tasks: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -17,12 +17,12 @@
   when: ansible_os_family == "RedHat"
 
 - name: Debug | misp_webserver var
-  debug: var=misp_webserver
+  ansible.builtin.debug: var=misp_webserver
 - import_tasks: nginx.yml
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
 - name: Ensure Random source is configured
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/default/rng-tools
     regexp: '^HRNGDEVICE=.*'
     line: 'HRNGDEVICE=/dev/urandom'
@@ -33,7 +33,7 @@
   when: ansible_os_family == "Debian"
 
 - name: Ensure /var/run/mysqld exists
-  file:
+  ansible.builtin.file:
     dest: /var/run/mysqld
     state: directory
     mode: '0755'
@@ -41,13 +41,13 @@
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Ensure services are enabled and started
-  service: "name={{ item }} state=started enabled=yes"
+  ansible.builtin.service: "name={{ item }} state=started enabled=yes"
   with_items: "{{ misp_services }}"
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - block:
     - name: Debian | Docker | Manually initialize mysql
-      shell: >
+      ansible.builtin.shell: >
         mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1
       args:
         creates: /tmp/mysql_install_db.out
@@ -59,7 +59,7 @@
 
 - block:
     - name: RedHat | Docker | Manually initialize mysql
-      shell: >
+      ansible.builtin.shell: >
         /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1
       args:
         creates: /tmp/mysql_install_db.out
@@ -71,7 +71,7 @@
 
 - block:
     - name: Docker | Manually start mysql service
-      shell: >
+      ansible.builtin.shell: >
         /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &
       args:
         creates: /tmp/mysqld_safe.out
@@ -81,7 +81,7 @@
 
 # possible git clone issues else
 - name: RedHat | Ensure latest nss curl libcurl
-  package:
+  ansible.builtin.package:
     name: ['nss', 'curl', 'libcurl']
     state: latest  # noqa 403
   when: ansible_os_family == "RedHat"
@@ -91,32 +91,32 @@
 - import_tasks: redis-secure.yml
 
 - name: ensure archives folder exists
-  file:
+  ansible.builtin.file:
     dest: "{{ install_archives }}"
     state: directory
     mode: '0755'
 
 - name: load local gpg key to check git signed commit
-  copy:
+  ansible.builtin.copy:
     src: "pgp-{{ item }}.asc"
     dest: "{{ install_archives }}"
     mode: '0400'
   with_items: "{{ misp_git_signing_keys_local }}"
 - name: import local gpg key to check git signed commit
-  command: "gpg --import {{ install_archives }}/pgp-{{ item }}.asc"
+  ansible.builtin.command: "gpg --import {{ install_archives }}/pgp-{{ item }}.asc"
   with_items: "{{ misp_git_signing_keys_local }}"
   register: import0
   changed_when: "'imported: [1-9]+' in import0.stdout"
 
 - name: recover gpg key to check git signed commit
-  command: "gpg --keyserver {{ misp_pgp_server }} --recv-keys {{ item }}"
+  ansible.builtin.command: "gpg --keyserver {{ misp_pgp_server }} --recv-keys {{ item }}"
   with_items: "{{ misp_git_signing_keys }}"
   register: import
   changed_when: "'imported: [1-9]+' in import.stdout"
   when: not (misp_proxy_host is defined and misp_proxy_host)
 
 - name: recover gpg key to check git signed commit - proxy
-  command: >
+  ansible.builtin.command: >
     gpg --keyserver {{ misp_pgp_server }} --recv-keys {{ item }}
         --keyserver-options
         \"timeout=10 http-proxy={{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}\"
@@ -132,7 +132,7 @@
   when: misp_proxy_host is defined and misp_proxy_host
 
 - name: Ensure MISP root dir exists
-  file:
+  ansible.builtin.file:
     dest: "{{ misp_rootdir }}"
     owner: "{{ www_user }}"
     group: "{{ www_user }}"
@@ -140,17 +140,17 @@
     mode: '0755'
 
 - name: Ensure ansible user temp directory is writeable
-  file:
+  ansible.builtin.file:
     path: /var/www/.ansible
     owner: "{{ www_user }}"
     mode: '0700'
     state: directory
 
 - name: Check if MISP folder already present
-  stat: path={{ misp_rootdir }}/INSTALL
+  ansible.builtin.stat: path={{ misp_rootdir }}/INSTALL
   register: m
 - name: git clone MISP
-  git:
+  ansible.builtin.git:
     repo: https://github.com/MISP/MISP.git
     dest: "{{ misp_rootdir }}"
     version: "{{ misp_version }}"
@@ -164,7 +164,7 @@
   # when: not m.stat.exists
 
 - name: update git submodules
-  command: "{{ item }}"
+  ansible.builtin.command: "{{ item }}"
   args:
     chdir: "{{ misp_rootdir }}"
   with_items:
@@ -176,13 +176,13 @@
 
 ## https://github.com/MISP/MISP/blob/e763e7646f7bbae5183ab93df840501d88c47119/INSTALL/UPDATE.txt
 - name: updating existing MISP - minor releases
-  # command: "git pull origin {{ misp_version }}"
+  # ansible.builtin.command: "git pull origin {{ misp_version }}"
   # args:
   #   chdir: "{{ misp_rootdir }}"
-  # command: "git pull origin {{ misp_version }} --verify-signatures chdir={{ misp_rootdir }}"
+  # ansible.builtin.command: "git pull origin {{ misp_version }} --verify-signatures chdir={{ misp_rootdir }}"
   # register: gitpull_result
   # changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
-  git:
+  ansible.builtin.git:
     repo: https://github.com/MISP/MISP.git
     dest: "{{ misp_rootdir }}"
     version: "{{ misp_version }}"
@@ -195,14 +195,14 @@
   become_user: "{{ www_user }}"
 
 - name: Ensure pip cache permissions are correct
-  file:
+  ansible.builtin.file:
     dest: /var/www/.cache/pip/http
     state: directory
     mode: '0755'
     owner: "{{ www_user }}"
 
 - name: install python dependencies with pip - python3
-  pip:
+  ansible.builtin.pip:
     name: "{{ item.n }}"
     version: "{{ item.v }}"
     extra_args: '--exists-action=w'
@@ -217,7 +217,7 @@
   become_user: "{{ www_user }}"
 
 - name: install python dependencies with pip - python, latest
-  pip:
+  ansible.builtin.pip:
     name: ['git+https://github.com/kbandla/pydeep.git', 'python-magic', 'zmq', 'plyara']
     extra_args: '--exists-action=w'
     virtualenv: "{{ misp_virtualenv }}"
@@ -247,7 +247,7 @@
 ### https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
 ### FIXME! pecl/redis requires PHP (version >= 7.0.0, version <= 7.1.0, excluded versions: 6.0.0)
 # - name: Install PECL libaries.
-#   shell: "yes \"\" | pecl install {{ item }}"
+#   ansible.builtin.shell: "yes \"\" | pecl install {{ item }}"
 #   register: pecl_result
 #   changed_when: "pecl_result.rc == 0"
 #   failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
@@ -256,7 +256,7 @@
 #   when: ansible_os_family == "RedHat"
 
 - name: setup MISP Cake config
-  copy:
+  ansible.builtin.copy:
     src: "{{ misp_rootdir }}/INSTALL/setup/config.php"
     dest: "{{ misp_rootdir }}/app/Plugin/CakeResque/Config/config.php"
     mode: '0644'
@@ -264,7 +264,7 @@
     backup: yes
 
 - name: validate permissions
-  file: "dest={{ item.f }} mode={{ item.m }} owner={{ www_user }} group={{ www_user }} state=directory"
+  ansible.builtin.file: "dest={{ item.f }} mode={{ item.m }} owner={{ www_user }} group={{ www_user }} state=directory"
   with_items:
     - { f: "{{ misp_rootdir }}", m: '0755' }
     - { f: "{{ misp_rootdir }}/app/files", m: '2775' }
@@ -274,7 +274,7 @@
     - { f: "{{ misp_rootdir }}/.gnupg", m: '0700' }
     - { f: "{{ misp_rootdir }}/app/webroot", m: '0700' }
 - name: check owner/group for multiple MISP folders
-  file:
+  ansible.builtin.file:
     dest: "{{ item }}"
     owner: "{{ www_user }}"
     group: "{{ www_user }}"
@@ -305,10 +305,10 @@
     - "{{ misp_rootdir }}/app/tmp/cached_exports/xml"
     - "{{ misp_rootdir }}/app/tmp/cached_exports/rpz"
 - name: Check if debug.log exists
-  stat: path="{{ misp_rootdir }}/app/tmp/debug.log"
+  ansible.builtin.stat: path="{{ misp_rootdir }}/app/tmp/debug.log"
   register: debuglog
 - name: touch debug.log
-  file:
+  ansible.builtin.file:
     dest: "{{ misp_rootdir }}/app/tmp/debug.log"
     mode: '0644'
     owner: "{{ www_user }}"
@@ -319,13 +319,13 @@
 - import_tasks: mysql-configure.yml
 
 - name: extra php settings
-  template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.{{ php_confext }} mode=0644"
+  ansible.builtin.template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.{{ php_confext }} mode=0644"
   notify:
     - restart webserver
     - restart webserver - docker,debian
     - restart webserver - docker,redhat
 - name: Enforce Timezone in php.ini
-  replace:
+  ansible.builtin.replace:
     dest: "{{ php_ini }}"
     regexp: '^;date.timezone ='
     replace: 'date.timezone = {{ tz }}'
@@ -335,7 +335,7 @@
     - restart webserver - docker,debian
     - restart webserver - docker,redhat
 - name: enabling MISP php settings
-  file:
+  ansible.builtin.file:
     src: "{{ php_confdir }}/misp-php.ini"
     dest: "{{ php_confenable }}/99-misp.ini"
     mode: '0644'
@@ -349,10 +349,10 @@
     (misp_webserver is not defined or misp_webserver == 'apache2')
 
 - name: Check if bootstrap.php exists
-  stat: path={{ misp_rootdir }}/app/Config/bootstrap.php
+  ansible.builtin.stat: path={{ misp_rootdir }}/app/Config/bootstrap.php
   register: conffiles
 - name: create config files from default
-  copy:
+  ansible.builtin.copy:
     src: "{{ misp_rootdir }}/app/Config/{{ item }}.default.php"
     dest: "{{ misp_rootdir }}/app/Config/{{ item }}.php"
     mode: '0644'
@@ -366,7 +366,7 @@
     # - config
   when: not conffiles.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 - name: create config files from default
-  copy:
+  ansible.builtin.copy:
     src: "{{ misp_rootdir }}/app/Config/{{ item }}.default.php"
     dest: "{{ misp_rootdir }}/app/Config/{{ item }}.php"
     mode: '0644'
@@ -378,7 +378,7 @@
     # - config
   when: not conffiles.stat.exists and not (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 - name: ensure right permissions for conf files
-  file: "dest={{ misp_rootdir }}/app/Config/{{ item }}.php owner={{ www_user }} mode=0600"
+  ansible.builtin.file: "dest={{ misp_rootdir }}/app/Config/{{ item }}.php owner={{ www_user }} mode=0600"
   with_items:
     - bootstrap
     - database
@@ -386,7 +386,7 @@
     # - config
 
 - name: update database settings
-  replace:
+  ansible.builtin.replace:
     dest: "{{ misp_rootdir }}/app/Config/database.php"
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
@@ -396,12 +396,12 @@
     - { regexp: 'db password', replace: "{{ misp_db_pass }}" }
   no_log: "{{ misp_no_log }}"
 - name: set CakeResque bootstrap to true
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
     line: "CakePlugin::loadAll(array( 'CakeResque' => array('bootstrap' => true) ));"
     mode: '0644'
 - name: set Cache::Config - mask acceptable for snuffleupagus
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
     regexp: "^Cache::config.'default', array.'engine' => 'File'.*.;"
     line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
@@ -409,7 +409,7 @@
     backup: yes
   when: misp_php_snuffleupagus_enable
 - name: set Cache::Config whole cakephp - mask acceptable for snuffleupagus  # noqa no-tabs
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php"
     regexp: "^\t\t\t'mask' => .*"
     line: "\t\t\t'mask' => 0600"
@@ -417,7 +417,7 @@
     backup: yes
   when: misp_php_snuffleupagus_enable
 - name: add vendor/autoload.php to core
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/core.php"
     line: "{{ item }}"
     mode: '0644'
@@ -425,7 +425,7 @@
     - "require_once dirname(__DIR__) . '/Vendor/autoload.php';"
 
 - name: Generating salt
-  shell: |
+  ansible.builtin.shell: |
     set -o pipefail
     openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;' | tee {{ misp_rootdir }}/.salt
   args:
@@ -437,28 +437,28 @@
   tags:
     - salt
 - name: Check if .salt exists
-  stat: path="{{ misp_rootdir }}/.salt"
+  ansible.builtin.stat: path="{{ misp_rootdir }}/.salt"
   register: s
 - name: Recover existing salt
-  command: "cat {{ misp_rootdir }}/.salt"
+  ansible.builtin.command: "cat {{ misp_rootdir }}/.salt"
   changed_when: false
   register: salt2
   no_log: "{{ misp_no_log }}"
   when: s.stat.exists
 - name: Set salt  # noqa 503
-  set_fact:
+  ansible.builtin.set_fact:
     salt: "{{ salt1.stdout }}"
   no_log: "{{ misp_no_log }}"
   when: salt1.changed
 - name: Set salt
-  set_fact:
+  ansible.builtin.set_fact:
     salt: "{{ salt2.stdout }}"
   no_log: "{{ misp_no_log }}"
   when: s.stat.exists
 
 # FIXME! idempotence. MISP is rewriting this file regularly
 - name: updating MISP config with salt
-  template:
+  ansible.builtin.template:
     src: "{{ misp_config_php_template }}"
     dest: "{{ misp_rootdir }}/app/Config/config.php"
     mode: '0600'
@@ -468,18 +468,18 @@
     - salt
 
 - name: Check if webroot gpg.asc exists
-  stat: "path={{ misp_rootdir }}/app/webroot/gpg.asc"
+  ansible.builtin.stat: "path={{ misp_rootdir }}/app/webroot/gpg.asc"
   register: gkey
 - name: create gpg configuration template
-  template: "src=gpg-template.j2 dest=/var/tmp/gpg-template owner={{ www_user }} mode=0600"
+  ansible.builtin.template: "src=gpg-template.j2 dest=/var/tmp/gpg-template owner={{ www_user }} mode=0600"
   when: not gkey.stat.exists
 - name: redhat | start gpg-agent
-  command: "gpg-agent --daemon --homedir={{ misp_rootdir }}/.gnupg"
+  ansible.builtin.command: "gpg-agent --daemon --homedir={{ misp_rootdir }}/.gnupg"
   become: yes
   become_user: "{{ www_user }}"
   when: not gkey.stat.exists and (ansible_os_family == "RedHat") and misp_webserver == 'nginx'
 - name: create gnupg key for {{ misp_email }}
-  command: "{{ item.s }}"
+  ansible.builtin.command: "{{ item.s }}"
   args:
     chdir: "{{ misp_rootdir }}/.gnupg"
     creates: "{{ item.c }}"
@@ -496,7 +496,7 @@
   become: yes
   become_user: "{{ www_user }}"
 - name: create gnupg key for {{ misp_email }}
-  shell: >
+  ansible.builtin.shell: >
     gpg --homedir {{ misp_rootdir }}/.gnupg --export --armor {{ misp_email }} --batch > {{ misp_rootdir }}/app/webroot/gpg.asc
   args:
     chdir: "{{ misp_rootdir }}/.gnupg"
@@ -507,7 +507,7 @@
 # - command: wipe -q -y /var/tmp/gpg-template
 #   when: not gkey.stat.exists
 - name: check permissions of gpg files
-  file:
+  ansible.builtin.file:
     dest: "{{ item.d }}"
     mode: "{{ item.m }}"
   with_items:
@@ -522,7 +522,7 @@
         )
 
 - name: validate worker start.sh permissions
-  file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
+  ansible.builtin.file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
 
 - import_tasks: redhat-logrotate.yml
   when: ansible_os_family == "RedHat"
@@ -532,7 +532,7 @@
 
 - block:
     - name: docker redis workaround ???
-      replace:
+      ansible.builtin.replace:
         dest: /etc/systemd/system/redis.service
         regexp: "{{ item.re }}"
         replace: "{{ item.rep }}"
@@ -546,14 +546,14 @@
     ansible_virtualization_type is defined and ansible_virtualization_type == "docker"
     and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
 - name: ensure redis is active before launching worker
-  service:
+  ansible.builtin.service:
     name: "{{ redis_svc }}"
     state: started
     enabled: yes
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Docker | Manually start redis
-  shell: "/usr/bin/redis-server {{ redis_conf }} --daemonize yes > /tmp/redis.out"
+  ansible.builtin.shell: "/usr/bin/redis-server {{ redis_conf }} --daemonize yes > /tmp/redis.out"
   become: yes
   become_user: redis
   become_flags: -H
@@ -562,18 +562,18 @@
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: check if worker active
-  command: "ps axu"
+  ansible.builtin.command: "ps axu"
   register: ps
   changed_when: false
 # - debug: var=ps.stdout_lines
 - name: start MISP worker
-  command: "bash {{ misp_rootdir }}/app/Console/worker/start.sh"
+  ansible.builtin.command: "bash {{ misp_rootdir }}/app/Console/worker/start.sh"
   become: yes
   become_user: "{{ www_user }}"
   when: misp_rootdir + '/app/Vendor/kamisama/php-resque-ex' not in ps.stdout
 
 - name: add MISP worker script for boot
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/rc.local
     line: "sudo -H -u {{ www_user }} bash {{ misp_rootdir }}/app/Console/worker/start.sh"
     mode: '0755'
@@ -583,13 +583,13 @@
 
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
-  command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php -exec chmod 0444 {} \\;"  # noqa 301
+  ansible.builtin.command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php -exec chmod 0444 {} \\;"  # noqa 301
   with_items:
     - '*.php'
     - '*.ctp'
   when: misp_php_snuffleupagus_enable
 - name: Ensure config files are writeable by www user
-  file:
+  ansible.builtin.file:
     dest: "{{ item }}"
     owner: "{{ www_user }}"
     mode: '0644'
@@ -600,13 +600,13 @@
     - "{{ misp_rootdir }}/app/Config/database.php"
   when: misp_php_snuffleupagus_enable
 - name: Backup cakephp
-  command: >
+  ansible.builtin.command: >
     cp -R {{ misp_rootdir }}/app/Lib/cakephp {{ misp_rootdir }}/app/Lib/cakephp.orig
   args:
     creates: "{{ misp_rootdir }}/app/Lib/cakephp.orig"
   when: misp_testing is defined and misp_testing
 - name: Backup MISP
-  copy:
+  ansible.builtin.copy:
     src: "{{ misp_rootdir }}/app/Controller/AppController.php"
     dest: "{{ misp_rootdir }}/app/Controller/AppController.php.orig"
     mode: '0644'
@@ -657,13 +657,13 @@
 
 ## or use tools/misp-backup/misp-backup.sh ?
 - name: Ensure scriptsdir directory exists
-  file: path={{ scriptsdir }} state=directory mode=0755
+  ansible.builtin.file: path={{ scriptsdir }} state=directory mode=0755
 - name: add backup script
-  template: src=backup-misp.sh.j2 dest={{ scriptsdir }}/backup-misp.sh mode=0755
+  ansible.builtin.template: src=backup-misp.sh.j2 dest={{ scriptsdir }}/backup-misp.sh mode=0755
 - name: add restore script
-  template: src=restore-misp.sh.j2 dest={{ scriptsdir }}/restore-misp.sh mode=0755
+  ansible.builtin.template: src=restore-misp.sh.j2 dest={{ scriptsdir }}/restore-misp.sh mode=0755
 - name: setup cron backup
-  cron: name="misp-backup" minute="30" hour="3" weekday="0"
+  ansible.builtin.cron: name="misp-backup" minute="30" hour="3" weekday="0"
     job="{{ scriptsdir }}/backup-misp.sh > /dev/null 2>&1"
     user=root
     cron_file=ansible_misp-backup

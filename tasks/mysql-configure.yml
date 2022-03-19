@@ -7,12 +7,12 @@
     login_user: "{{ misp_mysql_user | default(omit) }}"
     login_password: "{{ misp_mysql_pass | default(omit) }}"
 - name: Check if mysql import done
-  stat: path=/root/.mysql_misp_imported
+  ansible.builtin.stat: path=/root/.mysql_misp_imported
   register: mispdbloaded
 
 ## trusty: mysql 5.5, centos7: mariadb 5.5
 - name: pre-mysql5.6 | force MyISAM mysql engine to support FULLTEXT indexes
-  replace:
+  ansible.builtin.replace:
     dest: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
     regexp: "ENGINE=\\w+"
     replace: "ENGINE=MyISAM"
@@ -29,7 +29,7 @@
     login_password: "{{ misp_mysql_pass | default(omit) }}"
   when: not mispdbloaded.stat.exists
 - name: Add marker for mysql import
-  file:
+  ansible.builtin.file:
     dest: /root/.mysql_misp_imported
     mode: '0600'
     state: touch
@@ -45,12 +45,12 @@
 
 - block:
     - name: Temporary workaround - mysql57 disable strict mode
-      copy:
+      ansible.builtin.copy:
         src: disable_strict_mode.cnf
         dest: /etc/mysql/conf.d/disable_strict_mode.cnf
         mode: 0644
       register: mysqlstrict
     - name: restart mysql
-      service: name=mysql state=restarted
+      ansible.builtin.service: name=mysql state=restarted
       when: mysqlstrict.changed
   when: ansible_distribution_release == 'xenial'
