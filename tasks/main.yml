@@ -234,11 +234,13 @@
   when: misp_webserver is not defined or misp_webserver == 'apache2'
 
 - name: setting core.filemode for git
-  git_config:
+  community.general.git_config:
     name: core.filemode
     value: 'false'
     scope: local
     repo: "{{ misp_rootdir }}"
+  args:
+    chdir: "{{ misp_rootdir }}"
 
 - import_tasks: stix-cybox.yml
 
