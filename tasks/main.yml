@@ -239,8 +239,6 @@
     value: 'false'
     scope: local
     repo: "{{ misp_rootdir }}"
-  args:
-    chdir: "{{ misp_rootdir }}"
 
 - import_tasks: stix-cybox.yml
 
