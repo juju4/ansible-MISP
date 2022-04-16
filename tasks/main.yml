@@ -239,6 +239,8 @@
     value: 'false'
     scope: local
     repo: "{{ misp_rootdir }}"
+  become: yes
+  become_user: "{{ www_user }}"
 
 - import_tasks: stix-cybox.yml
 
