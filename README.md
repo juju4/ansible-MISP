@@ -142,6 +142,7 @@ see task 'docker redis workaround ???'
 * travis tasks seems to stall in some case like for ubuntu trusty.
 Not identified why...
 
+* CI failing sometimes on `Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction`. Seems related to [Issue 5004](https://github.com/MISP/MISP/issues/5004) - Open
 
 ## FAQ
 
