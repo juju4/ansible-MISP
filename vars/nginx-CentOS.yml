@@ -1,6 +1,6 @@
 ---
 
-webserver: "{{ misp_webserver_nginx }}"
+webserver: "{{ misp_webserver_nginx }}"
 
 www_user: nginx
 apache_svc: nginx
