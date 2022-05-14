@@ -24,7 +24,8 @@
         userkey: "{{ userinit.stdout }}"
       no_log: "{{ misp_no_log }}"
   when: not skey.stat.exists or skey.stat.size == 0
-- block:
+- name: existing key file
+  block:
     - name: get existing key file
       ansible.builtin.command: "cat {{ misp_key_file }}"
       changed_when: false
