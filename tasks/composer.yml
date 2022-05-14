@@ -23,7 +23,8 @@
   changed_when: false
   ignore_errors: true
 
-- block:
+- name: Composer signature
+  block:
     - name: Debug | installer var
       ansible.builtin.debug: var=installer.stat.checksum
     - name: Debug | installersig var

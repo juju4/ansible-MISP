@@ -46,7 +46,8 @@
     login_password: "{{ misp_mysql_pass | default(omit) }}"
   no_log: "{{ misp_no_log }}"
 
-- block:
+- name: Ubuntu xenial
+  block:
     - name: Temporary workaround - mysql57 disable strict mode
       ansible.builtin.copy:
         src: disable_strict_mode.cnf

@@ -10,7 +10,8 @@
   notify:
     - restart webserver
 
-- block:
+- name: Debian
+  block:
     - name: debian | enable misp configuration
       ansible.builtin.file:
         src: /etc/nginx/sites-available/misp.conf

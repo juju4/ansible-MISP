@@ -45,7 +45,8 @@
   with_items: "{{ misp_services }}"
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
-- block:
+- name: Debian Docker
+  block:
     - name: Debian | Docker | Manually initialize mysql
       ansible.builtin.shell: >
         mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1
@@ -57,7 +58,8 @@
     (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and
     ansible_os_family == "Debian"
 
-- block:
+- name: RedHat Docker
+  block:
     - name: RedHat | Docker | Manually initialize mysql
       ansible.builtin.shell: >
         /usr/bin/mysql_install_db > /tmp/mysql_install_db.out 2>&1
@@ -69,7 +71,8 @@
     (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     and ansible_os_family == "RedHat"
 
-- block:
+- name: Docker
+  block:
     - name: Docker | Manually start mysql service
       ansible.builtin.shell: >
         /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &
@@ -532,7 +535,8 @@
 - import_tasks: selinux-context.yml
   when: ansible_os_family == "RedHat" and ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
 
-- block:
+- name: Ubuntu Xenial Docker
+  block:
     - name: docker redis workaround ???
       ansible.builtin.replace:
         dest: /etc/systemd/system/redis.service

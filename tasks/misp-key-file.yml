@@ -6,7 +6,8 @@
 
 # - debug: var=skey
 
-- block:
+- name: key file
+  block:
     - name: generate key file - cake userInit
       ansible.builtin.shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
       args:

@@ -36,7 +36,8 @@
   register: pkg_result
   until: pkg_result is success
 
-- block:
+- name: Nginx
+  block:
     - name: set php-fpm to use socket file
       ansible.builtin.replace:
         dest: /etc/php-fpm.d/www.conf
@@ -78,7 +79,8 @@
     state: directory
 
 # https://github.com/ansible/ansible/issues/16612
-- block:
+- name: RedHat selinux facts
+  block:
     - name: Debug | ansible_selinux var
       ansible.builtin.debug: var=ansible_selinux
     - name: RedHat7- | Ensure selinux dependencies are present
@@ -106,7 +108,8 @@
     - name: Debug | ansible_selinux var
       ansible.builtin.debug: var=ansible_selinux
   when: ansible_os_family == "RedHat"
-- block:
+- name: RedHat selinux
+  block:
     - name: RedHat | Allow proxy to network connect in selinux
       seboolean:
         name: httpd_can_network_connect

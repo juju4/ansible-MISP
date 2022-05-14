@@ -72,7 +72,8 @@
   register: listusers
   changed_when: false
 
-- block:
+- name: Add users
+  block:
     - include_tasks: misp-add-user.yml
       vars:
         user: "{{ item }}"
