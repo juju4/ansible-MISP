@@ -67,7 +67,7 @@ sp.disable_function.function("ini_set").param("var_name").value("memory_limit").
 sp.disable_function.function("ini_set").param("var_name").value("include_path").drop();
 sp.disable_function.function("ini_set").param("var_name").value("open_basedir").drop();
 
-# Detect some backdoors via environnement recon
+# Detect some backdoors via environment recon
 sp.disable_function.function("ini_get").param("var_name").value("allow_url_fopen").drop();
 sp.disable_function.function("ini_get").param("var_name").value("open_basedir").drop();
 sp.disable_function.function("ini_get").param("var_name").value_r("suhosin").drop();
