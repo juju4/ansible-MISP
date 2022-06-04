@@ -55,7 +55,7 @@
   args:
     chdir: "{{ misp_rootdir }}/PyMISP/examples"
   environment:
-    debug: True
+    debug: 'True'
     PYTHONPATH: /usr/local/lib/python3.6/site-packages
   register: test
   changed_when: false
