@@ -144,6 +144,8 @@ Not identified why...
 
 * CI failing sometimes on `Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction`. Seems related to [Issue 5004](https://github.com/MISP/MISP/issues/5004) - Open
 
+* Ubuntu 22.04 seems unsupported as php8.1 and app/composer.json requires php >=7.2.0,<8.0.0
+
 ## FAQ
 
 * usage of roles dependencies like geerlinguy.{mysql,nginx,apache} are not required but allow more fine-tuning.

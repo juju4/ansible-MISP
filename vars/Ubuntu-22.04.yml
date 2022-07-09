@@ -4,9 +4,10 @@ misp_pkg_list:
  - openssh-server
  - mysql-server
  - php
+ - php-curl
  - php-mysql
  - php-mbstring
- - php7.4-opcache
+ - php8.1-opcache
  - php-readline
  - php-mbstring
  - php-zip
@@ -36,7 +37,7 @@ misp_pkg_list:
  #
  - php-redis
  - python3-mysqldb
- - rng-tools
+ - rng-tools5
  # misp-modules
  - python3
  - libpq5
@@ -67,7 +68,7 @@ python3_bin: python3
 python3_pip: pip3
 
 mysql_svc: mysql
-rng_svc: rng-tools
+rng_svc: rngd
 redis_svc: redis
 redis_conf: /etc/redis/redis.conf
 misp_services:
@@ -79,7 +80,7 @@ misp_services_nginx:
  - "{{ apache_svc }}"
  - "{{ mysql_svc }}"
  - "{{ rng_svc }}"
- - php7.4-fpm
+ - php8.1-fpm
 
 misp_testing_pkg:
  - ruby
@@ -95,17 +96,17 @@ misp_webserver_nginx:
  - nginx
  - php-fpm
 
-php_confdir: /etc/php/7.4/mods-available
+php_confdir: /etc/php/8.1/mods-available
 php_confext: ini
-php_ini: /etc/php/7.4/apache2/php.ini
-php_ini_nginx: /etc/php/7.4/fpm/php.ini
-php_confenable: /etc/php/7.4/apache2/conf.d
-nginx_sock: /run/php/php7.4-fpm.sock
+php_ini: /etc/php/8.1/apache2/php.ini
+php_ini_nginx: /etc/php/8.1/fpm/php.ini
+php_confenable: /etc/php/8.1/apache2/conf.d
+nginx_sock: /run/php/php8.1-fpm.sock
 fpm_user: www-data
 
 gnupg_privdir: "{{ misp_rootdir }}/.gnupg/private-keys-v1.d"
 
-mispmodules_libyarapath: /usr/local/lib/python3.6/dist-packages/usr/lib
+mispmodules_libyarapath: /usr/local/lib/python3.10/dist-packages/usr/lib
 
 apacheetc: /etc/apache2
 ssl_user: ssl-cert

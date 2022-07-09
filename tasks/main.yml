@@ -30,7 +30,9 @@
     backup: yes
   notify:
     - restart rng-tools
-  when: ansible_os_family == "Debian"
+  when:
+    - ansible_os_family == "Debian"
+    - (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int < 22)
 
 - name: Ensure /var/run/mysqld exists
   ansible.builtin.file:
