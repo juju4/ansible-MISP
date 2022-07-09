@@ -92,6 +92,10 @@ misp_git_signing_keys_local:
   - '4aee18f83afdeb23'
   - '6bbed1b63a6d639f'
 
+misp_composer_dl:
+  - { u: 'https://getcomposer.org/installer', d: '/tmp/composer-installer.php', m: '0755' }
+  - { u: 'https://composer.github.io/installer.sig', d: '/tmp/installer.sig', m: '0400' }
+
 misp_pymisp_verifycert: False
 misp_no_log: true
 misp_php_snuffleupagus_enable: false

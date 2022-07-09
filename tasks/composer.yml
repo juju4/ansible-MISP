@@ -8,9 +8,7 @@
     url: "{{ item.u }}"
     dest: "{{ item.d }}"
     mode: "{{ item.m }}"
-  with_items:
-    - { u: 'https://getcomposer.org/installer', d: '/tmp/composer-installer.php', m: '0755' }
-    - { u: 'https://composer.github.io/installer.sig', d: '/tmp/installer.sig', m: '0400' }
+  with_items: "{{ misp_composer_dl }}"
 
 - name: get installer checksum
   ansible.builtin.stat:
@@ -42,6 +40,7 @@
   composer:
     command: install
     working_dir: "{{ misp_rootdir }}/app"
+    arguments: --no-plugins
   register: pkg_result
   until: pkg_result is success
   become: yes
