@@ -36,11 +36,20 @@
   args:
     creates: /usr/local/bin/composer
 
+- name: allow-plugins composer/installers as required
+  composer:
+    command: config
+    arguments: allow-plugins.composer/installers true
+    working_dir: "{{ misp_rootdir }}/app"
+  register: pkg_result
+  until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
+
 - name: install PHP dependencies via composer (kamisama/cake-resque, Vendor)
   composer:
     command: install
     working_dir: "{{ misp_rootdir }}/app"
-    arguments: --no-plugins
   register: pkg_result
   until: pkg_result is success
   become: yes
