@@ -4,8 +4,6 @@ name: lint
 on:
   push:
   pull_request:
-  schedule:  # run weekly, every Thursday 06:00
-    - cron: '0 6 * * 4'
 
 jobs:
   build:
