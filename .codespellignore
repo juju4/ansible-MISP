@@ -1,2 +1,4 @@
 # selinux file extension
 te
+# Jenkinsfile docker volume
+ro
