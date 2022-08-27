@@ -5,8 +5,8 @@ VAGRANTFILE_API_VERSION = "2"
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-    config.vm.box = "ubuntu/trusty64"
-    #config.vm.box = "centos/7"
+    config.vm.box = "ubuntu/jammy64"
+    #config.vm.box = "generic/centos9s"
 
     config.vm.provision :ansible do |ansible|
        ansible.playbook = "site.yml"

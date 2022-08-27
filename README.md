@@ -26,7 +26,7 @@ It was tested on the following versions:
 
 ### Operating systems
 
-Tested with vagrant on Ubuntu 14.04, Kitchen test with xenial, trusty and centos7
+Tested on Ubuntu 18.04, 20.04, 22.04 and centos 8-Stream
 
 ## Example Playbook
 
@@ -102,33 +102,7 @@ Known bugs
 * in /var/www/MISP/app/tmp/logs/error.log
 Error: [MissingTableException] Table logs for model Log was not found in datasource default.
 check misp database exists in mysql and is filled
-* PHP Fatal error:  Can't use method return value in write context
-Only on centos71 with php54. Ok with ubuntu trusty and php55.
-= switch to php56 from remi repository
 * MISP curl_tests.sh is made to run once unlike kitchen verify. If repeated, this test will fail.
-* nosetests
-.coverage owned by root make the test failing
-on ubuntu trusty:
-```
-$ cd /var/www/MISP/PyMISP && nosetests --with-coverage --cover-package=pymisp tests/test_offline.py
-[...]
-ImportError: No module named packages.urllib3.response
-
-Name                 Stmts   Miss  Cover
-----------------------------------------
-pymisp/__init__.py       2      2     0%
-pymisp/api.py          782    782     0%
-----------------------------------------
-TOTAL                  784    784     0%
-----------------------------------------------------------------------
-Ran 1 test in 0.002s
-
-FAILED (errors=1)
-$ dpkg -l |grep urllib3
-ii  python-urllib3                   1.7.1-1ubuntu4                   all          HTTP library with thread-safe connection pooling for Python
-ii  python-urllib3-whl               1.7.1-1ubuntu4                   all          HTTP library with thread-safe connection pooling
-ii  python3-urllib3                  1.7.1-1ubuntu4                   all          HTTP library with thread-safe connection pooling for Python3
-```
 
 * if using privileged docker and a host with mysql, you might have the following issue
 ```
@@ -138,9 +112,6 @@ https://github.com/docker/docker/issues/7512
 
 * docker and redis can have issue too and it might be necessary to edit systemd config on xenial
 see task 'docker redis workaround ???'
-
-* travis tasks seems to stall in some case like for ubuntu trusty.
-Not identified why...
 
 * CI failing sometimes on `Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction`. Seems related to [Issue 5004](https://github.com/MISP/MISP/issues/5004) - Open
 

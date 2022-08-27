@@ -16,10 +16,9 @@ galaxy_info:
         - all
     - name: Ubuntu
       versions:
+        - jammy
         - focal
         - bionic
-        - xenial
-        - trusty
   #
   # Below are all categories currently available. Just as with
   # the platforms above, uncomment those that apply to your role.

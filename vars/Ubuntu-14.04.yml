@@ -5,7 +5,6 @@ misp_pkg_list:
  - mysql-server
  - php5
  - php5-mysql
- # - php5-mbstring	## not available in trusty
  - postfix
  - gcc
  - zip

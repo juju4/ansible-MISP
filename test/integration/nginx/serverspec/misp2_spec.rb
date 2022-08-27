@@ -13,9 +13,6 @@ describe command('cd /var/www/MISP/tests && ./curl_tests.sh `cat $HOME/build/key
 end
 
 ## FIXME!
-##	xenial: fail first run, ok second
-##	trusty: fail all the time
-##	centos7: fail, ok second
 #describe command('cd /var/www/MISP/PyMISP && /var/www/MISP/venv/bin/nosetests --with-coverage --cover-package=pymisp tests/test_offline.py 2>&1 | tee /tmp/nosetests.out') do
 #  its(:stdout) { should match /TOTAL/}
 #  its(:stdout) { should match /OK/}
