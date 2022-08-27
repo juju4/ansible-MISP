@@ -30,8 +30,8 @@ galaxy_info:
     - informationsharing
 dependencies:
   - juju4.redhat_epel
-## eventual dependencies for fine tuning but integration needed
-#  - geerlingguy.mysql
-## one or the other?
-#  - geerlingguy.nginx
-#  - geerlingguy.apache
+  ## eventual dependencies for fine tuning but integration needed
+  # - geerlingguy.mysql
+  ## one or the other?
+  # - geerlingguy.nginx
+  # - geerlingguy.apache

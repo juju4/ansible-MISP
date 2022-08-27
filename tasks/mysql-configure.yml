@@ -1,6 +1,6 @@
 ---
 
-- name: creating mysql misp db
+- name: Creating mysql misp db
   mysql_db:
     name: misp
     state: present
@@ -11,7 +11,7 @@
   ansible.builtin.stat: path=/root/.mysql_misp_imported
   register: mispdbloaded
 
-- name: pre-mysql5.6 | force MyISAM mysql engine to support FULLTEXT indexes
+- name: Pre-mysql5.6 | force MyISAM mysql engine to support FULLTEXT indexes
   ansible.builtin.replace:
     dest: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
     regexp: "ENGINE=\\w+"
@@ -20,7 +20,7 @@
     backup: yes
   when: ansible_distribution_major_version == '7'
 
-- name: importing mysql misp db template
+- name: Importing mysql misp db template
   mysql_db:
     name: misp
     state: import
@@ -35,7 +35,7 @@
     mode: '0600'
     state: touch
   when: not mispdbloaded.stat.exists
-- name: creating mysql misp db user
+- name: Creating mysql misp db user
   mysql_user:
     name: "{{ misp_db_user }}"
     password: "{{ misp_db_pass }}"
@@ -53,7 +53,7 @@
         dest: /etc/mysql/conf.d/disable_strict_mode.cnf
         mode: 0644
       register: mysqlstrict
-    - name: restart mysql
+    - name: Restart mysql
       ansible.builtin.service: name=mysql state=restarted
       when: mysqlstrict.changed
   when: ansible_distribution_release == 'xenial'

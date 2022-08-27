@@ -1,10 +1,10 @@
 ---
 
-- name: flush handlers as we need service up for API call
+- name: Flush handlers as we need service up for API call
   ansible.builtin.meta: flush_handlers
 
 ## FIXME! not idempotent, no way to list feeds with their status
-- name: enable feeds
+- name: Enable feeds
   ansible.builtin.uri:
     url: "{{ misp_local_base_url | default(misp_base_url) }}/feeds/enable/{{ item }}"
     method: POST
@@ -18,7 +18,7 @@
 
 # - debug: var=enableresults
 
-- name: fetch from feeds
+- name: Fetch from feeds
   ansible.builtin.uri:
     url: "{{ misp_local_base_url | default(misp_base_url) }}/feeds/fetchFromFeed/{{ item }}"
     method: GET
@@ -30,7 +30,7 @@
   with_items: "{{ misp_fetch_feeds }}"
   register: fetchresults
 
-- name: disable feeds
+- name: Disable feeds
   ansible.builtin.uri:
     url: "{{ misp_local_base_url | default(misp_base_url) }}/feeds/disable/{{ item }}"
     method: POST

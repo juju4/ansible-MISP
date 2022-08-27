@@ -1,6 +1,6 @@
 ---
 
-- name: yum | remi yum-utils
+- name: Redhat | remi yum-utils
   ansible.builtin.yum: name=yum-utils state=present update_cache=yes
   register: pkg_result
   until: pkg_result is success
@@ -19,14 +19,18 @@
   with_items:
     - { o: enabled, v: '1' }
     - { o: baseurl, v: 'http://mirror.centos.org/$contentdir/$releasever/PowerTools/$basearch/os/' }
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_distribution_major_version | int >= 8
 
 - name: Check available repositories
   ansible.builtin.command: dnf repolist
   changed_when: false
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_distribution_major_version | int >= 8
 
-- name: yum | MISP dependencies install
+- name: Redhat | MISP dependencies install
   ansible.builtin.yum:
     name: "{{ misp_pkg_list + webserver }}"
     state: present
@@ -38,7 +42,7 @@
 
 - name: Nginx
   block:
-    - name: set php-fpm to use socket file
+    - name: Set php-fpm to use socket file
       ansible.builtin.replace:
         dest: /etc/php-fpm.d/www.conf
         regexp: "{{ item.re }}"
@@ -52,12 +56,12 @@
         - { re: '^listen.owner = .*$', rep: 'listen.owner = {{ fpm_user }}' }
         - { re: '^listen.group = .*$', rep: 'listen.group = {{ fpm_user }}' }
       notify:
-        - restart php-fpm
+        - Restart php-fpm
 
-    - name: ensure socket dir exists
+    - name: Ensure socket dir exists
       ansible.builtin.file: dest=/var/run/php-fpm state=directory owner=nobody group=nobody mode=0755
 
-    - name: set php-fpm user/group to nginx
+    - name: Set php-fpm user/group to nginx
       ansible.builtin.replace:
         dest: /etc/php-fpm.d/www.conf
         regexp: "{{ item.re }}"
@@ -68,10 +72,10 @@
         - { re: '^user = .*$', rep: 'user = nginx' }
         - { re: '^group = .*$', rep: 'group = nginx' }
       notify:
-        - restart php-fpm
+        - Restart php-fpm
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
-- name: redhat | ensure python36 site-packages directory exists
+- name: Redhat | ensure python36 site-packages directory exists
   ansible.builtin.file:
     dest: /usr/local/lib/python3.6/site-packages
     owner: root
@@ -92,7 +96,9 @@
         state: present
       register: pkg_result
       until: pkg_result is success
-      when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8
+      when:
+        - ansible_os_family == "RedHat"
+        - ansible_distribution_major_version|int < 8
     - name: RedHat8+ | Ensure selinux dependencies are present
       ansible.builtin.package:
         name:
@@ -102,8 +108,10 @@
         state: present
       register: pkg_result
       until: pkg_result is success
-      when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
-    - name: re-collect facts
+      when:
+        - ansible_os_family == "RedHat"
+        - ansible_distribution_major_version | int >= 8
+    - name: Re-collect facts
       ansible.builtin.setup:
     - name: Debug | ansible_selinux var
       ansible.builtin.debug: var=ansible_selinux
@@ -123,4 +131,7 @@
         setype: http_port_t
         state: present
       when: misp_base_port != 80 and misp_base_port != 443
-  when: ansible_os_family == "RedHat" and ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_selinux.status is defined
+    - ansible_selinux.status != 'disabled'

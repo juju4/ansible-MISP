@@ -5,7 +5,7 @@
 - name: Check if admin pass already set
   ansible.builtin.stat: path="{{ misp_rootdir }}/.admin_pass_set"
   register: ap
-- name: set admin password
+- name: Set admin password
   ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Password \"{{ misp_web_user }}\" \"{{ misp_web_pass }}\""
   become: yes
   become_user: "{{ www_user }}"
@@ -25,7 +25,7 @@
 
 - import_tasks: misp-key-file.yml
 
-- name: set local variables in PyMISP/examples/keys.py
+- name: Set local variables in PyMISP/examples/keys.py
   ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/PyMISP/examples/keys.py"
     regexp: "{{ item.re }}"
@@ -39,16 +39,16 @@
     - { re: '^misp_verifycert = .*', l: "misp_verifycert = {{ misp_pymisp_verifycert }}" }
   no_log: "{{ misp_no_log }}"
 
-- name: flush handlers as we need service up for API call
+- name: Flush handlers as we need service up for API call
   ansible.builtin.meta: flush_handlers
 
-- name: wait for MISP port to be opened
+- name: Wait for MISP port to be opened
   ansible.builtin.wait_for:
     host: "{{ misp_base_ip }}"
     port: "{{ misp_base_port }}"
     timeout: 300
 
-- name: ensure PyMISP API working
+- name: Ensure PyMISP API working
   ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./last.py -l 10"
   become: yes
   become_user: "{{ www_user }}"
@@ -61,7 +61,7 @@
   changed_when: false
   ignore_errors: true
 
-- name: list current users
+- name: List current users
   ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./users_list.py"
   become: yes
   become_user: "{{ www_user }}"

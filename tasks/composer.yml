@@ -10,12 +10,12 @@
     mode: "{{ item.m }}"
   with_items: "{{ misp_composer_dl }}"
 
-- name: get installer checksum
+- name: Get installer checksum
   ansible.builtin.stat:
     path: /tmp/composer-installer.php
     checksum_algorithm: sha384
   register: installer
-- name: get signature hash
+- name: Get signature hash
   ansible.builtin.command: cat /tmp/installer.sig
   register: installersig
   changed_when: false
@@ -27,16 +27,16 @@
       ansible.builtin.debug: var=installer.stat.checksum
     - name: Debug | installersig var
       ansible.builtin.debug: var=installersig.stdout
-    - name: check composer signature
+    - name: Check composer signature
       ansible.builtin.fail: msg="FATAL! composer signature not matching."
   when: installer.stat.checksum != installersig.stdout
 
-- name: install composer
+- name: Install composer
   ansible.builtin.command: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
   args:
     creates: /usr/local/bin/composer
 
-- name: allow-plugins composer/installers as required
+- name: Allow-plugins composer/installers as required
   composer:
     command: config
     arguments: allow-plugins.composer/installers true
@@ -46,7 +46,7 @@
   become: yes
   become_user: "{{ www_user }}"
 
-- name: install PHP dependencies via composer (kamisama/cake-resque, Vendor)
+- name: Install PHP dependencies via composer (kamisama/cake-resque, Vendor)
   composer:
     command: install
     working_dir: "{{ misp_rootdir }}/app"

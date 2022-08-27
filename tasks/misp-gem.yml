@@ -1,6 +1,6 @@
 ---
 
-- name: install gem dependencies
+- name: Install gem dependencies
   gem:
     name: "{{ item }}"
     pre_release: yes

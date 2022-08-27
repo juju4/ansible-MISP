@@ -1,8 +1,6 @@
 ---
-# debian wheezy: add backports
-# deb http://http.debian.net/debian wheezy-backports main
 
-- name: apt | MISP dependencies install
+- name: Debian | MISP dependencies install
   ansible.builtin.apt:
     name: "{{ misp_pkg_list + webserver }}"
     state: present

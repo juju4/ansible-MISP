@@ -1,9 +1,9 @@
 ---
-- name: restart webserver
+- name: Restart webserver
   ansible.builtin.service: name={{ apache_svc }} state=restarted
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
-- name: restart webserver - docker,debian
+- name: Restart webserver - docker,debian
   ansible.builtin.command: "{{ item }}"
   with_items:
     - killall apache2
@@ -20,7 +20,7 @@
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "Debian"
 
-- name: restart webserver - docker,redhat
+- name: Restart webserver - docker,redhat
   ansible.builtin.command: "{{ item }}"
   with_items:
     - pkill httpd
@@ -29,13 +29,13 @@
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "RedHat"
 
-- name: restart php-fpm
+- name: Restart php-fpm
   ansible.builtin.service: name=php-fpm state=restarted
 
-- name: restart rng-tools
+- name: Restart rng-tools
   ansible.builtin.service: name=rng-tools state=restarted
 
-- name: updating existing MISP submodules - minor releases
+- name: Updating existing MISP submodules - minor releases
   ansible.builtin.command: "git submodule update --init --force"  # noqa 303
   args:
     chdir: "{{ misp_rootdir }}"

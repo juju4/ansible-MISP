@@ -1,14 +1,14 @@
 ---
 
-- name: check if existing key file
+- name: Check if existing key file
   ansible.builtin.stat: "path={{ misp_key_file }}"
   register: skey
 
 # - debug: var=skey
 
-- name: key file
+- name: Key file
   block:
-    - name: generate key file - cake userInit
+    - name: Generate key file - cake userInit
       ansible.builtin.shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
       args:
         creates: "{{ misp_key_file }}"
@@ -24,9 +24,9 @@
         userkey: "{{ userinit.stdout }}"
       no_log: "{{ misp_no_log }}"
   when: not skey.stat.exists or skey.stat.size == 0
-- name: existing key file
+- name: Existing key file
   block:
-    - name: get existing key file
+    - name: Get existing key file
       ansible.builtin.command: "cat {{ misp_key_file }}"
       changed_when: false
       register: userinit2
@@ -39,6 +39,6 @@
 # - debug: var=userkey
 
 ## FIXME! fail if returns 'Script aborted: MISP instance already initialised.'
-- name: check no script error
+- name: Check no script error
   ansible.builtin.fail: msg="Fatal! error retrieving user key"
   when: "'Script aborted: MISP instance already initialised.' in userkey or not userkey"

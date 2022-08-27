@@ -1,27 +1,27 @@
 ---
 
-- name: review misp error.log
+- name: Review misp error.log
   ansible.builtin.command: "tail {{ misp_rootdir }}/app/tmp/logs/error.log"
   changed_when: false
   failed_when: false
 
 - import_tasks: travis.yml
 
-- name: install testing tools
+- name: Install testing tools
   ansible.builtin.package:
     name: "{{ misp_testing_pkg }}"
     state: present
   register: pkg_result
   until: pkg_result is success
 
-- name: replace misp.local hostname
+- name: Replace misp.local hostname
   ansible.builtin.replace:
     dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
     regexp: 'http:\/\/misp.local'
     replace: "{{ misp_base_url }}"
     mode: '0755'
     backup: yes
-- name: check tool version for debugging
+- name: Check tool version for debugging
   ansible.builtin.command: "{{ item }}"
   with_items:
     - php --version
@@ -31,7 +31,7 @@
   become_user: "{{ www_user }}"
   environment:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-- name: pip dependencies for testing
+- name: Pip dependencies for testing
   ansible.builtin.pip:
     name: ['coveralls', 'codecov', 'nose', 'requests-mock', 'poetry']
     virtualenv: "{{ misp_virtualenv }}"
@@ -43,11 +43,11 @@
   become: yes
   become_user: "{{ www_user }}"
 
-- name: ensure test user in group of web server
+- name: Ensure test user in group of web server
   ansible.builtin.user: "user={{ misp_testing_user }} groups={{ www_user }} append=yes"
   become: yes
 
-- name: check home permissions
+- name: Check home permissions
   ansible.builtin.file: dest={{ item }} mode=0755 state=directory
   with_items:
     - "{{ misp_testing_user_home }}/build"
@@ -55,7 +55,7 @@
     - /home
 
 # Get authkey
-- name: check world-writeable permissions
+- name: Check world-writeable permissions
   ansible.builtin.file: "dest={{ item }} mode=0777 owner={{ misp_testing_user }} recurse=yes"
   with_items:
     - "{{ misp_rootdir }}/build"
@@ -112,7 +112,7 @@
   ansible.builtin.debug: var=misp_base_url
 - name: Debug | userinit var
   ansible.builtin.debug: var=userinit
-- name: set local variables in PyMISP/tests/keys.py
+- name: Set local variables in PyMISP/tests/keys.py
   ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
     line: "{{ item }}"
@@ -123,7 +123,7 @@
     - "url = \"{{ misp_pymisp_base_url | default(misp_base_url) }}\""
     - "key = \"{{ userkey }}\""
   no_log: "{{ misp_no_log }}"
-- name: symlink key file in examples/events
+- name: Symlink key file in examples/events
   ansible.builtin.file:
     src: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
     dest: "{{ misp_rootdir }}/PyMISP/examples/events/keys.py"
@@ -131,7 +131,7 @@
     owner: "{{ misp_testing_user }}"
     state: link
     force: yes
-- name: symlink key file in PyMISP
+- name: Symlink key file in PyMISP
   ansible.builtin.file:
     src: "{{ misp_rootdir }}/PyMISP/tests/keys.py"
     dest: "{{ misp_rootdir }}/PyMISP/keys.py"
@@ -140,7 +140,7 @@
     state: link
     force: yes
 
-- name: allow self-signed certificates in curl_tests.sh
+- name: Allow self-signed certificates in curl_tests.sh
   ansible.builtin.replace:
     dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
     regexp: '^curl -([iH].)'
@@ -148,7 +148,7 @@
     mode: '0755'
     backup: yes
 
-- name: review misp error.log 2
+- name: Review misp error.log 2
   ansible.builtin.command: "tail {{ misp_rootdir }}/app/tmp/logs/error.log"
   changed_when: false
   failed_when: false

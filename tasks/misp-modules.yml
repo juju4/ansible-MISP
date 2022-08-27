@@ -9,7 +9,7 @@
     state: directory
     mode: '0755'
 
-- name: git clone MISP modules
+- name: Git clone MISP modules
   ansible.builtin.git:
     repo: https://github.com/MISP/misp-modules.git
     dest: "{{ mispmodules_rootdir }}/misp-modules"
@@ -34,7 +34,7 @@
     state: absent
   when: >
     (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04') or
-    (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int == 8)
+    (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 8)
 
 - name: Enforce latest PyMISP
   ansible.builtin.replace:
@@ -53,7 +53,7 @@
     state: directory
     mode: '0755'
 
-- name: debian | install pillow dependency for MISP modules (pip3)
+- name: Debian | install pillow dependency for MISP modules (pip3)
   ansible.builtin.pip:
     name: pillow
     virtualenv: "{{ misp_virtualenv }}"
@@ -65,7 +65,7 @@
   become: yes
   become_user: "{{ www_user }}"
 
-- name: debian | install dependencies for MISP modules (pip3)
+- name: Debian | install dependencies for MISP modules (pip3)
   ansible.builtin.pip:
     requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
     virtualenv: "{{ misp_virtualenv }}"
@@ -87,7 +87,7 @@
   when: ansible_os_family == 'RedHat'
 
 ## centos7: pip points to python3x
-- name: redhat | install dependencies for MISP modules (pip)
+- name: Redhat | install dependencies for MISP modules (pip)
   # ansible.builtin.pip:
   #   requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
   #   virtualenv: "{{ misp_virtualenv }}"
@@ -110,11 +110,11 @@
   become_user: "{{ www_user }}"
   become_flags: -H
 
-- name: redhat8+ | install zbar-py dependencies for MISP modules (pip)
+- name: Redhat8+ | install zbar-py dependencies for MISP modules (pip)
   ansible.builtin.command: "{{ misp_virtualenv }}/bin/pip install zbar-py"
   args:
     chdir: "{{ mispmodules_rootdir }}/misp-modules"
-  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8
   environment:
     PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   register: pkg_result
@@ -123,7 +123,7 @@
   become_user: "{{ www_user }}"
   become_flags: -H
 
-- name: install MISP modules (pip3)
+- name: Install MISP modules (pip3)
   ansible.builtin.pip:
     name: "file://{{ mispmodules_rootdir }}/misp-modules"
     virtualenv: "{{ misp_virtualenv }}"
@@ -135,7 +135,7 @@
   become: yes
   become_user: "{{ www_user }}"
 
-- name: debian | install dependencies for MISP modules (pip3) - post-install
+- name: Debian | install dependencies for MISP modules (pip3) - post-install
   ansible.builtin.pip:
     name:
       - censys
@@ -149,7 +149,7 @@
   become: yes
   become_user: "{{ www_user }}"
 
-- name: add MISP modules script for boot
+- name: Add MISP modules script for boot
   ansible.builtin.lineinfile:
     dest: /etc/rc.local
     regexp: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules .* &"
@@ -158,12 +158,12 @@
     insertbefore: "^exit 0"
     backup: yes
 
-- name: check if misp modules is running
+- name: Check if misp modules is running
   ansible.builtin.shell: "ps axu |grep misp-modules"
   register: ps
   changed_when: false
   ignore_errors: true
-- name: start MISP modules app
+- name: Start MISP modules app
   ansible.builtin.shell: "{{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.start 2>&1 &"
   become: yes
   become_user: "{{ www_user }}"

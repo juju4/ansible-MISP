@@ -1,7 +1,7 @@
 ---
 
 # - debug: var=list
-- name: add user {{ user.email }}
+- name: Add user {{ user.email }}
   ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./add_user.py -e {{ user.email }} -o {{ user.org }} -r {{ user.role }}"
   become: yes
   become_user: "{{ www_user }}"
@@ -9,6 +9,8 @@
     chdir: "{{ misp_rootdir }}/PyMISP/examples"
   environment:
     PYTHONPATH: /usr/local/lib/python3.6/site-packages
-  when: list.stdout.find(user.email) == -1 and user.email is defined
+  when:
+    - user.email is defined
+    - list.stdout.find(user.email) == -1
   register: out
 # - debug: var=out

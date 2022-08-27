@@ -8,19 +8,19 @@
     mode: '0644'
     backup: yes
   notify:
-    - restart webserver
-    - restart webserver - docker,debian
-    - restart webserver - docker,redhat
+    - Restart webserver
+    - Restart webserver - docker,debian
+    - Restart webserver - docker,redhat
 
 - name: Debian | Disable default apache config
   ansible.builtin.file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
   notify:
-    - restart webserver
-    - restart webserver - docker,debian
-    - restart webserver - docker,redhat
+    - Restart webserver
+    - Restart webserver - docker,debian
+    - Restart webserver - docker,redhat
   when: ansible_os_family == 'Debian'
 
-- name: debian | ensure required modules are present
+- name: Debian | ensure required modules are present
   apache2_module:
     state: present
     name: "{{ item }}"
@@ -28,9 +28,9 @@
     - headers
     - rewrite
   notify:
-    - restart webserver
-    - restart webserver - docker,debian
-    - restart webserver - docker,redhat
+    - Restart webserver
+    - Restart webserver - docker,debian
+    - Restart webserver - docker,redhat
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Debian | Enable misp apache config
@@ -40,7 +40,7 @@
     mode: '0644'
     state: link
   notify:
-    - restart webserver
-    - restart webserver - docker,debian
-    - restart webserver - docker,redhat
+    - Restart webserver
+    - Restart webserver - docker,debian
+    - Restart webserver - docker,redhat
   when: ansible_os_family == 'Debian'

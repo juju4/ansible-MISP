@@ -1,10 +1,10 @@
 ---
 
-- name: get the package facts
+- name: Get the package facts
   ansible.builtin.package_facts:
     manager: "auto"
 
-- name: show packages
+- name: Show packages
   ansible.builtin.debug: var=ansible_facts.packages
 
 - name: Import Remi rpm repository keys
@@ -37,29 +37,29 @@
   register: pkg_result
   until: pkg_result is success
 
-- name: check if remi-php repo is enabled
+- name: Check if remi-php repo is enabled
   ansible.builtin.command: "grep '^enabled=' /etc/yum.repos.d/remi-php{{ php_remi_version }}.repo"
   register: remistate
   changed_when: false
-  when: ansible_distribution_major_version|int < 8
+  when: ansible_distribution_major_version | int < 8
 
 # https://github.com/ansible/ansible-modules-extras/issues/2384
-- name: enable remi repository for php
+- name: Enable remi repository for php
   ansible.builtin.command: "yum-config-manager --enable remi-php{{ php_remi_version }}"
   # yum_repository:
   #   name: remi-php56
   #   enable: yes
   when:
-    - ansible_distribution_major_version|int < 8
+    - ansible_distribution_major_version | int < 8
     - remistate.stdout is defined
     - not ('enabled=1' in remistate.stdout)
 
-- name: RHEL8 | reset php stream to use remi latest
+- name: RHEL8 | reset php stream to use remi latest
   ansible.builtin.command: "dnf module reset php -y"
   when:
-    - ansible_distribution_major_version|int >= 8
+    - ansible_distribution_major_version | int >= 8
     - ansible_facts.packages['php-fpm']
     - ansible_facts.packages['php-fpm'][0]['version'] is version_compare('7.4', '<')
-- name: RHEL8 | enable remi repository for php
+- name: RHEL8 | enable remi repository for php
   ansible.builtin.command: "dnf module enable php:remi-7.4 -y"
-  when: ansible_distribution_major_version|int >= 8
+  when: ansible_distribution_major_version | int >= 8
