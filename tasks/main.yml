@@ -385,7 +385,10 @@
     # - config
   when: not conffiles.stat.exists and not (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 - name: Ensure right permissions for conf files
-  ansible.builtin.file: "dest={{ misp_rootdir }}/app/Config/{{ item }}.php owner={{ www_user }} mode=0600"
+  ansible.builtin.file:
+    dest: "{{ misp_rootdir }}/app/Config/{{ item }}.php"
+    owner: "{{ www_user }}"
+    mode: '0640'
   with_items:
     - bootstrap
     - database
@@ -397,7 +400,7 @@
     dest: "{{ misp_rootdir }}/app/Config/database.php"
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
-    mode: '0644'
+    mode: '0640'
   with_items:
     - { regexp: 'db login', replace: "{{ misp_db_user }}" }
     - { regexp: 'db password', replace: "{{ misp_db_pass }}" }
@@ -406,13 +409,13 @@
   ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
     line: "CakePlugin::loadAll(array( 'CakeResque' => array('bootstrap' => true) ));"
-    mode: '0644'
+    mode: '0640'
 - name: Set Cache::Config - mask acceptable for snuffleupagus
   ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/bootstrap.php"
     regexp: "^Cache::config.'default', array.'engine' => 'File'.*.;"
     line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
-    mode: '0644'
+    mode: '0640'
     backup: yes
   when: misp_php_snuffleupagus_enable
 - name: Set Cache::Config whole cakephp - mask acceptable for snuffleupagus  # noqa no-tabs
@@ -427,7 +430,7 @@
   ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/core.php"
     line: "{{ item }}"
-    mode: '0644'
+    mode: '0640'
   with_items:
     - "require_once dirname(__DIR__) . '/Vendor/autoload.php';"
 
@@ -591,22 +594,23 @@
 
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
-  ansible.builtin.command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php -exec chmod 0444 {} \\;"  # noqa no-changed-when
+  ansible.builtin.command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php ! -path {{ misp_rootdir }}/app/Config/email.php -exec chmod 0444 {} \\;"  # noqa no-changed-when
   with_items:
     - '*.php'
     - '*.ctp'
   when: misp_php_snuffleupagus_enable
-- name: Ensure config files are writeable by www user
+- name: Ensure config files are writeable by www user but not the world
   ansible.builtin.file:
     dest: "{{ item }}"
     owner: "{{ www_user }}"
-    mode: '0644'
+    group: root
+    mode: '0640'
   loop:
     - "{{ misp_rootdir }}/app/Config/bootstrap.php"
     - "{{ misp_rootdir }}/app/Config/config.php"
     - "{{ misp_rootdir }}/app/Config/core.php"
     - "{{ misp_rootdir }}/app/Config/database.php"
-  when: misp_php_snuffleupagus_enable
+    - "{{ misp_rootdir }}/app/Config/email.php"
 - name: Backup cakephp
   ansible.builtin.command: >
     cp -R {{ misp_rootdir }}/app/Lib/cakephp {{ misp_rootdir }}/app/Lib/cakephp.orig

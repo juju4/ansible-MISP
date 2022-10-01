@@ -50,7 +50,7 @@ misp_passreq_lenth: 12
 ## leave empty when no proxy
 misp_proxy_scheme: ''
 misp_proxy_host: ''
-misp_proxy_port: ''
+misp_proxy_port: 0
 misp_proxy_method: ''
 misp_proxy_user: ''
 misp_proxy_pass: ''
