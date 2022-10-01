@@ -7,6 +7,7 @@
 # - debug: var=skey
 
 - name: Key file
+  when: not skey.stat.exists or skey.stat.size == 0
   block:
     - name: Generate key file - cake userInit
       ansible.builtin.shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
@@ -23,8 +24,8 @@
       ansible.builtin.set_fact:
         userkey: "{{ userinit.stdout }}"
       no_log: "{{ misp_no_log }}"
-  when: not skey.stat.exists or skey.stat.size == 0
 - name: Existing key file
+  when: skey.stat.exists
   block:
     - name: Get existing key file
       ansible.builtin.command: "cat {{ misp_key_file }}"
@@ -34,7 +35,6 @@
     - name: Set fact userkey
       ansible.builtin.set_fact:
         userkey: "{{ userinit2.stdout }}"
-  when: skey.stat.exists
 
 # - debug: var=userkey
 

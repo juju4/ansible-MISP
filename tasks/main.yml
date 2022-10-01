@@ -48,6 +48,9 @@
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Debian Docker
+  when: >
+    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and
+    ansible_os_family == "Debian"
   block:
     - name: Debian | Docker | Manually initialize mysql
       ansible.builtin.shell: >
@@ -56,11 +59,11 @@
         creates: /tmp/mysql_install_db.out
       become: yes
       become_user: mysql
-  when: >
-    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and
-    ansible_os_family == "Debian"
 
 - name: RedHat Docker
+  when: >
+    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+    and ansible_os_family == "RedHat"
   block:
     - name: RedHat | Docker | Manually initialize mysql
       ansible.builtin.shell: >
@@ -69,11 +72,10 @@
         creates: /tmp/mysql_install_db.out
       become: yes
       become_user: mysql
-  when: >
-    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
-    and ansible_os_family == "RedHat"
 
 - name: Docker
+  when: >
+    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
   block:
     - name: Docker | Manually start mysql service
       ansible.builtin.shell: >
@@ -81,14 +83,12 @@
       args:
         creates: /tmp/mysqld_safe.out
         chdir: /var/lib/mysql
-  when: >
-    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 # possible git clone issues else
 - name: RedHat | Ensure latest nss curl libcurl
   ansible.builtin.package:
     name: ['nss', 'curl', 'libcurl']
-    state: latest  # noqa 403
+    state: latest  # noqa package-latest
   when: ansible_os_family == "RedHat"
   register: pkg_result
   until: pkg_result is success
@@ -452,7 +452,7 @@
   register: salt2
   no_log: "{{ misp_no_log }}"
   when: s.stat.exists
-- name: Set salt  # noqa 503
+- name: Set salt  # noqa no-handler
   ansible.builtin.set_fact:
     salt: "{{ salt1.stdout }}"
   no_log: "{{ misp_no_log }}"
@@ -538,6 +538,9 @@
   when: ansible_os_family == "RedHat" and ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
 
 - name: Ubuntu Xenial Docker
+  when: >
+    ansible_virtualization_type is defined and ansible_virtualization_type == "docker"
+    and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
   block:
     - name: Docker redis workaround ???
       ansible.builtin.replace:
@@ -550,9 +553,6 @@
         - { re: '^PrivateTmp=yes', rep: 'PrivateTmp=no' }
         - { re: '^PrivateDevices=yes', rep: 'PrivateDevices=no' }
         # - { re: '^', rep: '' }
-  when: >
-    ansible_virtualization_type is defined and ansible_virtualization_type == "docker"
-    and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
 - name: Ensure redis is active before launching worker
   ansible.builtin.service:
     name: "{{ redis_svc }}"
@@ -591,7 +591,7 @@
 
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
-  ansible.builtin.command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php -exec chmod 0444 {} \\;"  # noqa 301
+  ansible.builtin.command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php -exec chmod 0444 {} \\;"  # noqa no-changed-when
   with_items:
     - '*.php'
     - '*.ctp'

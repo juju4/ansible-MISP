@@ -46,6 +46,7 @@
   no_log: "{{ misp_no_log }}"
 
 - name: Ubuntu xenial
+  when: ansible_distribution_release == 'xenial'
   block:
     - name: Temporary workaround - mysql57 disable strict mode
       ansible.builtin.copy:
@@ -56,4 +57,3 @@
     - name: Restart mysql
       ansible.builtin.service: name=mysql state=restarted
       when: mysqlstrict.changed
-  when: ansible_distribution_release == 'xenial'

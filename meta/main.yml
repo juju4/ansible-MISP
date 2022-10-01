@@ -29,9 +29,9 @@ galaxy_info:
     - threatintelligence
     - informationsharing
 dependencies:
-  - juju4.redhat_epel
+  - role: juju4.redhat_epel
   ## eventual dependencies for fine tuning but integration needed
-  # - geerlingguy.mysql
+  # - role: geerlingguy.mysql
   ## one or the other?
-  # - geerlingguy.nginx
-  # - geerlingguy.apache
+  # - role: geerlingguy.nginx
+  # - role: geerlingguy.apache

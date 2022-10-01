@@ -11,6 +11,7 @@
     - Restart webserver
 
 - name: Debian
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
   block:
     - name: Debian | enable misp configuration
       ansible.builtin.file:
@@ -24,7 +25,6 @@
       ansible.builtin.file: dest=/etc/nginx/sites-enabled/default state=absent
       notify:
         - Restart webserver
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Set nginx default configuration
   ansible.builtin.template: src=nginx-empty.conf.j2 dest=/etc/nginx/nginx.conf mode=0644 backup=yes

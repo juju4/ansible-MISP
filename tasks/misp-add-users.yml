@@ -73,10 +73,10 @@
   changed_when: false
 
 - name: Add users
+  when: misp_webusers_list is defined and misp_webusers_list != []
   block:
     - include_tasks: misp-add-user.yml
       vars:
         user: "{{ item }}"
         list: "{{ listusers }}"
       with_items: "{{ misp_webusers_list }}"
-  when: misp_webusers_list is defined and misp_webusers_list != []

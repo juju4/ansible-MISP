@@ -41,6 +41,7 @@
   until: pkg_result is success
 
 - name: Nginx
+  when: misp_webserver is defined and misp_webserver == 'nginx'
   block:
     - name: Set php-fpm to use socket file
       ansible.builtin.replace:
@@ -73,7 +74,6 @@
         - { re: '^group = .*$', rep: 'group = nginx' }
       notify:
         - Restart php-fpm
-  when: misp_webserver is defined and misp_webserver == 'nginx'
 
 - name: Redhat | ensure python36 site-packages directory exists
   ansible.builtin.file:
@@ -84,6 +84,7 @@
 
 # https://github.com/ansible/ansible/issues/16612
 - name: RedHat selinux facts
+  when: ansible_os_family == "RedHat"
   block:
     - name: Debug | ansible_selinux var
       ansible.builtin.debug: var=ansible_selinux
@@ -115,8 +116,11 @@
       ansible.builtin.setup:
     - name: Debug | ansible_selinux var
       ansible.builtin.debug: var=ansible_selinux
-  when: ansible_os_family == "RedHat"
 - name: RedHat selinux
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_selinux.status is defined
+    - ansible_selinux.status != 'disabled'
   block:
     - name: RedHat | Allow proxy to network connect in selinux
       seboolean:
@@ -131,7 +135,3 @@
         setype: http_port_t
         state: present
       when: misp_base_port != 80 and misp_base_port != 443
-  when:
-    - ansible_os_family == "RedHat"
-    - ansible_selinux.status is defined
-    - ansible_selinux.status != 'disabled'

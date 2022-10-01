@@ -36,6 +36,6 @@
   ansible.builtin.service: name=rng-tools state=restarted
 
 - name: Updating existing MISP submodules - minor releases
-  ansible.builtin.command: "git submodule update --init --force"  # noqa 303
+  ansible.builtin.command: "git submodule update --init --force"  # noqa command-instead-of-module
   args:
     chdir: "{{ misp_rootdir }}"
