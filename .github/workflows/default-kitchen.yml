@@ -21,7 +21,7 @@ jobs:
             version: 8-Stream
             version2: 8-Stream
             suite: default
-            experimental: false
+            experimental: true
           - distribution: ubuntu
             version: '22.04'
             version2: 2204
@@ -246,5 +246,11 @@ jobs:
           cd $GITHUB_WORKSPACE/juju4.misp
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'sudo dnf repolist' || true
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'find /etc/yum.repos.d/ -exec cat {} \;' || true
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - mysql
+        run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'mysql -e "SHOW TABLES" misp' || true
         if: ${{ always() }}
         continue-on-error: true
