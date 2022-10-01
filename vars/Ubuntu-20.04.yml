@@ -61,7 +61,8 @@ misp_pkg_list:
  - libxrender1
 
 misp_gem_list:
- - asciidoctor-pdf
+ - { name: public_suffix, v: 4.0.7 }
+ - { name: asciidoctor-pdf, v: 2.3.2 }
 
 python3_bin: python3
 python3_pip: pip3

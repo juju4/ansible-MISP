@@ -2,7 +2,8 @@
 
 - name: Install gem dependencies
   gem:
-    name: "{{ item }}"
+    name: "{{ item.name }}"
+    version: "{{ item.v | default(omit) }}"
     pre_release: yes
     state: present
     user_install: no
