@@ -252,5 +252,14 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'mysql -e "SHOW TABLES" misp' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'mysql -e "SELECT * from users;" misp' || true
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - misp
+        run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin securityAudit' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin configLint' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin live' || true
         if: ${{ always() }}
         continue-on-error: true
