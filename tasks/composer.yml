@@ -32,7 +32,7 @@
       ansible.builtin.fail: msg="FATAL! composer signature not matching."
 
 - name: Install composer
-  ansible.builtin.command: "php -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
+  ansible.builtin.command: "{{ php_bin | default('php') }} -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"
   args:
     creates: /usr/local/bin/composer
 
@@ -41,6 +41,7 @@
     command: config
     arguments: allow-plugins.composer/installers true
     working_dir: "{{ misp_rootdir }}/app"
+    executable: "{{ php_bin | default(omit) }}"
   register: pkg_result
   until: pkg_result is success
   become: yes
@@ -50,6 +51,7 @@
   community.general.composer:
     command: install
     working_dir: "{{ misp_rootdir }}/app"
+    executable: "{{ php_bin | default(omit) }}"
   register: pkg_result
   until: pkg_result is success
   become: yes
