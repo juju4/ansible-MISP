@@ -9,7 +9,7 @@
     backup: yes
 
 - name: Ensure misp web logs have right selinux context for rotation
-  sefcontext:
+  ansible.posix.sefcontext:
     target: "{{ misp_rootdir }}/app/tmp/logs(/.*)?"
     setype: httpd_log_t
     state: present

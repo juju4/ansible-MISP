@@ -26,7 +26,8 @@
 #       with_items: "{{ misp_webusers_list }}"
 #   when: misp_webusers_list is defined and misp_webusers_list
 
-- import_tasks: misp-key-file.yml
+- name: Import misp-key-file
+  ansible.builtin.import_tasks: misp-key-file.yml
 
 - name: Set local variables in PyMISP/examples/keys.py
   ansible.builtin.lineinfile:
@@ -78,7 +79,8 @@
 - name: Add users
   when: misp_webusers_list is defined and misp_webusers_list != []
   block:
-    - include_tasks: misp-add-user.yml
+    - name: Include misp-add-user
+      ansible.builtin.include_tasks: misp-add-user.yml
       vars:
         user: "{{ item }}"
         list: "{{ listusers }}"

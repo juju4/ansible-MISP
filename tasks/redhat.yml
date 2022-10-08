@@ -6,11 +6,12 @@
   until: pkg_result is success
 
 ## for php-redis
-- import_tasks: redhat-remi.yml
+- name: Import redhat-remi
+  ansible.builtin.import_tasks: redhat-remi.yml
   when: ansible_os_family == "RedHat"
 
 - name: RedHat8+ | Enable PowerTools repo
-  ini_file:
+  community.general.ini_file:
     dest: /etc/yum.repos.d/CentOS-Stream-PowerTools.repo
     section: powertools
     option: "{{ item.o }}"
@@ -123,13 +124,13 @@
     - ansible_selinux.status != 'disabled'
   block:
     - name: RedHat | Allow proxy to network connect in selinux
-      seboolean:
+      ansible.posix.seboolean:
         name: httpd_can_network_connect
         state: yes
         persistent: yes
 
     - name: RedHat | Allow httpd to listen to unusual ports
-      seport:
+      ansible.posix.seport:
         ports: "{{ misp_base_port }}"
         proto: tcp
         setype: http_port_t

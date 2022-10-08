@@ -10,15 +10,18 @@
 - name: Include webserver+distribution-specific variables
   ansible.builtin.include_vars: "{{ misp_webserver }}-{{ ansible_distribution }}.yml"
 
-- import_tasks: debian.yml
+- name: Import debian
+  ansible.builtin.import_tasks: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-- import_tasks: redhat.yml
+- name: Import redhat
+  ansible.builtin.import_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
 
 - name: Debug | misp_webserver var
   ansible.builtin.debug: var=misp_webserver
-- import_tasks: nginx.yml
+- name: Import nginx
+  ansible.builtin.import_tasks: nginx.yml
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
 - name: Ensure Random source is configured
@@ -93,7 +96,8 @@
   register: pkg_result
   until: pkg_result is success
 
-- import_tasks: redis-secure.yml
+- name: Import redis-secure
+  ansible.builtin.import_tasks: redis-secure.yml
 
 - name: Ensure archives folder exists
   ansible.builtin.file:
@@ -131,7 +135,7 @@
   when: misp_proxy_host is defined and misp_proxy_host
 
 - name: Git setup proxy
-  git_config:
+  community.general.git_config:
     name: http.proxy
     value: "{{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}"
   when: misp_proxy_host is defined and misp_proxy_host
@@ -235,7 +239,8 @@
   become_user: "{{ www_user }}"
 
 ## must be after git cloning MISP
-- import_tasks: apache2.yml
+- name: Import apache2
+  ansible.builtin.import_tasks: apache2.yml
   when: misp_webserver is not defined or misp_webserver == 'apache2'
 
 - name: Setting core.filemode for git
@@ -247,9 +252,11 @@
   become: yes
   become_user: "{{ www_user }}"
 
-- import_tasks: stix-cybox.yml
+- name: Import stix-cybox
+  ansible.builtin.import_tasks: stix-cybox.yml
 
-- import_tasks: composer.yml
+- name: Import composer
+  ansible.builtin.import_tasks: composer.yml
 
 ### https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
 ### FIXME! pecl/redis requires PHP (version >= 7.0.0, version <= 7.1.0, excluded versions: 6.0.0)
@@ -323,7 +330,8 @@
     state: touch
   when: not debuglog.stat.exists
 
-- import_tasks: mysql-configure.yml
+- name: Import mysql-configure
+  ansible.builtin.import_tasks: mysql-configure.yml
 
 - name: Extra php settings
   ansible.builtin.template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.{{ php_confext }} mode=0644"
@@ -534,10 +542,12 @@
 - name: Validate worker start.sh permissions
   ansible.builtin.file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
 
-- import_tasks: redhat-logrotate.yml
+- name: Import redhat-logrotate
+  ansible.builtin.import_tasks: redhat-logrotate.yml
   when: ansible_os_family == "RedHat"
 
-- import_tasks: selinux-context.yml
+- name: Import selinux-context
+  ansible.builtin.import_tasks: selinux-context.yml
   when: ansible_os_family == "RedHat" and ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
 
 - name: Ubuntu Xenial Docker
@@ -625,7 +635,7 @@
     remote_src: true
   when: misp_testing is defined and misp_testing
 - name: Patch cakephp with stricter casting to support sp.global_strict
-  patch:
+  ansible.posix.patch:
     src: "{{ item.s }}"
     basedir: "{{ item.b }}"
   with_items:
@@ -638,23 +648,29 @@
     - { s: patch-app-Lib-Cackephp-lib-cakephp-lib-Cake-Model-Datasource-CakeSession_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource" }
   when: misp_php_snuffleupagus_enable
 - name: Patch kamisama/php-resque-ex with stricter casting to support sp.global_strict
-  patch:
+  ansible.posix.patch:
     src: patch-php-resque-ex-master-lib-Resque-Redis.php
     basedir: "{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex/lib/Resque"
   when: misp_php_snuffleupagus_enable
 
-- import_tasks: lief.yml
+- name: Import lief
+  ansible.builtin.import_tasks: lief.yml
   when: misp_lief_enable
 
-- import_tasks: misp-modules.yml
-- import_tasks: misp-gem.yml
+- name: Import misp-modules
+  ansible.builtin.import_tasks: misp-modules.yml
+- name: Import misp-gem
+  ansible.builtin.import_tasks: misp-gem.yml
 
-- import_tasks: testing.yml
+- name: Import testing
+  ansible.builtin.import_tasks: testing.yml
   when: misp_testing is defined and misp_testing
 
-- import_tasks: misp-add-users.yml
+- name: Import misp-add-users
+  ansible.builtin.import_tasks: misp-add-users.yml
 
-- import_tasks: misp-feeds.yml
+- name: Import misp-feed
+  ansible.builtin.import_tasks: misp-feeds.yml
 
 ## or use tools/misp-backup/misp-backup.sh ?
 - name: Ensure scriptsdir directory exists

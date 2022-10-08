@@ -1,7 +1,7 @@
 ---
 
 - name: Creating mysql misp db
-  mysql_db:
+  community.mysql.mysql_db:
     name: misp
     state: present
     login_user: "{{ misp_mysql_user | default(omit) }}"
@@ -21,7 +21,7 @@
   when: ansible_distribution_major_version == '7'
 
 - name: Importing mysql misp db template
-  mysql_db:
+  community.mysql.mysql_db:
     name: misp
     state: import
     target: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
@@ -36,7 +36,7 @@
     state: touch
   when: not mispdbloaded.stat.exists
 - name: Creating mysql misp db user
-  mysql_user:
+  community.mysql.mysql_user:
     name: "{{ misp_db_user }}"
     password: "{{ misp_db_pass }}"
     priv: "*.*:USAGE/misp.*:ALL"

@@ -1,7 +1,7 @@
 ---
 
 - name: Install gem dependencies
-  gem:
+  community.general.gem:
     name: "{{ item.name }}"
     version: "{{ item.v | default(omit) }}"
     pre_release: yes

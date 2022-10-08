@@ -21,7 +21,7 @@
   when: ansible_os_family == 'Debian'
 
 - name: Debian | ensure required modules are present
-  apache2_module:
+  community.general.apache2_module:
     state: present
     name: "{{ item }}"
   with_items:

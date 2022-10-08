@@ -5,7 +5,8 @@
   changed_when: false
   failed_when: false
 
-- import_tasks: travis.yml
+- name: Import travis
+  ansible.builtin.import_tasks: travis.yml
 
 - name: Install testing tools
   ansible.builtin.package:
@@ -68,7 +69,8 @@
 #     backup: yes
 #     force: yes
 
-- import_tasks: misp-key-file.yml
+- name: Import misp-key-file
+  ansible.builtin.import_tasks: misp-key-file.yml
 
 - name: MISP tree permissions
   ## break .gnupg if applied to whole tree
