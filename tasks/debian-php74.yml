@@ -1,9 +1,11 @@
 ---
 
-- import_tasks: debian-php74.yml
-  when: ansible_distribution_release == 'jammy'
 
-- name: Debian | MISP dependencies install
+- name: Debian PHP7.4 | Add ondrej/php repository from PPA
+  ansible.builtin.apt_repository:
+    repo: ppa:ondrej/php
+
+- name: Debian PHP7.4 | Ensure php is present
   ansible.builtin.apt:
     name: "{{ misp_pkg_list + webserver }}"
     state: present
