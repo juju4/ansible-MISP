@@ -130,7 +130,7 @@
         persistent: yes
 
     - name: RedHat | Allow httpd to listen to unusual ports
-      ansible.posix.seport:
+      community.general.seport:
         ports: "{{ misp_base_port }}"
         proto: tcp
         setype: http_port_t
