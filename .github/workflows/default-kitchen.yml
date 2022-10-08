@@ -140,6 +140,7 @@ jobs:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_LOCAL_YAML: $GITHUB_WORKSPACE/juju4.misp/.kitchen.yml
           TERM: xterm-256color
+        if: ${{ version }} != '20.04'
 
       - name: On failure
         run: |
