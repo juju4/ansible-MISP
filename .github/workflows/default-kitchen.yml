@@ -256,6 +256,15 @@ jobs:
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'mysql -e "SELECT * from users;" misp' || true
         if: ${{ always() }}
         continue-on-error: true
+      - name: After script - php
+        run: |
+          cd $GITHUB_WORKSPACE/juju4.misp
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'which php' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'which php7.4' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'dpkg -L php' || true
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'dpkg -L php7.4' || true
+        if: ${{ always() }}
+        continue-on-error: true
       - name: After script - misp
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp
