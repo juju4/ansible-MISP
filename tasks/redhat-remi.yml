@@ -7,6 +7,7 @@
 - name: Show packages
   ansible.builtin.debug:
     var: ansible_facts.packages
+    verbosity: 3
 
 - name: Import Remi rpm repository keys
   ansible.builtin.rpm_key:
