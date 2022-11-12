@@ -2,15 +2,15 @@
 
 - hosts: all
   vars:
-    - misp_webserver: 'nginx'
-    - misp_testing: true
-    - misp_testing_user: _misp
-    - misp_testing_user_home: "/home/{{ misp_testing_user }}"
-    - misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
-    - misp_base_url: http://localhost
-    - misp_webusers_list:
-        - { u: dupont@admin.test, p: dupont_passphrase. }
-        - { u: dupond@admin.test, p: dupond_passphrase. }
+    misp_webserver: 'nginx'
+    misp_testing: true
+    misp_testing_user: _misp
+    misp_testing_user_home: "/home/{{ misp_testing_user }}"
+    misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
+    misp_base_url: http://localhost
+    misp_webusers_list:
+      - { u: dupont@admin.test, p: dupont_passphrase. }
+      - { u: dupond@admin.test, p: dupond_passphrase. }
   roles:
     # - geerlingguy.apache
     - juju4.misp
