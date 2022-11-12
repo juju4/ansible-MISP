@@ -1,5 +1,13 @@
 ---
 
+- name: Debian PHP7.4 | Ensure gnupg is present
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  register: pkg_result
+  until: pkg_result is success
 
 - name: Debian PHP7.4 | Add ondrej/php repository from PPA
   ansible.builtin.apt_repository:
