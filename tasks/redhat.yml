@@ -40,6 +40,19 @@
   register: pkg_result
   until: pkg_result is success
 
+# possible git clone issues else
+- name: RedHat | Remove libcurl-minimal
+  ansible.builtin.package:
+    name: libcurl-minimal
+    state: absent
+- name: RedHat | Ensure latest nss curl libcurl
+  ansible.builtin.package:
+    name: ['nss', 'curl', 'libcurl']
+    state: latest  # noqa package-latest
+  when: ansible_os_family == "RedHat"
+  register: pkg_result
+  until: pkg_result is success
+
 - name: Nginx
   when: misp_webserver is defined and misp_webserver == 'nginx'
   block:

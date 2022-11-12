@@ -91,15 +91,6 @@
         creates: /tmp/mysqld_safe.out
         chdir: /var/lib/mysql
 
-# possible git clone issues else
-- name: RedHat | Ensure latest nss curl libcurl
-  ansible.builtin.package:
-    name: ['nss', 'curl', 'libcurl']
-    state: latest  # noqa package-latest
-  when: ansible_os_family == "RedHat"
-  register: pkg_result
-  until: pkg_result is success
-
 - name: Import redis-secure
   ansible.builtin.import_tasks: redis-secure.yml
 
