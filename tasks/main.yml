@@ -61,7 +61,7 @@
   block:
     - name: Debian | Docker | Manually initialize mysql
       ansible.builtin.shell: >
-        mysqld --initialize --datadir='/var/lib/mysql' > /tmp/mysql_install_db.out 2>&1
+        mysqld --initialize --datadir='/var/lib/mysql' 2>&1 | tee /tmp/mysql_install_db.out
       args:
         creates: /tmp/mysql_install_db.out
       become: yes
