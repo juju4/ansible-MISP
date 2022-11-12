@@ -1,0 +1,18 @@
+---
+
+www_user: apache
+apache_svc: httpd
+apache_confdir: /etc/httpd/conf.d
+apache_sitedir: /etc/httpd/conf.d
+apachesslconf: /etc/apache2/sites-enabled/default-ssl.conf
+apache_logs: /var/log/httpd
+modsecurity_conf: /etc/httpd/conf.d/mod_security.conf
+modsecurity_active: /etc/httpd/modsecurity.d/activated_rules
+php_ini: /etc/php.ini
+
+webserver: "{{ misp_webserver_apache2 }}"
+
+misp_services:
+    - "{{ apache_svc }}"
+    - "{{ mysql_svc }}"
+    - "{{ rng_svc }}"
