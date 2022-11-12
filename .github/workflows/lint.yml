@@ -4,6 +4,7 @@ name: lint
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,11 +13,15 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 4
+    env:
+      ANSIBLE_CALLBACKS_ENABLED: profile_tasks
+      ANSIBLE_EXTRA_VARS: ""
+      ANSIBLE_ROLE: juju4.misp
 
     steps:
       - uses: actions/checkout@v2
         with:
-          path: juju4.misp
+          path: ${{ env.ANSIBLE_ROLE }}
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -32,17 +37,36 @@ jobs:
           ls -l /opt/hostedtoolcache/Python/3.9.1/x64/bin || true
           echo "/opt/hostedtoolcache/Python/3.9.1/x64/bin" >> $GITHUB_PATH
           ansible --version
-          cd $GITHUB_WORKSPACE/juju4.misp
+          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE
+          [ -f molecule/default/requirements.yml ] && ansible-galaxy install -r molecule/default/requirements.yml
           [ -f get-dependencies.sh ] && sh -x get-dependencies.sh
           { echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
+      - name: Fetch central settings repository
+        run: |
+          export settings_repo="https://raw.githubusercontent.com/juju4/ansible-ci-settings/main"
+          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE
+          set -x
+          curl -o requirements.txt "$settings_repo/requirements.txt"
+          curl -o .ansible-lint "$settings_repo/.ansible-lint"
+          curl -o .yamllint "$settings_repo/.yamllint"
+          pip install -r requirements.txt
+        continue-on-error: true
       - name: Environment
         run: |
           pwd
           env
-          find -ls
+          find . -ls
+      - uses: codespell-project/actions-codespell@master
+        with:
+          ignore_words_file: ${{ env.ANSIBLE_ROLE }}/.codespellignore
+          skip: .git
+          path: ${{ env.ANSIBLE_ROLE }}
+        if: ${{ always() }}
       - name: yamllint
         run: |
-          cd $GITHUB_WORKSPACE/juju4.misp && yamllint .
+          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && yamllint .
+        if: ${{ always() }}
       - name: ansible-lint
         run: |
-          cd $GITHUB_WORKSPACE/juju4.misp && ansible-lint
+          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && ansible-lint
+        if: ${{ always() }}
