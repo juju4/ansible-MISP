@@ -8,7 +8,8 @@
     login_password: "{{ misp_mysql_pass | default(omit) }}"
   no_log: "{{ misp_no_log }}"
 - name: Check if mysql import done
-  ansible.builtin.stat: path=/root/.mysql_misp_imported
+  ansible.builtin.stat:
+    path: /root/.mysql_misp_imported
   register: mispdbloaded
 
 - name: Pre-mysql5.6 | force MyISAM mysql engine to support FULLTEXT indexes
@@ -55,5 +56,7 @@
         mode: 0644
       register: mysqlstrict
     - name: Restart mysql
-      ansible.builtin.service: name=mysql state=restarted
+      ansible.builtin.service:
+        name: mysql
+        state: restarted
       when: mysqlstrict.changed

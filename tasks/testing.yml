@@ -45,11 +45,17 @@
   become_user: "{{ www_user }}"
 
 - name: Ensure test user in group of web server
-  ansible.builtin.user: "user={{ misp_testing_user }} groups={{ www_user }} append=yes"
+  ansible.builtin.user:
+    user: "{{ misp_testing_user }}"
+    groups: "{{ www_user }}"
+    append: "yes"
   become: yes
 
 - name: Check home permissions
-  ansible.builtin.file: dest={{ item }} mode=0755 state=directory
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    mode: "0755"
+    state: "directory"
   with_items:
     - "{{ misp_testing_user_home }}/build"
     - "{{ misp_testing_user_home }}"
@@ -57,7 +63,11 @@
 
 # Get authkey
 - name: Check world-writeable permissions
-  ansible.builtin.file: "dest={{ item }} mode=0777 owner={{ misp_testing_user }} recurse=yes"
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    mode: "0777"
+    owner: "{{ misp_testing_user }}"
+    recurse: "yes"
   with_items:
     - "{{ misp_rootdir }}/build"
     - "{{ misp_rootdir }}/tests"
@@ -75,10 +85,16 @@
 - name: MISP tree permissions
   ## break .gnupg if applied to whole tree
   # file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=755 recurse=yes"
-  ansible.builtin.file: "dest={{ misp_rootdir }} owner={{ www_user }} mode=0755"
+  ansible.builtin.file:
+    dest: "{{ misp_rootdir }}"
+    owner: "{{ www_user }}"
+    mode: 0755
   become: yes
 - name: MISP tree permissions
-  ansible.builtin.file: "dest={{ item }} owner={{ www_user }} mode=0755"
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    owner: "{{ www_user }}"
+    mode: 0755
   ## Note: recurse is only valid if directory and can't select them from fileglob
   # with_fileglob:
   #   - "{{ misp_rootdir }}/*"
@@ -111,9 +127,11 @@
     recurse: yes
 
 - name: Debug | misp_base_url var
-  ansible.builtin.debug: var=misp_base_url
+  ansible.builtin.debug:
+    var: misp_base_url
 - name: Debug | userinit var
-  ansible.builtin.debug: var=userinit
+  ansible.builtin.debug:
+    var: userinit
 - name: Set local variables in PyMISP/tests/keys.py
   ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/PyMISP/tests/keys.py"

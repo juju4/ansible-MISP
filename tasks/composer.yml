@@ -25,11 +25,14 @@
   when: installer.stat.checksum != installersig.stdout
   block:
     - name: Debug | installer var
-      ansible.builtin.debug: var=installer.stat.checksum
+      ansible.builtin.debug:
+        var: installer.stat.checksum
     - name: Debug | installersig var
-      ansible.builtin.debug: var=installersig.stdout
+      ansible.builtin.debug:
+        var: installersig.stdout
     - name: Check composer signature
-      ansible.builtin.fail: msg="FATAL! composer signature not matching."
+      ansible.builtin.fail:
+        msg: "FATAL! composer signature not matching."
 
 - name: Install composer
   ansible.builtin.command: "{{ php_bin | default('php') }} -q /tmp/composer-installer.php --install-dir=/usr/local/bin --filename=composer"

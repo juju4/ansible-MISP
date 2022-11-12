@@ -13,7 +13,9 @@
     - Restart webserver - docker,redhat
 
 - name: Debian | Disable default apache config
-  ansible.builtin.file: dest=/etc/apache2/sites-enabled/000-default.conf state=absent
+  ansible.builtin.file:
+    dest: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
   notify:
     - Restart webserver
     - Restart webserver - docker,debian

@@ -1,7 +1,8 @@
 ---
 
 - name: Check if existing key file
-  ansible.builtin.stat: "path={{ misp_key_file }}"
+  ansible.builtin.stat:
+    path: "{{ misp_key_file }}"
   register: skey
 
 # - debug: var=skey
@@ -40,5 +41,6 @@
 
 ## FIXME! fail if returns 'Script aborted: MISP instance already initialised.'
 - name: Check no script error
-  ansible.builtin.fail: msg="Fatal! error retrieving user key"
+  ansible.builtin.fail:
+    msg: "Fatal! error retrieving user key"
   when: "'Script aborted: MISP instance already initialised.' in userkey or not userkey"

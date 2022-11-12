@@ -1,12 +1,17 @@
 ---
 
 - name: Debug | apache_sitedir var
-  ansible.builtin.debug: var=apache_sitedir
+  ansible.builtin.debug:
+    var: apache_sitedir
 - name: Debug | ansible_distribution var
-  ansible.builtin.debug: var=ansible_distribution
+  ansible.builtin.debug:
+    var: ansible_distribution
 
 - name: Set misp nginx configuration
-  ansible.builtin.template: src=nginx-misp.conf.j2 dest={{ apache_sitedir }}/misp.conf mode=0644
+  ansible.builtin.template:
+    src: nginx-misp.conf.j2
+    dest: "{{ apache_sitedir }}/misp.conf"
+    mode: 0644
   notify:
     - Restart webserver
 
@@ -22,12 +27,18 @@
       notify:
         - Restart webserver
     - name: Debian | disable default configuration
-      ansible.builtin.file: dest=/etc/nginx/sites-enabled/default state=absent
+      ansible.builtin.file:
+        dest: /etc/nginx/sites-enabled/default
+        state: absent
       notify:
         - Restart webserver
 
 - name: Set nginx default configuration
-  ansible.builtin.template: src=nginx-empty.conf.j2 dest=/etc/nginx/nginx.conf mode=0644 backup=yes
+  ansible.builtin.template:
+    src: nginx-empty.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: 0644
+    backup: yes
   notify:
     - Restart webserver
   when: ansible_os_family == "RedHat"

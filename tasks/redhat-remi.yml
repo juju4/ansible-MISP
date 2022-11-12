@@ -5,7 +5,8 @@
     manager: "auto"
 
 - name: Show packages
-  ansible.builtin.debug: var=ansible_facts.packages
+  ansible.builtin.debug:
+    var: ansible_facts.packages
 
 - name: Import Remi rpm repository keys
   ansible.builtin.rpm_key:
@@ -19,20 +20,23 @@
   until: pkg_result is success
 
 - name: RedHat6 | Install Remi repo
-  ansible.builtin.yum: name=http://rpms.remirepo.net/enterprise/remi-release-6.rpm
-       state=present
+  ansible.builtin.yum:
+    name: http://rpms.remirepo.net/enterprise/remi-release-6.rpm
+    state: present
   when: ansible_distribution_major_version == "6" and 'remi-release' not in ansible_facts.packages
   register: pkg_result
   until: pkg_result is success
 - name: RedHat7 | Install Remi repo
-  ansible.builtin.yum: name=http://rpms.remirepo.net/enterprise/remi-release-7.rpm
-       state=present
+  ansible.builtin.yum:
+    name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    state: present
   when: ansible_distribution_major_version == "7" and 'remi-release' not in ansible_facts.packages
   register: pkg_result
   until: pkg_result is success
 - name: RedHat8 | Install Remi repo
-  ansible.builtin.yum: name=http://rpms.remirepo.net/enterprise/remi-release-8.rpm
-       state=present
+  ansible.builtin.yum:
+    name: http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+    state: present
   when: ansible_distribution_major_version == "8" and 'remi-release' not in ansible_facts.packages
   register: pkg_result
   until: pkg_result is success

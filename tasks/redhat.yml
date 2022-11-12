@@ -1,7 +1,10 @@
 ---
 
 - name: Redhat | remi yum-utils
-  ansible.builtin.yum: name=yum-utils state=present update_cache=yes
+  ansible.builtin.yum:
+    name: yum-utils
+    state: present
+    update_cache: yes
   register: pkg_result
   until: pkg_result is success
 
@@ -61,7 +64,12 @@
         - Restart php-fpm
 
     - name: Ensure socket dir exists
-      ansible.builtin.file: dest=/var/run/php-fpm state=directory owner=nobody group=nobody mode=0755
+      ansible.builtin.file:
+        dest: /var/run/php-fpm
+        state: directory
+        owner: nobody
+        group: nobody
+        mode: 0755
 
     - name: Set php-fpm user/group to nginx
       ansible.builtin.replace:
@@ -88,7 +96,8 @@
   when: ansible_os_family == "RedHat"
   block:
     - name: Debug | ansible_selinux var
-      ansible.builtin.debug: var=ansible_selinux
+      ansible.builtin.debug:
+        var: ansible_selinux
     - name: RedHat7- | Ensure selinux dependencies are present
       ansible.builtin.package:
         name:
@@ -116,7 +125,8 @@
     - name: Re-collect facts
       ansible.builtin.setup:
     - name: Debug | ansible_selinux var
-      ansible.builtin.debug: var=ansible_selinux
+      ansible.builtin.debug:
+        var: ansible_selinux
 - name: RedHat selinux
   when:
     - ansible_os_family == "RedHat"

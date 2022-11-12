@@ -1,6 +1,8 @@
 ---
 - name: Restart webserver
-  ansible.builtin.service: name={{ apache_svc }} state=restarted
+  ansible.builtin.service:
+    name: "{{ apache_svc }}"
+    state: "restarted"
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Restart webserver - docker,debian
@@ -30,10 +32,14 @@
     - ansible_os_family == "RedHat"
 
 - name: Restart php-fpm
-  ansible.builtin.service: name=php-fpm state=restarted
+  ansible.builtin.service:
+    name: php-fpm
+    state: restarted
 
 - name: Restart rng-tools
-  ansible.builtin.service: name=rng-tools state=restarted
+  ansible.builtin.service:
+    name: rng-tools
+    state: restarted
 
 - name: Updating existing MISP submodules - minor releases
   ansible.builtin.command: "git submodule update --init --force"  # noqa command-instead-of-module

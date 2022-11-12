@@ -19,7 +19,8 @@
   when: ansible_os_family == "RedHat"
 
 - name: Debug | misp_webserver var
-  ansible.builtin.debug: var=misp_webserver
+  ansible.builtin.debug:
+    var: misp_webserver
 - name: Import nginx
   ansible.builtin.import_tasks: nginx.yml
   when: misp_webserver is defined and misp_webserver == 'nginx'
@@ -46,7 +47,10 @@
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Ensure services are enabled and started
-  ansible.builtin.service: "name={{ item }} state=started enabled=yes"
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: "started"
+    enabled: "yes"
   with_items: "{{ misp_services }}"
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
@@ -156,7 +160,8 @@
     state: directory
 
 - name: Check if MISP folder already present
-  ansible.builtin.stat: path={{ misp_rootdir }}/INSTALL
+  ansible.builtin.stat:
+    path: "{{ misp_rootdir }}/INSTALL"
   register: m
 - name: Git clone MISP
   ansible.builtin.git:
@@ -278,7 +283,12 @@
     backup: yes
 
 - name: Validate permissions
-  ansible.builtin.file: "dest={{ item.f }} mode={{ item.m }} owner={{ www_user }} group={{ www_user }} state=directory"
+  ansible.builtin.file:
+    dest: "{{ item.f }}"
+    mode: "{{ item.m }}"
+    owner: "{{ www_user }}"
+    group: "{{ www_user }}"
+    state: "directory"
   with_items:
     - { f: "{{ misp_rootdir }}", m: '0755' }
     - { f: "{{ misp_rootdir }}/app/files", m: '2775' }
@@ -319,7 +329,8 @@
     - "{{ misp_rootdir }}/app/tmp/cached_exports/xml"
     - "{{ misp_rootdir }}/app/tmp/cached_exports/rpz"
 - name: Check if debug.log exists
-  ansible.builtin.stat: path="{{ misp_rootdir }}/app/tmp/debug.log"
+  ansible.builtin.stat:
+    path: "{{ misp_rootdir }}/app/tmp/debug.log"
   register: debuglog
 - name: Touch debug.log
   ansible.builtin.file:
@@ -334,7 +345,10 @@
   ansible.builtin.import_tasks: mysql-configure.yml
 
 - name: Extra php settings
-  ansible.builtin.template: "src=misp-php.ini.j2 dest={{ php_confdir }}/misp-php.{{ php_confext }} mode=0644"
+  ansible.builtin.template:
+    src: "misp-php.ini.j2"
+    dest: "{{ php_confdir }}/misp-php.{{ php_confext }}"
+    mode: "0644"
   notify:
     - Restart webserver
     - Restart webserver - docker,debian
@@ -364,7 +378,8 @@
     (misp_webserver is not defined or misp_webserver == 'apache2')
 
 - name: Check if bootstrap.php exists
-  ansible.builtin.stat: path={{ misp_rootdir }}/app/Config/bootstrap.php
+  ansible.builtin.stat:
+    path: "{{ misp_rootdir }}/app/Config/bootstrap.php"
   register: conffiles
 - name: Create config files from default
   ansible.builtin.copy:
@@ -455,7 +470,8 @@
   tags:
     - salt
 - name: Check if .salt exists
-  ansible.builtin.stat: path="{{ misp_rootdir }}/.salt"
+  ansible.builtin.stat:
+    path: "{{ misp_rootdir }}/.salt"
   register: s
 - name: Recover existing salt
   ansible.builtin.command: "cat {{ misp_rootdir }}/.salt"
@@ -486,10 +502,15 @@
     - salt
 
 - name: Check if webroot gpg.asc exists
-  ansible.builtin.stat: "path={{ misp_rootdir }}/app/webroot/gpg.asc"
+  ansible.builtin.stat:
+    path: "{{ misp_rootdir }}/app/webroot/gpg.asc"
   register: gkey
 - name: Create gpg configuration template
-  ansible.builtin.template: "src=gpg-template.j2 dest=/var/tmp/gpg-template owner={{ www_user }} mode=0600"
+  ansible.builtin.template:
+    src: "gpg-template.j2"
+    dest: "/var/tmp/gpg-template"
+    owner: "{{ www_user }}"
+    mode: "0600"
   when: not gkey.stat.exists
 - name: Redhat | start gpg-agent
   ansible.builtin.command: "gpg-agent --daemon --homedir={{ misp_rootdir }}/.gnupg"
@@ -540,7 +561,9 @@
         )
 
 - name: Validate worker start.sh permissions
-  ansible.builtin.file: dest={{ misp_rootdir }}/app/Console/worker/start.sh mode=0755
+  ansible.builtin.file:
+    dest: "{{ misp_rootdir }}/app/Console/worker/start.sh"
+    mode: "0755"
 
 - name: Import redhat-logrotate
   ansible.builtin.import_tasks: redhat-logrotate.yml
@@ -674,13 +697,26 @@
 
 ## or use tools/misp-backup/misp-backup.sh ?
 - name: Ensure scriptsdir directory exists
-  ansible.builtin.file: path={{ scriptsdir }} state=directory mode=0755
+  ansible.builtin.file:
+    path: "{{ scriptsdir }}"
+    state: "directory"
+    mode: "0755"
 - name: Add backup script
-  ansible.builtin.template: src=backup-misp.sh.j2 dest={{ scriptsdir }}/backup-misp.sh mode=0755
+  ansible.builtin.template:
+    src: "backup-misp.sh.j2"
+    dest: "{{ scriptsdir }}/backup-misp.sh"
+    mode: "0755"
 - name: Add restore script
-  ansible.builtin.template: src=restore-misp.sh.j2 dest={{ scriptsdir }}/restore-misp.sh mode=0755
+  ansible.builtin.template:
+    src: "restore-misp.sh.j2"
+    dest: "{{ scriptsdir }}/restore-misp.sh"
+    mode: "0755"
 - name: Setup cron backup
-  ansible.builtin.cron: name="misp-backup" minute="30" hour="3" weekday="0"
-    job="{{ scriptsdir }}/backup-misp.sh > /dev/null 2>&1"
-    user=root
-    cron_file=ansible_misp-backup
+  ansible.builtin.cron:
+    name: "misp-backup"
+    minute: "30"
+    hour: "3"
+    weekday: "0"
+    job: "{{ scriptsdir }}/backup-misp.sh > /dev/null 2>&1"
+    user: root
+    cron_file: ansible_misp-backup
