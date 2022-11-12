@@ -1,0 +1,31 @@
+---
+
+- name: Converge
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+  remote_user: root
+  pre_tasks:
+    - name: Ubuntu | Install python3
+      ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
+      register: python3
+      changed_when: "'installed' in python3.stdout"
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+    - name: RedHat | Install python3
+      ansible.builtin.raw: test -e /usr/bin/python3 || (yum install -y python3)
+      register: python3
+      changed_when: "'installed' in python3.stdout"
+      when: (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    - name: Gather Facts
+      ansible.builtin.setup:
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+    - name: Ubuntu Bionic+, Redhat 8+ | Enforce python3 for ansible
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+      when: >
+        (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16) or
+        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+  roles:
+    - juju4.misp

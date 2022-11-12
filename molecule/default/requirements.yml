@@ -1,0 +1,20 @@
+---
+
+collections:
+  - ansible.posix
+
+roles:
+  - src: https://github.com/juju4/ansible-redhat-epel/
+    version: master
+    name: juju4.redhat_epel
+  - src: https://github.com/juju4/ansible-harden-apache/
+    version: master
+    name: juju4.harden_apache
+  - src: https://github.com/juju4/ansible-harden-nginx/
+    version: master
+    name: juju4.harden_nginx
+  - src: https://github.com/juju4/ansible-faup/
+    version: master
+    name: juju4.faup
+  - name: geerlingguy.nginx
+  - name: geerlingguy.apache
