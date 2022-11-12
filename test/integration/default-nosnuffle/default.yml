@@ -1,35 +1,36 @@
 ---
 
-- hosts: all
+- name: Test playbook - nosnuffle
+  hosts: all
   vars:
-    - misp_testing: true
-    - misp_testing_user: _misp
-    - misp_testing_user_home: "/home/{{ misp_testing_user }}"
-    - misp_testing_key_file: "{{ misp_key_file }}"
-    # - misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
-    - misp_base_url: https://localhost
-    - misp_base_ip: 127.0.0.1
-    - misp_base_port: 443
-    - misp_webusers_list:
-        - { p: 'dupont_passphrase.', email: dupont@localhost.local, org: 1, role: 2 }
-        - { p: 'dupond_passphrase.', email: dupond@localhost.local, org: 1, role: 4 }
-        # - { p: 'dupond_passphrase.', email: dupona@localhost.local, org: 1, role: 4 }
-    - misp_no_log: false
-    - hardenwebserver_enable_defaultssl: false
-    - harden_php_disable_functions: 'pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,chown,diskfreespace,disk_free_space,disk_total_space,dl,exec,escapeshellarg,escapeshellcmd,fileinode,highlight_file,max_execution_time,passthru,pclose,phpinfo,popen,proc_close,proc_open,proc_get_status,proc_nice,proc_terminate,shell_exec,show_source,system,__construct, __destruct, __call,__wakeup'
-    - misp_php_snuffleupagus_enable: false
-    - harden_php7_snuffleupagus: false
-    - harden_apache_php_variants: ['apache2']
+    misp_testing: true
+    misp_testing_user: _misp
+    misp_testing_user_home: "/home/{{ misp_testing_user }}"
+    misp_testing_key_file: "{{ misp_key_file }}"
+    # misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
+    misp_base_url: https://localhost
+    misp_base_ip: 127.0.0.1
+    misp_base_port: 443
+    misp_webusers_list:
+      - { p: 'dupont_passphrase.', email: dupont@localhost.local, org: 1, role: 2 }
+      - { p: 'dupond_passphrase.', email: dupond@localhost.local, org: 1, role: 4 }
+      # - { p: 'dupond_passphrase.', email: dupona@localhost.local, org: 1, role: 4 }
+    misp_no_log: false
+    hardenwebserver_enable_defaultssl: false
+    harden_php_disable_functions: 'pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,chown,diskfreespace,disk_free_space,disk_total_space,dl,exec,escapeshellarg,escapeshellcmd,fileinode,highlight_file,max_execution_time,passthru,pclose,phpinfo,popen,proc_close,proc_open,proc_get_status,proc_nice,proc_terminate,shell_exec,show_source,system,__construct, __destruct, __call,__wakeup'
+    misp_php_snuffleupagus_enable: false
+    harden_php7_snuffleupagus: false
+    harden_apache_php_variants: ['apache2']
   pre_tasks:
-    - name: php-cli hardening for Composer
-      set_fact:
+    - name: Php-cli hardening for Composer
+      ansible.builtin.set_fact:
         harden_php_allow_url_fopen: On
         harden_php_disable_functions: 'pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,chown,diskfreespace,disk_free_space,disk_total_space,dl,exec,escapeshellarg,escapeshellcmd,fileinode,highlight_file,max_execution_time,passthru,pclose,phpinfo,popen,proc_nice,proc_terminate,shell_exec,show_source,system,__construct, __destruct, __call,__wakeup'
       when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
     - name: Bionic | set Lief version without compilation for test speed
-      set_fact:
+      ansible.builtin.set_fact:
         misp_lief_version: 0.12.1
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int == 18
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 18
   roles:
     # - geerlingguy.apache
     - juju4.harden_apache

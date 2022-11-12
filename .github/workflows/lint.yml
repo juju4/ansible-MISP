@@ -60,7 +60,7 @@ jobs:
         with:
           ignore_words_file: ${{ env.ANSIBLE_ROLE }}/.codespellignore
           skip: .git
-          exclude_file: pgp-09e2cd4944e6cbcd.asc
+          exclude_file: "*/files/pgp-09e2cd4944e6cbcd.asc"
           path: ${{ env.ANSIBLE_ROLE }}
         if: ${{ always() }}
       - name: yamllint

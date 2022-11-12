@@ -1,6 +1,7 @@
 ---
 
-- hosts: all
+- name: Test playbook
+  hosts: all
   vars:
     misp_testing: true
     misp_testing_user: _misp
@@ -39,11 +40,11 @@
           - { d: /var/www/.cache/pip, s: directory, m: '0755', o: "www-data" }
           - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/build", s: directory, m: '0755', o: "www-data" }
           - { d: "{{ toolsetdir }}/faup/src/lib/bindings/python/pyfaup.egg-info", s: directory, m: '0755', o: "www-data" }
-      when: ansible_distribution == "Ubuntu" and ansible_distribution_version.split('.')[0]|int >= 18
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_version.split('.')[0] | int >= 18
     - name: Bionic | set Lief version without compilation for test speed
       ansible.builtin.set_fact:
         misp_lief_version: 0.12.1
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int == 18
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 18
   roles:
     # - geerlingguy.apache
     - juju4.harden_apache
