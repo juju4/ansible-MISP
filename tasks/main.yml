@@ -551,11 +551,6 @@
           (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
         )
 
-- name: Validate worker start.sh permissions
-  ansible.builtin.file:
-    dest: "{{ misp_rootdir }}/app/Console/worker/start.sh"
-    mode: "0755"
-
 - name: Import redhat-logrotate
   ansible.builtin.import_tasks: redhat-logrotate.yml
   when: ansible_os_family == "RedHat"
@@ -595,26 +590,6 @@
   args:
     creates: /tmp/redis.out
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
-
-- name: Check if worker active
-  ansible.builtin.command: "ps axu"
-  register: ps
-  changed_when: false
-# - debug: var=ps.stdout_lines
-- name: Start MISP worker
-  ansible.builtin.command: "bash {{ misp_rootdir }}/app/Console/worker/start.sh"
-  become: yes
-  become_user: "{{ www_user }}"
-  when: misp_rootdir + '/app/Vendor/kamisama/php-resque-ex' not in ps.stdout
-
-- name: Add MISP worker script for boot
-  ansible.builtin.lineinfile:
-    dest: /etc/rc.local
-    line: "sudo -H -u {{ www_user }} bash {{ misp_rootdir }}/app/Console/worker/start.sh"
-    mode: '0755'
-    insertbefore: "^exit 0"
-    backup: yes
-    create: yes
 
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
