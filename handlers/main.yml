@@ -46,3 +46,8 @@
   ansible.builtin.command: "git submodule update --init --force"  # noqa command-instead-of-module
   args:
     chdir: "{{ misp_rootdir }}"
+
+- name: Supervisor update
+  ansible.builtin.service:
+    name: "{{ supervisor_service }}"
+    state: "restarted"

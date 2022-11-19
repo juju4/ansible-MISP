@@ -1,0 +1,67 @@
+{{ ansible_managed | comment }}
+[group:misp-workers]
+programs=default,email,cache,prio,update
+
+[program:default]
+directory={{ misp_rootdir }}
+command={{ misp_rootdir }}/app/Console/cake start_worker default
+process_name=%(program_name)s_%(process_num)02d
+numprocs=5
+autostart=true
+autorestart=true
+redirect_stderr=false
+stderr_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers-errors.log
+stdout_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers.log
+directory={{ misp_rootdir }}
+user={{ www_user }}
+
+[program:prio]
+directory={{ misp_rootdir }}
+command={{ misp_rootdir }}/app/Console/cake start_worker prio
+process_name=%(program_name)s_%(process_num)02d
+numprocs=5
+autostart=true
+autorestart=true
+redirect_stderr=false
+stderr_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers-errors.log
+stdout_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers.log
+directory={{ misp_rootdir }}
+user={{ www_user }}
+
+[program:email]
+directory={{ misp_rootdir }}
+command={{ misp_rootdir }}/app/Console/cake start_worker email
+process_name=%(program_name)s_%(process_num)02d
+numprocs=5
+autostart=true
+autorestart=true
+redirect_stderr=false
+stderr_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers-errors.log
+stdout_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers.log
+directory={{ misp_rootdir }}
+user={{ www_user }}
+
+[program:update]
+directory={{ misp_rootdir }}
+command={{ misp_rootdir }}/app/Console/cake start_worker update
+process_name=%(program_name)s_%(process_num)02d
+numprocs=1
+autostart=true
+autorestart=true
+redirect_stderr=false
+stderr_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers-errors.log
+stdout_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers.log
+directory={{ misp_rootdir }}
+user={{ www_user }}
+
+[program:cache]
+directory={{ misp_rootdir }}
+command={{ misp_rootdir }}/app/Console/cake start_worker cache
+process_name=%(program_name)s_%(process_num)02d
+numprocs=5
+autostart=true
+autorestart=true
+redirect_stderr=false
+stderr_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers-errors.log
+stdout_logfile={{ misp_rootdir }}/app/tmp/logs/misp-workers.log
+user={{ www_user }}
