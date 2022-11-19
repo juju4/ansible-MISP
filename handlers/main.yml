@@ -20,10 +20,7 @@
     - ansible_os_family == "Debian"
 
 - name: Restart webserver - docker,redhat
-  ansible.builtin.command: "{{ item }}"
-  with_items:
-    - pkill httpd
-    - /usr/sbin/httpd -k start
+  ansible.builtin.shell: "(pkill httpd; /usr/sbin/httpd -k start)"
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "RedHat"
