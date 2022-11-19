@@ -63,6 +63,11 @@ misp_pkg_list:
  - libpoppler-cpp-dev
  - imagemagick
  - libxrender1
+ # for numpy
+ - libopenblas-dev
+ - libopenblas-base
+ - libatlas-base-dev
+ - libatlas3-base
 
 misp_gem_list:
  - { name: asciidoctor-pdf, v: 2.3.2 }
@@ -116,3 +121,7 @@ apacheetc: /etc/apache2
 ssl_user: ssl-cert
 ssl_dir: /etc/ssl
 ssl_privatedir: /etc/ssl/private
+
+supervisor_confdir: /etc/supervisor/conf.d
+supervisor_ext: conf
+supervisor_service: supervisor

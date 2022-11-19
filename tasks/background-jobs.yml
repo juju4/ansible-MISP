@@ -1,0 +1,67 @@
+---
+# https://github.com/MISP/MISP/blob/2.4/docs/background-jobs-migration-guide.md
+
+- name: Ensure supervisor is present
+  ansible.builtin.package:
+    name: supervisor
+    state: present
+  register: pkg_result
+  until: pkg_result is success
+
+- name: Ensure composer files permissions are correct
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0644'
+  loop:
+    - "{{ misp_rootdir }}/app/Vendor/composer/installed.php"
+    - "{{ misp_rootdir }}/app/Vendor/composer/InstalledVersions.php"
+    # - "{{ misp_rootdir }}/app/Vendor/composer/autoload.php"
+    - "{{ misp_rootdir }}/app/Vendor/composer/autoload_classmap.php"
+    - "{{ misp_rootdir }}/app/Vendor/composer/autoload_files.php"
+    - "{{ misp_rootdir }}/app/Vendor/composer/autoload_namespaces.php"
+    - "{{ misp_rootdir }}/app/Vendor/composer/autoload_psr4.php"
+    - "{{ misp_rootdir }}/app/Vendor/composer/autoload_real.php"
+    - "{{ misp_rootdir }}/app/Vendor/composer/autoload_static.php"
+    - "{{ misp_rootdir }}/app/Vendor/composer/platform_check.php"
+    - "{{ misp_rootdir }}/app/Vendor/composer/ClassLoader.php"
+
+- name: Install PHP composer dependencies for background-jobs
+  community.general.composer:
+    command: require
+    arguments: |
+      --with-all-dependencies \
+      supervisorphp/supervisor:^4.0 \
+      guzzlehttp/guzzle \
+      php-http/message \
+      lstrojny/fxmlrpc
+    working_dir: "{{ misp_rootdir }}/app"
+    executable: "{{ php_bin | default(omit) }}"
+  register: pkg_result
+  until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
+
+- name: Add http server for supervisord
+  ansible.builtin.blockinfile:
+    path: /etc/supervisor/supervisord.conf
+    mode: '0644'
+    block: |
+      [inet_http_server]
+      port=127.0.0.1:9001
+      username={{ misp_supervisorhttp_user }}
+      password={{ misp_supervisorhttp_pass }}
+  notify:
+    - Supervisor update
+
+- name: Configure misp-workers in supervisor
+  ansible.builtin.template:
+    src: misp-workers.conf.j2
+    dest: "{{ supervisor_confdir }}/misp-workers.{{ supervisor_ext }}"
+    mode: '0644'
+  notify:
+    - Supervisor update
+
+- name: Ensure supervisor service is enabled
+  ansible.builtin.service:
+    name: "{{ supervisor_service }}"
+    enabled: "yes"

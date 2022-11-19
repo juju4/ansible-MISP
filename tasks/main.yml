@@ -91,15 +91,6 @@
         creates: /tmp/mysqld_safe.out
         chdir: /var/lib/mysql
 
-# possible git clone issues else
-- name: RedHat | Ensure latest nss curl libcurl
-  ansible.builtin.package:
-    name: ['nss', 'curl', 'libcurl']
-    state: latest  # noqa package-latest
-  when: ansible_os_family == "RedHat"
-  register: pkg_result
-  until: pkg_result is success
-
 - name: Import redis-secure
   ansible.builtin.import_tasks: redis-secure.yml
 
@@ -560,11 +551,6 @@
           (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
         )
 
-- name: Validate worker start.sh permissions
-  ansible.builtin.file:
-    dest: "{{ misp_rootdir }}/app/Console/worker/start.sh"
-    mode: "0755"
-
 - name: Import redhat-logrotate
   ansible.builtin.import_tasks: redhat-logrotate.yml
   when: ansible_os_family == "RedHat"
@@ -605,29 +591,9 @@
     creates: /tmp/redis.out
   when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
-- name: Check if worker active
-  ansible.builtin.command: "ps axu"
-  register: ps
-  changed_when: false
-# - debug: var=ps.stdout_lines
-- name: Start MISP worker
-  ansible.builtin.command: "bash {{ misp_rootdir }}/app/Console/worker/start.sh"
-  become: yes
-  become_user: "{{ www_user }}"
-  when: misp_rootdir + '/app/Vendor/kamisama/php-resque-ex' not in ps.stdout
-
-- name: Add MISP worker script for boot
-  ansible.builtin.lineinfile:
-    dest: /etc/rc.local
-    line: "sudo -H -u {{ www_user }} bash {{ misp_rootdir }}/app/Console/worker/start.sh"
-    mode: '0755'
-    insertbefore: "^exit 0"
-    backup: yes
-    create: yes
-
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
-  ansible.builtin.command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php ! -path {{ misp_rootdir }}/app/Config/email.php -exec chmod 0444 {} \\;"  # noqa no-changed-when
+  ansible.builtin.command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php ! -path {{ misp_rootdir }}/app/Config/email.php ! -path {{ misp_rootdir }}/app/Vendor/ -exec chmod 0444 {} \\;"  # noqa no-changed-when
   with_items:
     - '*.php'
     - '*.ctp'
@@ -694,6 +660,9 @@
 
 - name: Import misp-feed
   ansible.builtin.import_tasks: misp-feeds.yml
+
+- name: Import background-jobs
+  ansible.builtin.import_tasks: background-jobs.yml
 
 ## or use tools/misp-backup/misp-backup.sh ?
 - name: Ensure scriptsdir directory exists

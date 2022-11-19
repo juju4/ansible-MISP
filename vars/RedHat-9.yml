@@ -101,3 +101,7 @@ apacheetc: /etc/httpd
 ssl_user: root
 ssl_dir: /etc/pki/tls/certs
 ssl_privatedir: /etc/pki/tls/private
+
+supervisor_confdir: /etc/supervisord.d
+supervisor_ext: ini
+supervisor_service: supervisord

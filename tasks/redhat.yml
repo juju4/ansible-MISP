@@ -14,19 +14,15 @@
   when: ansible_os_family == "RedHat"
 
 - name: RedHat8+ | Enable PowerTools repo
-  community.general.ini_file:
-    dest: /etc/yum.repos.d/CentOS-Stream-PowerTools.repo
-    section: powertools
-    option: "{{ item.o }}"
-    value: "{{ item.v }}"
-    mode: '0644'
-  with_items:
-    - { o: enabled, v: '1' }
-    - { o: baseurl, v: 'http://mirror.centos.org/$contentdir/$releasever/PowerTools/$basearch/os/' }
+  ansible.builtin.command: dnf config-manager --set-enabled powertools
+  become: yes
   when:
     - ansible_os_family == "RedHat"
     - ansible_distribution_major_version | int >= 8
 
+- name: Check available repositories - list
+  ansible.builtin.command: ls -l /etc/yum.repos.d/
+  changed_when: false
 - name: Check available repositories
   ansible.builtin.command: dnf repolist
   changed_when: false
@@ -41,6 +37,19 @@
     update_cache: yes
   async: 3600
   poll: 300
+  register: pkg_result
+  until: pkg_result is success
+
+# possible git clone issues else
+- name: RedHat | Remove libcurl-minimal
+  ansible.builtin.package:
+    name: libcurl-minimal
+    state: absent
+- name: RedHat | Ensure latest nss curl libcurl
+  ansible.builtin.package:
+    name: ['nss', 'curl', 'libcurl']
+    state: latest  # noqa package-latest
+  when: ansible_os_family == "RedHat"
   register: pkg_result
   until: pkg_result is success
 

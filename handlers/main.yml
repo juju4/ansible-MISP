@@ -6,10 +6,7 @@
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Restart webserver - docker,debian
-  ansible.builtin.command: "{{ item }}"
-  with_items:
-    - killall apache2
-    - /usr/sbin/apache2 -k start
+  ansible.builtin.shell: "(killall apache2; /usr/sbin/apache2 -k start)"
   environment:
     APACHE_RUN_USER: www-data
     APACHE_RUN_GROUP: www-data
@@ -23,10 +20,7 @@
     - ansible_os_family == "Debian"
 
 - name: Restart webserver - docker,redhat
-  ansible.builtin.command: "{{ item }}"
-  with_items:
-    - pkill httpd
-    - /usr/sbin/httpd -k start
+  ansible.builtin.shell: "(pkill httpd; /usr/sbin/httpd -k start)"
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "RedHat"
@@ -45,3 +39,8 @@
   ansible.builtin.command: "git submodule update --init --force"  # noqa command-instead-of-module
   args:
     chdir: "{{ misp_rootdir }}"
+
+- name: Supervisor update
+  ansible.builtin.service:
+    name: "{{ supervisor_service }}"
+    state: "restarted"

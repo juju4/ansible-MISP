@@ -36,6 +36,14 @@
     (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04') or
     (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 8)
 
+- name: Ubuntu 22.04 | Update numpy - numpy#22520, opencv-python#571
+  ansible.builtin.lineinfile:
+    dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
+    regexp: '^numpy==.*'
+    line: 'numpy==1.23.4'
+  when: >
+    (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04')
+
 - name: Enforce latest PyMISP
   ansible.builtin.replace:
     dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
@@ -156,6 +164,7 @@
     line: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.boot 2>&1 &"
     mode: '0755'
     insertbefore: "^exit 0"
+    create: yes
     backup: yes
 
 - name: Check if misp modules is running
