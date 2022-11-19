@@ -6,11 +6,7 @@
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Restart webserver - docker,debian
-  ansible.builtin.command: "{{ item.c }}"
-  failed_when: "{{ item.w | default(omit) }}"
-  with_items:
-    - { c: 'killall apache2', w: false }
-    - { c: '/usr/sbin/apache2 -k start' }
+  ansible.builtin.shell: "(killall apache2; /usr/sbin/apache2 -k start)"
   environment:
     APACHE_RUN_USER: www-data
     APACHE_RUN_GROUP: www-data
