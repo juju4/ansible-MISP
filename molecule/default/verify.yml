@@ -180,7 +180,7 @@
       failed_when: false
       register: mysql2
 
-    - name: Check misp-workers under supervisor
+    - name: Check misp-workers under supervisor  # noqa command-instead-of-module
       ansible.builtin.command: supervisorctl status
       changed_when: false
       failed_when: false
