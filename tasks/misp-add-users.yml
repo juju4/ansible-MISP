@@ -80,7 +80,7 @@
       changed_when: false
   rescue:
     - name: Check MISP logs
-      ansible.builtin.command: "tail -100 {{ misp_rootdir }}/app/tmp/logs/error.log {{ misp_rootdir }}/app/tmp/logs/debug.log"
+      ansible.builtin.command: "tail -n100 {{ misp_rootdir }}/app/tmp/logs/error.log {{ misp_rootdir }}/app/tmp/logs/debug.log"
       changed_when: false
     - name: Fail
       ansible.builtin.fail:
