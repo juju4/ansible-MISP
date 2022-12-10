@@ -122,6 +122,7 @@ ssl_user: ssl-cert
 ssl_dir: /etc/ssl
 ssl_privatedir: /etc/ssl/private
 
+supervisor_conf: /etc/supervisor/supervisord.conf
 supervisor_confdir: /etc/supervisor/conf.d
 supervisor_ext: conf
 supervisor_service: supervisor
