@@ -17,7 +17,7 @@
     - "{{ misp_rootdir }}/app/Vendor/composer/InstalledVersions.php"
     # - "{{ misp_rootdir }}/app/Vendor/composer/autoload.php"
     - "{{ misp_rootdir }}/app/Vendor/composer/autoload_classmap.php"
-    - "{{ misp_rootdir }}/app/Vendor/composer/autoload_files.php"
+    # - "{{ misp_rootdir }}/app/Vendor/composer/autoload_files.php"
     - "{{ misp_rootdir }}/app/Vendor/composer/autoload_namespaces.php"
     - "{{ misp_rootdir }}/app/Vendor/composer/autoload_psr4.php"
     - "{{ misp_rootdir }}/app/Vendor/composer/autoload_real.php"
