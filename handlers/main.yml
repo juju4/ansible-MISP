@@ -6,7 +6,7 @@
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Restart webserver - docker,debian
-  ansible.builtin.shell: "(killall apache2; /usr/sbin/apache2 -k start)"
+  ansible.builtin.command: "apache2ctl restart"
   environment:
     APACHE_RUN_USER: www-data
     APACHE_RUN_GROUP: www-data
@@ -20,7 +20,7 @@
     - ansible_os_family == "Debian"
 
 - name: Restart webserver - docker,redhat
-  ansible.builtin.shell: "(pkill httpd; /usr/sbin/httpd -k start)"
+  ansible.builtin.command: "apachectl restart"
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "RedHat"
