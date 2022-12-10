@@ -10,7 +10,12 @@ $config = array (
     'footermidright' => '',
     'org' => 'ORGNAME',
     'showorg' => true,
+{% if (
+      (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 20) or
+      (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    ) %}
     'background_jobs' => true,
+{% endif %}
     'cached_attachments' => true,
     'email' => '{{ misp_email_contact }}',
     'contact' => '{{ misp_email_contact }}',
@@ -139,6 +144,10 @@ $config = array (
     'Action_timeout' => 10,
     'Workflow_enable' => false,
   ),
+{% if (
+      (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 20) or
+      (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    ) %}
   'SimpleBackgroundJobs' =>
   array (
     'supervisor_password' => '{{ misp_supervisorhttp_pass }}',
@@ -153,6 +162,7 @@ $config = array (
     'supervisor_port' => 9001,
     'redis_password' => '{{ misp_redis_password | default('') }}',
   ),
+{% endif %}
   'CertAuth' => NULL,
   'ApacheShibbAuth' => NULL,
   'ApacheSecureAuth' => NULL,

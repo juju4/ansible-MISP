@@ -17,7 +17,7 @@
     - "{{ misp_rootdir }}/app/Vendor/composer/InstalledVersions.php"
     # - "{{ misp_rootdir }}/app/Vendor/composer/autoload.php"
     - "{{ misp_rootdir }}/app/Vendor/composer/autoload_classmap.php"
-    - "{{ misp_rootdir }}/app/Vendor/composer/autoload_files.php"
+    # - "{{ misp_rootdir }}/app/Vendor/composer/autoload_files.php"
     - "{{ misp_rootdir }}/app/Vendor/composer/autoload_namespaces.php"
     - "{{ misp_rootdir }}/app/Vendor/composer/autoload_psr4.php"
     - "{{ misp_rootdir }}/app/Vendor/composer/autoload_real.php"
@@ -43,7 +43,7 @@
 
 - name: Add http server for supervisord
   ansible.builtin.blockinfile:
-    path: /etc/supervisor/supervisord.conf
+    path: "{{ supervisor_conf }}"
     mode: '0644'
     block: |
       [inet_http_server]

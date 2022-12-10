@@ -10,7 +10,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
@@ -36,7 +36,7 @@ jobs:
             version: '18.04'
             version2: 1804
             suite: default
-            experimental: false
+            experimental: true
           - distribution: ubuntu
             version: '20.04'
             version2: 2004

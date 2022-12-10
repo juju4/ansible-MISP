@@ -651,6 +651,14 @@
 - name: Import misp-gem
   ansible.builtin.import_tasks: misp-gem.yml
 
+- name: Import background-jobs
+  ansible.builtin.import_tasks: background-jobs.yml
+  when: >
+    (
+      (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 20) or
+      (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    )
+
 - name: Import testing
   ansible.builtin.import_tasks: testing.yml
   when: misp_testing is defined and misp_testing
@@ -660,9 +668,6 @@
 
 - name: Import misp-feed
   ansible.builtin.import_tasks: misp-feeds.yml
-
-- name: Import background-jobs
-  ansible.builtin.import_tasks: background-jobs.yml
 
 ## or use tools/misp-backup/misp-backup.sh ?
 - name: Ensure scriptsdir directory exists

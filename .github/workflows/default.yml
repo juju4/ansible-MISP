@@ -30,7 +30,7 @@ jobs:
           - molecule_distro: 'ubuntu:20.04'
             experimental: false
           - molecule_distro: 'ubuntu:18.04'
-            experimental: false
+            experimental: true
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       MOLECULE_NO_LOG: "false"
@@ -49,6 +49,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install molecule[docker] ansible-lint flake8 testinfra ansible
           mkdir -p $HOME/.ansible/roles && ln -s $GITHUB_WORKSPACE/$ANSIBLE_ROLE $HOME/.ansible/roles/
+          # template search only in currently executed role root/tasks/templates folders and molecule scenario root/templates folders
+          cp $GITHUB_WORKSPACE/$ANSIBLE_ROLE/templates/misp-snuffleupagus-rules.ini.j2 $GITHUB_WORKSPACE/$ANSIBLE_ROLE/molecule/default/
       - name: Fetch central settings repository
         run: |
           export settings_repo="https://raw.githubusercontent.com/juju4/ansible-ci-settings/main"

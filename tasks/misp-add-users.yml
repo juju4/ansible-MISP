@@ -66,16 +66,25 @@
   changed_when: false
   ignore_errors: true
 
-- name: List current users
-  ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./users_list.py"
-  become: yes
-  become_user: "{{ www_user }}"
-  args:
-    chdir: "{{ misp_rootdir }}/PyMISP/examples"
-  environment:
-    PYTHONPATH: /usr/local/lib/python3.6/site-packages
-  register: listusers
-  changed_when: false
+- name: Test MISP API
+  block:
+    - name: List current users
+      ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./users_list.py"
+      become: yes
+      become_user: "{{ www_user }}"
+      args:
+        chdir: "{{ misp_rootdir }}/PyMISP/examples"
+      environment:
+        PYTHONPATH: /usr/local/lib/python3.6/site-packages
+      register: listusers
+      changed_when: false
+  rescue:
+    - name: Check MISP logs
+      ansible.builtin.command: "tail -n100 {{ misp_rootdir }}/app/tmp/logs/error.log {{ misp_rootdir }}/app/tmp/logs/debug.log"
+      changed_when: false
+    - name: Fail
+      ansible.builtin.fail:
+        msg: "Test of MISP API failed"
 
 - name: Add users
   when: misp_webusers_list is defined and misp_webusers_list != []
