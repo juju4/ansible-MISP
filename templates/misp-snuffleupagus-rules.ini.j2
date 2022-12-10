@@ -24,7 +24,7 @@
 sp.global.secret_key("{{ snuffleupagus_secret1.stdout | default(snuffleupagus_secret2.stdout) }}");
 sp.harden_random.enable();
 sp.disable_xxe.enable();
-sp.eval_blacklist.list("system,exec,shell_exec");
+sp.eval_blacklist.list("system,exec");
 sp.eval_whitelist.list("strlen,strcmp").simulation();
 
 # use SameSite on session cookie
