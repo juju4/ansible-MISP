@@ -653,6 +653,11 @@
 
 - name: Import background-jobs
   ansible.builtin.import_tasks: background-jobs.yml
+  when: >
+    (
+      (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 20) or
+      (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    )
 
 - name: Import testing
   ansible.builtin.import_tasks: testing.yml
