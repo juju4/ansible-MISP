@@ -170,12 +170,16 @@ jobs:
       - name: After script - python
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp
+          set -x
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'which pip'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip freeze'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'which pip3'
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip3 install pipdeptree'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pip3 freeze'
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'pipdeptree -r'
           sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/python --version'
-          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/pip freeze'
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/pip install pipdeptree'
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/pipdeptree -r'
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - MISP files
