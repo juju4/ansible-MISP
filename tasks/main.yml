@@ -648,6 +648,7 @@
 
 - name: Import misp-modules
   ansible.builtin.import_tasks: misp-modules.yml
+  when: misp_modules_enable|bool
 - name: Import misp-gem
   ansible.builtin.import_tasks: misp-gem.yml
 
