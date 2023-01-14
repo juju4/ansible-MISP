@@ -10,7 +10,7 @@ install_archives: /var/_install
 misp_version: '2.4'
 misp_rootdir: /var/www/_MISP/MISP
 misp_virtualenv: /var/www/_MISP/venv
-misp_modules_enable: true
+misp_modules_enable: false
 mispmodules_rootdir: /opt
 misp_webserver: 'apache2'
 # misp_webserver: 'nginx'
