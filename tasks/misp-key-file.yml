@@ -10,6 +10,11 @@
 - name: Key file
   when: not skey.stat.exists or skey.stat.size == 0
   block:
+    - name: Replace default MISP admin by "{{ misp_web_user }}" before running userInit
+      ansible.builtin.replace:
+        dest: "{{ misp_rootdir }}/app/Model/User.php"
+        regexp: 'admin@admin.test'
+        replace: "{{ misp_web_user }}"
     - name: Generate key file - cake userInit
       ansible.builtin.shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
       args:
