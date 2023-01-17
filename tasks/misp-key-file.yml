@@ -15,6 +15,9 @@
         dest: "{{ misp_rootdir }}/app/Model/User.php"
         regexp: 'admin@admin.test'
         replace: "{{ misp_web_user }}"
+        mode: '0640'
+        owner: "{{ www_user }}"
+        group: "{{ www_user }}"
     - name: Generate key file - cake userInit
       ansible.builtin.shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
       args:
