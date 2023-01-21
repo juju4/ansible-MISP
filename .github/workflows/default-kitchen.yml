@@ -226,7 +226,7 @@ jobs:
       - name: After script - PyMISP
         run: |
           cd $GITHUB_WORKSPACE/juju4.misp
-          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c '/var/www/_MISP/venv/bin/python /var/www/_MISP/MISP/PyMISP/examples/users_list.py'
+          sudo kitchen exec ${{ matrix.suite }}-${{ matrix.distribution }}-${{ matrix.version2 }} -c 'cd /var/www/_MISP/MISP/PyMISP/examples && /var/www/_MISP/venv/bin/python /var/www/_MISP/MISP/PyMISP/examples/users_list.py'
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - system
