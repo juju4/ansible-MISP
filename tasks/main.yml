@@ -451,7 +451,7 @@
 - name: Import random
   ansible.builtin.import_tasks: random.yml
   vars:
-    secretdir: "{{ misp_rootdir }}"
+    secretdir: "{{ misp_rootdir }}"
     secretprefix: .misp-
     name: salt
 - name: Set salt
@@ -462,7 +462,7 @@
 - name: Import random
   ansible.builtin.import_tasks: random.yml
   vars:
-    secretdir: "{{ misp_rootdir }}"
+    secretdir: "{{ misp_rootdir }}"
     secretprefix: .misp-
     name: encryption_key
 - name: Set salt
