@@ -44,6 +44,9 @@ $config = array (
     'enableEventBlacklisting' => true,
     'enableOrgBlacklisting' => true,
     'log_client_ip' => true,
+    'log_user_ips' => true,
+    'log_user_ips_authkeys' => true,
+    'log_new_audit' => true,
     'log_auth' => true,
     'block_event_alert' => false,
     'block_event_alert_tag' => 'no-alerts="true"',
@@ -96,6 +99,7 @@ $config = array (
   array (
     'level' => 'medium',
     'salt' => '{{ salt }}',
+    'encryption_key' => '{{ salt2 }}',
     'cipherSeed' => '',
     'password_policy_length' => {{ misp_passreq_lenth }},
     'csp_enforce' => {{ misp_csp_enforce | default('true') }},

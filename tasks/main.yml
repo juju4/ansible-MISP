@@ -448,38 +448,27 @@
   with_items:
     - "require_once dirname(__DIR__) . '/Vendor/autoload.php';"
 
-- name: Generating salt
-  ansible.builtin.shell: |
-    set -o pipefail
-    openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;' | tee {{ misp_rootdir }}/.salt
-  args:
-    creates: "{{ misp_rootdir }}/.salt"
-    executable: /bin/bash
-  register: salt1
-  changed_when: false
-  no_log: "{{ misp_no_log }}"
-  tags:
-    - salt
-- name: Check if .salt exists
-  ansible.builtin.stat:
-    path: "{{ misp_rootdir }}/.salt"
-  register: s
-- name: Recover existing salt
-  ansible.builtin.command: "cat {{ misp_rootdir }}/.salt"
-  changed_when: false
-  register: salt2
-  no_log: "{{ misp_no_log }}"
-  when: s.stat.exists
-- name: Set salt  # noqa no-handler
-  ansible.builtin.set_fact:
-    salt: "{{ salt1.stdout }}"
-  no_log: "{{ misp_no_log }}"
-  when: salt1.changed
+- name: Import random
+  ansible.builtin.import_tasks: random.yml
+  vars:
+    secretdir: "{{ misp_rootdir }}"
+    secretprefix: .misp-
+    name: salt
 - name: Set salt
   ansible.builtin.set_fact:
-    salt: "{{ salt2.stdout }}"
+    salt: "{{ secret }}"
   no_log: "{{ misp_no_log }}"
-  when: s.stat.exists
+
+- name: Import random
+  ansible.builtin.import_tasks: random.yml
+  vars:
+    secretdir: "{{ misp_rootdir }}"
+    secretprefix: .misp-
+    name: encryption_key
+- name: Set salt
+  ansible.builtin.set_fact:
+    salt2: "{{ secret }}"
+  no_log: "{{ misp_no_log }}"
 
 # FIXME! idempotence. MISP is rewriting this file regularly
 - name: Updating MISP config with salt
