@@ -10,7 +10,7 @@
 - name: Key file
   when: not skey.stat.exists or skey.stat.size == 0
   block:
-    - name: Replace default MISP admin by "{{ misp_web_user }}" before running userInit
+    - name: Replace default MISP admin by "{{ misp_web_user }}"
       ansible.builtin.replace:
         dest: "{{ d }}"
         regexp: 'admin@admin.test'
