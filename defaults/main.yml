@@ -43,9 +43,16 @@ misp_base_port: 8888
 misp_base_url: http://127.0.0.1:8888
 misp_servername: misp.local
 misp_email: root@localhost
+misp_gpg_name: "MISP Service"
+misp_gpg_comment: "Managed by Ansible"
+misp_gpg_key_type: "default"
+misp_gpg_key_lenght: 4096
+misp_gpg_subkey_type: "default"
+misp_gpg_subkey_lenght: 4096
 misp_gpg_email: "{{ misp_email }}"
 misp_gpg_homedir: "{{ misp_rootdir }}/.gnupg"
 misp_gpg_pass: gpg_pass_to_change_fast
+misp_gpg_expire_date: "3y"
 misp_secureauth_expire: 300
 misp_passreq_lenth: 12
 ## not mapped currently
