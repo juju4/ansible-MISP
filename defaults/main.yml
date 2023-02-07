@@ -14,6 +14,7 @@ misp_modules_enable: true
 mispmodules_rootdir: /opt
 misp_webserver: 'apache2'
 # misp_webserver: 'nginx'
+misp_webserver_harden: true
 misp_fcgi_enable: false
 misp_lief_enable: true
 misp_lief_rootdir: /var/lief
