@@ -19,6 +19,7 @@
         owner: "{{ www_user }}"
         group: "{{ www_user }}"
       loop:
+        - "{{ misp_rootdir }}/app/Console/Command/Ls22Shell.php"
         - "{{ misp_rootdir }}/app/Model/User.php"
       loop_control:
         loop_var: d
