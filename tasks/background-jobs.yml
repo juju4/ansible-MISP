@@ -26,6 +26,17 @@
     - "{{ misp_rootdir }}/app/Vendor/composer/ClassLoader.php"
   failed_when: false
 
+- name: Allow-plugins php-http/discovery as required
+  community.general.composer:
+    command: config
+    arguments: allow-plugins.php-http/discovery true
+    working_dir: "{{ misp_rootdir }}/app"
+    executable: "{{ php_bin | default(omit) }}"
+  register: pkg_result
+  until: pkg_result is success
+  become: yes
+  become_user: "{{ www_user }}"
+
 - name: Install PHP composer dependencies for background-jobs
   community.general.composer:
     command: require
