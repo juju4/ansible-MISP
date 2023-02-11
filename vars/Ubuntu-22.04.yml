@@ -46,6 +46,7 @@ misp_pkg_list:
  - libpq5
  - acl
  - sudo
+ - cron
  ## pillow
  - libtiff5-dev
  - libjpeg8-dev
