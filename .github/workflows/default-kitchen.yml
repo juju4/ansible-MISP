@@ -7,9 +7,12 @@ on:
   schedule:  # run weekly, every Thursday 06:00
     - cron: '0 6 * * 4'
 
+permissions: {}
+
 jobs:
   build:
-
+    permissions:
+      contents: read
     runs-on: ubuntu-20.04
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -47,11 +50,11 @@ jobs:
       ANSIBLE_EXTRA_VARS: "-e misp_mysql_user=root -e misp_mysql_pass=root"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: juju4.misp
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
       - name: Install dependencies
