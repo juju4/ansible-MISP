@@ -3,7 +3,11 @@
 - name: Test playbook - nosnuffle
   hosts: all
   vars:
-    misp_testing: true
+    misp_pymisp_validation_fatal: false
+    # need pymisp
+    misp_enable_feeds: []
+    misp_webusers_list: []
+    misp_testing: false
     misp_testing_user: _misp
     misp_testing_user_home: "/home/{{ misp_testing_user }}"
     misp_testing_key_file: "{{ misp_key_file }}"
@@ -11,10 +15,6 @@
     misp_base_url: https://localhost
     misp_base_ip: 127.0.0.1
     misp_base_port: 443
-    misp_webusers_list:
-      - { p: 'dupont_passphrase.', email: dupont@localhost.local, org: 1, role: 2 }
-      - { p: 'dupond_passphrase.', email: dupond@localhost.local, org: 1, role: 4 }
-      # - { p: 'dupond_passphrase.', email: dupona@localhost.local, org: 1, role: 4 }
     misp_no_log: false
     hardenwebserver_enable_defaultssl: false
     harden_php_allow_url_fopen: On
