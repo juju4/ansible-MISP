@@ -26,7 +26,7 @@ It was tested on the following versions:
 
 ### Operating systems
 
-Tested on Ubuntu 18.04, 20.04, 22.04 and centos 8-Stream
+Tested on Ubuntu 20.04, 22.04 and centos 8-Stream
 
 ## Example Playbook
 

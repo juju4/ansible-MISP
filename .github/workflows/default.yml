@@ -29,8 +29,6 @@ jobs:
             experimental: true
           - molecule_distro: 'ubuntu:20.04'
             experimental: false
-          - molecule_distro: 'ubuntu:18.04'
-            experimental: true
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       MOLECULE_NO_LOG: "false"
