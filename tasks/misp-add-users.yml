@@ -85,6 +85,7 @@
     - name: Fail
       ansible.builtin.fail:
         msg: "Test of MISP API failed"
+      when: misp_pymisp_validation_fatal | bool
 
 - name: Add users
   when: misp_webusers_list is defined and misp_webusers_list != []

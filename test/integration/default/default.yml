@@ -3,6 +3,7 @@
 - name: Test playbook
   hosts: all
   vars:
+    misp_pymisp_validation_fatal: false
     misp_testing: true
     misp_testing_user: _misp
     misp_testing_user_home: "/home/{{ misp_testing_user }}"

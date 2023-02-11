@@ -32,6 +32,9 @@ misp_latest_pymisp: false
 ## for automation of users creation and testing
 misp_key_file: "{{ misp_rootdir }}/.ht_key"
 
+# Should play fails if pymisp is not working
+misp_pymisp_validation_fatal: true
+
 misp_testing: false
 misp_testing_user: ''
 misp_testing_user_home: ''
