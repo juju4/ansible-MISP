@@ -40,7 +40,10 @@ Listen {{ misp_base_port }}
 {% endif %}
     SSLCertificateFile {{ ssl_dir }}/{{ ansible_fqdn }}.crt
     SSLCertificateKeyFile {{ ssl_privatedir }}/{{ ansible_fqdn }}.key
+
+{% if misp_webserver_harden %}
     Include {{ apacheetc }}/harden-apache2-https.conf
+{% endif %}
 
 {% else %}
     # If direct access without https, ensure CSP is not including
