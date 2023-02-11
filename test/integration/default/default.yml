@@ -3,6 +3,7 @@
 - name: Test playbook
   hosts: all
   vars:
+    misp_modules_enable: true
     misp_pymisp_validation_fatal: false
     # need pymisp
     misp_enable_feeds: []
