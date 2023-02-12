@@ -47,6 +47,10 @@
       ansible.builtin.set_fact:
         misp_lief_version: 0.12.1
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 18
+    - name: 22.04 | Set fact
+      ansible.builtin.set_fact:
+        misp_modules_enable: false
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int == 22)
   roles:
     # - geerlingguy.apache
     - juju4.harden_apache
