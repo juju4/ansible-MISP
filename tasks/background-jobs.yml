@@ -48,6 +48,7 @@
       lstrojny/fxmlrpc
     working_dir: "{{ misp_rootdir }}/app"
     executable: "{{ php_bin | default(omit) }}"
+    no_plugins: true
   register: pkg_result
   until: pkg_result is success
   become: yes
