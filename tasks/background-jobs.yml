@@ -49,6 +49,7 @@
     working_dir: "{{ misp_rootdir }}/app"
     executable: "{{ php_bin | default(omit) }}"
     no_plugins: true
+    prefer_dist: true
   register: pkg_result
   until: pkg_result is success
   become: yes
