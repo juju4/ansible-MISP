@@ -41,7 +41,7 @@
   community.general.composer:
     command: require
     arguments: |
-      --with-all-dependencies \
+      --no-ansi --no-interaction --no-progress --with-all-dependencies \
       supervisorphp/supervisor:^4.0 \
       guzzlehttp/guzzle \
       php-http/message \
