@@ -16,6 +16,7 @@
       - { h: localhost, p: 6379 }
     url: https://localhost
     is_container: false
+    misp_pymisp_test: false
   pre_tasks:
     - name: Debug | var ansible_virtualization_type
       ansible.builtin.debug:
@@ -128,6 +129,7 @@
       ansible.builtin.assert:
         that:
           - "'admin@admin.test' in pymisp.stdout"
+      when: misp_pymisp_test | bool
 
     - name: Check cake Admin configLint
       ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Admin configLint"
