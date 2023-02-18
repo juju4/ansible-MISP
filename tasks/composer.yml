@@ -69,6 +69,7 @@
         executable: "{{ php_bin | default(omit) }}"
       register: pkg_result
       until: pkg_result is success
+      failed_when: false
       become: yes
       become_user: "{{ www_user }}"
     - name: Composer global diagnose
@@ -78,6 +79,7 @@
         executable: "{{ php_bin | default(omit) }}"
       register: pkg_result
       until: pkg_result is success
+      failed_when: false
       become: yes
       become_user: "{{ www_user }}"
     - name: Composer version profile
