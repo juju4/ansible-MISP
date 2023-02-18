@@ -192,5 +192,5 @@
       ansible.builtin.assert:
         that:
           - "'misp-workers:' in sup.stdout"
-          - "'RUNNING:' in sup.stdout"
+          - "'RUNNING' in sup.stdout"
           - sup.rc == 0
