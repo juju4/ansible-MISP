@@ -40,8 +40,8 @@ misp_pkg_list:
  - "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rng-tools{% endif %}"
  - wget
  # misp-modules
- - python36
- - python36-devel
+ - python3.10
+ - python3.10-devel
  - python3-PyMySQL
  - libpq
  ## misc
@@ -64,8 +64,8 @@ misp_pkg_list:
  ## CentOS PowerTools x86_64
  - poppler-cpp-devel
 
-easy_install_bin: easy_install-3.6
-python3_bin: python3.6
+easy_install_bin: easy_install-3.10
+python3_bin: python3.10
 python3_pip: /usr/local/bin/pip3
 
 misp_webserver_apache2:
