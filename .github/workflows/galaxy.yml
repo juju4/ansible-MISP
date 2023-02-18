@@ -23,3 +23,4 @@ jobs:
         with:
           galaxy_api_key: ${{ secrets.galaxy_api_key }}
           path: juju4.MISP
+          git_branch: main
