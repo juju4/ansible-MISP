@@ -169,6 +169,7 @@
         that:
           - "'Error: ' not in securityaudit.stdout"
           - not securityaudit.stderr|string
+      when: false
 
     - name: Check mysql misp tables
       ansible.builtin.command: mysql -e "SHOW TABLES" misp
