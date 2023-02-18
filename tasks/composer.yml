@@ -74,7 +74,8 @@
       become_user: "{{ www_user }}"
     - name: Composer global diagnose
       community.general.composer:
-        command: global diagnose
+        command: global
+        arguments: diagnose
         working_dir: "{{ misp_rootdir }}/app"
         executable: "{{ php_bin | default(omit) }}"
       register: pkg_result
