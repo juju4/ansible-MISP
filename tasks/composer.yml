@@ -39,23 +39,54 @@
   args:
     creates: /usr/local/bin/composer
 
-- name: Allow-plugins composer/installers as required
-  community.general.composer:
-    command: config
-    arguments: allow-plugins.composer/installers true
-    working_dir: "{{ misp_rootdir }}/app"
-    executable: "{{ php_bin | default(omit) }}"
-  register: pkg_result
-  until: pkg_result is success
-  become: yes
-  become_user: "{{ www_user }}"
+- name: Install composers components
+  block:
+    - name: Allow-plugins composer/installers as required
+      community.general.composer:
+        command: config
+        arguments: allow-plugins.composer/installers true
+        working_dir: "{{ misp_rootdir }}/app"
+        executable: "{{ php_bin | default(omit) }}"
+      register: pkg_result
+      until: pkg_result is success
+      become: yes
+      become_user: "{{ www_user }}"
 
-- name: Install PHP dependencies via composer (kamisama/cake-resque, Vendor)
-  community.general.composer:
-    command: install
-    working_dir: "{{ misp_rootdir }}/app"
-    executable: "{{ php_bin | default(omit) }}"
-  register: pkg_result
-  until: pkg_result is success
-  become: yes
-  become_user: "{{ www_user }}"
+    - name: Install PHP dependencies via composer (kamisama/cake-resque, Vendor)
+      community.general.composer:
+        command: install
+        working_dir: "{{ misp_rootdir }}/app"
+        executable: "{{ php_bin | default(omit) }}"
+      register: pkg_result
+      until: pkg_result is success
+      become: yes
+      become_user: "{{ www_user }}"
+  rescue:
+    - name: Composer diagnose
+      community.general.composer:
+        command: diagnose
+        working_dir: "{{ misp_rootdir }}/app"
+        executable: "{{ php_bin | default(omit) }}"
+      register: pkg_result
+      until: pkg_result is success
+      become: yes
+      become_user: "{{ www_user }}"
+    - name: Composer global diagnose
+      community.general.composer:
+        command: global diagnose
+        working_dir: "{{ misp_rootdir }}/app"
+        executable: "{{ php_bin | default(omit) }}"
+      register: pkg_result
+      until: pkg_result is success
+      become: yes
+      become_user: "{{ www_user }}"
+    - name: Composer version profile
+      community.general.composer:
+        command: ""
+        arguments: --version --profile -vvv --no-interaction
+        working_dir: "{{ misp_rootdir }}/app"
+        executable: "{{ php_bin | default(omit) }}"
+      register: pkg_result
+      until: pkg_result is success
+      become: yes
+      become_user: "{{ www_user }}"
