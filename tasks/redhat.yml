@@ -13,12 +13,21 @@
   ansible.builtin.import_tasks: redhat-remi.yml
   when: ansible_os_family == "RedHat"
 
-- name: RedHat8+ | Enable PowerTools repo
+
+- name: RedHat9 | Enable PowerTools repo
+  ansible.builtin.command: dnf config-manager --enable crb
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_distribution_major_version | int == 9
+
+- name: Check available repositories - list
+- name: RedHat8 | Enable PowerTools repo
   ansible.builtin.command: dnf config-manager --set-enabled powertools
   become: yes
   when:
     - ansible_os_family == "RedHat"
-    - ansible_distribution_major_version | int >= 8
+    - ansible_distribution_major_version | int == 8
 
 - name: Check available repositories - list
   ansible.builtin.command: ls -l /etc/yum.repos.d/
