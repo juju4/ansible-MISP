@@ -17,6 +17,7 @@
     - https://rpms.remirepo.net/RPM-GPG-KEY-remi
     - https://rpms.remirepo.net/RPM-GPG-KEY-remi2017
     - https://rpms.remirepo.net/RPM-GPG-KEY-remi2018
+    - https://rpms.remirepo.net/RPM-GPG-KEY-remi2021
   register: pkg_result
   until: pkg_result is success
 
