@@ -21,6 +21,11 @@ jobs:
       matrix:
         include:
           - distribution: centos
+            version: 9-Stream
+            version2: 9-Stream
+            suite: default
+            experimental: true
+          - distribution: centos
             version: 8-Stream
             version2: 8-Stream
             suite: default
