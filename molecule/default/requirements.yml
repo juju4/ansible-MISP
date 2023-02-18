@@ -5,16 +5,16 @@ collections:
 
 roles:
   - src: https://github.com/juju4/ansible-redhat-epel/
-    version: master
+    version: main
     name: juju4.redhat_epel
   - src: https://github.com/juju4/ansible-harden-apache/
-    version: master
+    version: main
     name: juju4.harden_apache
   - src: https://github.com/juju4/ansible-harden-nginx/
-    version: master
+    version: main
     name: juju4.harden_nginx
   - src: https://github.com/juju4/ansible-faup/
-    version: master
+    version: main
     name: juju4.faup
   - name: geerlingguy.nginx
   - name: geerlingguy.apache
