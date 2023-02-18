@@ -40,8 +40,8 @@ misp_pkg_list:
  - "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rng-tools{% endif %}"
  - wget
  # misp-modules
- - python3.10
- - python3.10-devel
+ - python3
+ - python3-devel
  - python3-PyMySQL
  - libpq
  ## misc
