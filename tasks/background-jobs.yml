@@ -41,13 +41,15 @@
   community.general.composer:
     command: require
     arguments: |
-      --with-all-dependencies \
+      --no-ansi --no-interaction --no-progress --with-all-dependencies \
       supervisorphp/supervisor:^4.0 \
       guzzlehttp/guzzle \
       php-http/message \
       lstrojny/fxmlrpc
     working_dir: "{{ misp_rootdir }}/app"
     executable: "{{ php_bin | default(omit) }}"
+    no_plugins: true
+    prefer_dist: true
   register: pkg_result
   until: pkg_result is success
   become: yes
