@@ -44,6 +44,7 @@
     harden_php7_snuffleupagus_rules_template: 'misp-snuffleupagus-rules.ini.j2'
     harden_apache_php_variants: ['apache2']
     harden_apache_php74_debian_enable: true
+    harden_apache_php74_rhel9_enable: true
     misp_no_log: false
   roles:
     - { role: juju4.redhat_epel, when: ansible_os_family == 'RedHat' }
