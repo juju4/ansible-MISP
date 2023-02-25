@@ -17,6 +17,9 @@
     url: https://localhost
     is_container: false
     misp_pymisp_test: false
+    apache_process: apache2
+    apache_user: www-data
+    php_pkg: php
   pre_tasks:
     - name: Debug | var ansible_virtualization_type
       ansible.builtin.debug:
@@ -28,6 +31,25 @@
         (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
+    - name: RedHat | Set fact
+      ansible.builtin.set_fact:
+        apache_process: httpd
+        apache_user: root
+      when: ansible_os_family == 'RedHat'
+    - name: Jammy, RHEL9 | Set fact php7.4
+      ansible.builtin.set_fact:
+        php_pkg: php7.4
+      when: >
+        not (
+          harden_apache_php74_debian_enable | bool and (
+            (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 22)
+          )
+        ) and
+        not (
+          harden_apache_php74_rhel9_enable | bool and (
+            (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 9)
+          )
+        )
   tasks:
     - name: Gather package facts
       ansible.builtin.package_facts:
@@ -35,7 +57,7 @@
     - name: Validate that needed packages are present
       ansible.builtin.assert:
         that:
-          - ansible_facts.packages['php']
+          - ansible_facts.packages[php_pkg]
           - ansible_facts.packages['redis-server']
           - ansible_facts.packages['python3']
 
@@ -48,7 +70,7 @@
         that: cfg1.stat.exists and cfg1.stat.size != 0
 
     - name: Ensure apache process is running
-      ansible.builtin.command: pgrep -u www-data apache2
+      ansible.builtin.command: "pgrep -u {{ apache_user }} {{ apache_process }}"
       register: ps1
       changed_when: false
       failed_when: false
