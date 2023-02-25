@@ -37,6 +37,14 @@
     - ansible_os_family == "RedHat"
     - ansible_distribution_major_version | int >= 8
 
+- name: Redhat | remove possible conflicting packages
+  ansible.builtin.yum:
+    name:
+      - curl-minimal
+    state: absent
+  register: pkg_result
+  until: pkg_result is success
+
 - name: Redhat | MISP dependencies install
   ansible.builtin.yum:
     name: "{{ misp_pkg_list + webserver }}"
