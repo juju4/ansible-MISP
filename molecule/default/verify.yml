@@ -41,14 +41,10 @@
         php_pkg: php7.4
       when: >
         not (
-          harden_apache_php74_debian_enable | bool and (
             (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 22)
-          )
         ) and
         not (
-          harden_apache_php74_rhel9_enable | bool and (
             (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 9)
-          )
         )
   tasks:
     - name: Gather package facts
