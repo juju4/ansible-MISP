@@ -53,6 +53,11 @@
       ansible.builtin.set_fact:
         misp_modules_enable: false
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int == 22)
+    - name: RedHat9 | Set fact
+      ansible.builtin.set_fact:
+        misp_mysql_user: 'root'
+        misp_mysql_pass: ''
+      when: (ansible_os_family == "RedHat" and ansible_distribution_major_version | int == 9)
   roles:
     - { role: juju4.redhat_epel, when: ansible_os_family == 'RedHat' }
     # - geerlingguy.apache
