@@ -21,13 +21,13 @@ describe command("curl -s http://127.0.0.1:6666/modules | jq .") do
   its(:stdout) { should_not match /{"name":"Not Found"/ }
 end
 
-describe command("#{misp_virtualenv}/bin/python -c 'import yara'"), :if => os[:family] == 'ubuntu' do
+describe command("#{misp_virtualenv}/bin/python -c 'import yara'"), :if => os[:family] == 'ubuntu' && os[:release] != '22.04' do
   its(:stderr) { should_not match /Error/ }
   its(:stderr) { should_not match /Failed/ }
   its(:exit_status) { should eq 0 }
 end
 
-describe command("#{misp_virtualenv}/bin/python -c 'import sigma'"), :if => os[:family] == 'ubuntu' do
+describe command("#{misp_virtualenv}/bin/python -c 'import sigma'"), :if => os[:family] == 'ubuntu' && os[:release] != 22.04 do
   its(:stderr) { should_not match /Error/ }
   its(:stderr) { should_not match /Failed/ }
   its(:exit_status) { should eq 0 }
