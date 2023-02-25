@@ -1,12 +1,32 @@
 ---
 
-- name: Creating mysql misp db
-  community.mysql.mysql_db:
-    name: misp
-    state: present
-    login_user: "{{ misp_mysql_user | default(omit) }}"
-    login_password: "{{ misp_mysql_pass | default(omit) }}"
-  no_log: "{{ misp_no_log }}"
+- name: Database initialization
+  block:
+    - name: Creating mysql misp db
+      community.mysql.mysql_db:
+        name: misp
+        state: present
+        login_user: "{{ misp_mysql_user | default(omit) }}"
+        login_password: "{{ misp_mysql_pass | default(omit) }}"
+      no_log: "{{ misp_no_log }}"
+  rescue:
+    - name: Ensure db user has not empty password
+      community.mysql.mysql_user:
+        name: "{{ misp_mysql_user }}"
+        password: "{{ misp_mysql_pass }}"
+        state: present
+        login_user: "{{ misp_mysql_user }}"
+        login_password: ""
+      when:
+        - misp_mysql_user|string
+        - misp_mysql_pass|string
+    - name: Creating mysql misp db
+      community.mysql.mysql_db:
+        name: misp
+        state: present
+        login_user: "{{ misp_mysql_user | default(omit) }}"
+        login_password: "{{ misp_mysql_pass | default(omit) }}"
+      no_log: "{{ misp_no_log }}"
 - name: Check if mysql import done
   ansible.builtin.stat:
     path: /root/.mysql_misp_imported
