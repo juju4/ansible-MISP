@@ -21,7 +21,7 @@ jobs:
           - molecule_distro: 'rockylinux:9'
             experimental: true
           - molecule_distro: 'rockylinux:8'
-            experimental: false
+            experimental: true
           - molecule_distro: 'centos:7'
             # SSL CERTIFICATE_VERIFY_FAILED remirepo
             experimental: true
