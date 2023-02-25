@@ -119,7 +119,7 @@ see task 'docker redis workaround ???'
 
 * `Error: Database connection \"Mysql\" is missing, or could not be created.` can be cause if multiple php versions are present and wrong version is called from cli.
 
-* `PHP Fatal error: Uncaught TypeError: Return value of Symfony\\Component\\Process\\Process::close() must be of the type int, null returned in phar:///usr/local/bin/composer/vendor/symfony/process/Process.php:1466` (rhel/rockylinux8): root cause not identified.
+* `PHP Fatal error: Uncaught TypeError: Return value of Symfony\\Component\\Process\\Process::close() must be of the type int, null returned in phar:///usr/local/bin/composer/vendor/symfony/process/Process.php:1466` (rhel/rockylinux8 and 9): root cause not identified.
 
 ## FAQ
 
