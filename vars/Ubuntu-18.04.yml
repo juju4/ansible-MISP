@@ -101,6 +101,7 @@ php_confext: ini
 php_ini: /etc/php/7.2/apache2/php.ini
 php_ini_nginx: /etc/php/7.2/fpm/php.ini
 php_confenable: /etc/php/7.2/apache2/conf.d
+php_bin: /usr/bin/php7.2
 nginx_sock: /run/php/php7.2-fpm.sock
 fpm_user: www-data
 
