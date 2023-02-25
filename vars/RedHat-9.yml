@@ -64,9 +64,8 @@ misp_pkg_list:
  ## CentOS PowerTools x86_64
  - poppler-cpp-devel
 
-easy_install_bin: easy_install-3.10
-python3_bin: python3.10
-python3_pip: /usr/local/bin/pip3
+python3_bin: python3
+python3_pip: /usr/bin/pip3
 
 misp_webserver_apache2:
  - httpd
