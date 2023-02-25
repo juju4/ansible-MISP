@@ -27,7 +27,7 @@ describe command("#{misp_virtualenv}/bin/python -c 'import yara'"), :if => os[:f
   its(:exit_status) { should eq 0 }
 end
 
-describe command("#{misp_virtualenv}/bin/python -c 'import sigma'"), :if => os[:family] == 'ubuntu' && os[:release] != 22.04 do
+describe command("#{misp_virtualenv}/bin/python -c 'import sigma'"), :if => os[:family] == 'ubuntu' && os[:release] != '22.04' do
   its(:stderr) { should_not match /Error/ }
   its(:stderr) { should_not match /Failed/ }
   its(:exit_status) { should eq 0 }
