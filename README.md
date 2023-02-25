@@ -117,6 +117,10 @@ see task 'docker redis workaround ???'
 
 * Ubuntu 22.04 seems unsupported as php8.1 and app/composer.json requires php >=7.2.0,<8.0.0
 
+* `Error: Database connection \"Mysql\" is missing, or could not be created.` can be cause if multiple php versions are present and wrong version is called from cli.
+
+* `PHP Fatal error: Uncaught TypeError: Return value of Symfony\\Component\\Process\\Process::close() must be of the type int, null returned in phar:///usr/local/bin/composer/vendor/symfony/process/Process.php:1466` (rhel/rockylinux8): root cause not identified.
+
 ## FAQ
 
 * usage of roles dependencies like geerlinguy.{mysql,nginx,apache} are not required but allow more fine-tuning.
