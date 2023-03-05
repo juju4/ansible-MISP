@@ -13,3 +13,10 @@
     - "updateNoticeLists"
   loop_control:
     loop_var: c
+
+- name: Update object templates for "{{ misp_web_user }}"
+  become: yes
+  become_user: "{{ www_user }}"
+  ansible.builtin.command:
+    chdir: "{{ misp_rootdir }}"
+    cmd: "{{ misp_rootdir }}/app/Console/cake admin updateObjectTemplates 1"
