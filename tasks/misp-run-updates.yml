@@ -1,0 +1,15 @@
+---
+
+- name: Run admin update routines before first login
+  become: yes
+  become_user: "{{ www_user }}"
+  ansible.builtin.command:
+    chdir: "{{ misp_rootdir }}"
+    cmd: "{{ misp_rootdir }}/app/Console/cake admin {{ c }}"
+  loop:
+    - "runUpdates"
+    - "updateGalaxies"
+    - "updateWarningLists"
+    - "updateNoticeLists"
+  loop_control:
+    loop_var: c
