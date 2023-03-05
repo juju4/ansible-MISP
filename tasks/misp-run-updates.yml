@@ -13,6 +13,7 @@
     - "updateNoticeLists"
   loop_control:
     loop_var: c
+  when: (misp_run_updates is defined) and misp_run_updates
 
 - name: Update object templates for "{{ misp_web_user }}"
   become: yes
@@ -20,3 +21,4 @@
   ansible.builtin.command:
     chdir: "{{ misp_rootdir }}"
     cmd: "{{ misp_rootdir }}/app/Console/cake admin updateObjectTemplates 1"
+  when: (misp_run_updates is defined) and misp_run_updates
