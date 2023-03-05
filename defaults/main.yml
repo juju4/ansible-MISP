@@ -123,3 +123,4 @@ misp_redis_securecommands:
 
 # Update Galaxies, ObjectTemplates, Warninglists, Noticelists and Templates before first login
 misp_run_updates: false
+misp_run_updates_lock: "{{ misp_rootdir }}/.run_updates_lock"
