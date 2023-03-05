@@ -1,6 +1,6 @@
 ---
 
-- name: Run admin update routines before first login
+- name: "Run admin update routines before first login"
   become: yes
   become_user: "{{ www_user }}"
   ansible.builtin.command:
@@ -17,7 +17,7 @@
   when: (misp_run_updates is defined) and misp_run_updates
   register: run_updates_routines
 
-- name: Update object templates for "{{ misp_web_user }}"
+- name: "Update object templates for {{ misp_web_user }}"
   become: yes
   become_user: "{{ www_user }}"
   ansible.builtin.command:
@@ -27,7 +27,7 @@
   when: (misp_run_updates is defined) and misp_run_updates
   register: run_updates_objects
 
-- name: Create lock file on "{{ misp_run_updates_lock }}"
+- name: "Create lock file on {{ misp_run_updates_lock }}"
   ansible.builtin.command:
     cmd: "dd if=/dev/random of={{ misp_run_updates_lock }} bs=1 count=1"
     creates: "{{ misp_run_updates_lock }}"
