@@ -6,6 +6,7 @@
   ansible.builtin.command:
     chdir: "{{ misp_rootdir }}"
     cmd: "{{ misp_rootdir }}/app/Console/cake admin {{ c }}"
+    creates: "{{ misp_run_updates_lock }}"
   loop:
     - "runUpdates"
     - "updateGalaxies"
@@ -14,6 +15,7 @@
   loop_control:
     loop_var: c
   when: (misp_run_updates is defined) and misp_run_updates
+  register: run_updates_routines
 
 - name: Update object templates for "{{ misp_web_user }}"
   become: yes
@@ -21,4 +23,14 @@
   ansible.builtin.command:
     chdir: "{{ misp_rootdir }}"
     cmd: "{{ misp_rootdir }}/app/Console/cake admin updateObjectTemplates 1"
+    creates: "{{ misp_run_updates_lock }}"
   when: (misp_run_updates is defined) and misp_run_updates
+  register: run_updates_objects
+
+- name: Create lock file on "{{ misp_run_updates_lock }}"
+  ansible.builtin.command:
+    cmd: "dd if=/dev/random of={{ misp_run_updates_lock }} bs=1 count=1"
+    creates: "{{ misp_run_updates_lock }}"
+  when:
+    - (run_updates_routines is defined) and run_updates_routines
+    - (run_updates_objects is defined) and run_updates_objects
