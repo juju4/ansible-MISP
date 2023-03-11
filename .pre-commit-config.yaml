@@ -15,12 +15,12 @@ repos:
       - id: double-quote-string-fixer
       - id: requirements-txt-fixer
   - repo: https://github.com/ansible-community/ansible-lint.git
-    rev: v6.10.2
+    rev: v6.14.2
     hooks:
       - id: ansible-lint
         files: \.(yaml|yml)$
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.2
+    rev: v2.2.4
     hooks:
       - id: codespell
         args: [-I, .codespellignore, --exclude-file, files/pgp-09e2cd4944e6cbcd.asc]
