@@ -656,6 +656,10 @@
 - name: Import misp-add-users
   ansible.builtin.import_tasks: misp-add-users.yml
 
+- name: Import misp-run-updates
+  ansible.builtin.import_tasks: misp-run-updates.yml
+  when: misp_run_updates is defined and misp_run_updates
+
 - name: Import misp-feed
   ansible.builtin.import_tasks: misp-feeds.yml
 
