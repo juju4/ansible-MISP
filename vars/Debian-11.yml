@@ -2,7 +2,7 @@
 
 misp_pkg_list:
  - openssh-server
- - mysql-server
+ - mariadb-server
  - php
  - php-mysql
  - php-mbstring
