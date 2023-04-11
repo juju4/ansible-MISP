@@ -45,7 +45,7 @@ misp_pkg_list:
  - cron
  ## pillow
  - libtiff5-dev
- - libjpeg8-dev
+ - libjpeg-dev
  - zlib1g-dev
  - libfreetype6-dev
  ## if pyzmq?
