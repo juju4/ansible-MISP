@@ -536,6 +536,7 @@
     - { d: "{{ misp_rootdir }}/.gnupg/secring.gpg", m: '0600' }
   when: >
     not (
+          (ansible_distribution == 'Debian' and ansible_distribution_major_version | int >= 11) or
           (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 18) or
           (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
         )
