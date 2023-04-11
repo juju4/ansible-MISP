@@ -1,0 +1,121 @@
+---
+
+misp_pkg_list:
+ - openssh-server
+ - mysql-server
+ - php
+ - php-mysql
+ - php-mbstring
+ - php7.4-opcache
+ - php-readline
+ - php-mbstring
+ - php-zip
+ - php-redis
+ - php-gnupg
+ - php-intl
+ - php-bcmath
+ - php-gd
+ - postfix
+ - gcc
+ - zip
+ - git
+ - redis-server
+ - make
+ - python3-dev
+ - python3-pip
+ - python3-virtualenv
+ - python3-setuptools
+ - libxml2-dev
+ - libxslt1-dev
+ - libgl1-mesa-glx
+ - libzbar0
+ - zlib1g-dev
+ - php-dev
+ - curl
+ - gnupg
+ #
+ - php-redis
+ - python3-mysqldb
+ - rng-tools
+ # misp-modules
+ - python3
+ - libpq5
+ - acl
+ - sudo
+ - cron
+ ## pillow
+ - libtiff5-dev
+ - libjpeg8-dev
+ - zlib1g-dev
+ - libfreetype6-dev
+ ## if pyzmq?
+ # - libczmq-dev
+ - openssl
+ - libfuzzy-dev
+ - ruby-pygments.rb
+ - libsm6
+ - libzbar0
+ - libzbar-dev
+ - tesseract-ocr
+ - libpoppler-cpp-dev
+ - imagemagick
+ - libxrender1
+
+misp_gem_list:
+ - { name: public_suffix, v: 4.0.7 }
+ - { name: asciidoctor-pdf, v: 2.3.2 }
+
+python3_bin: python3
+python3_pip: pip3
+
+mysql_svc: mysql
+rng_svc: rng-tools
+redis_svc: redis
+redis_conf: /etc/redis/redis.conf
+misp_services:
+ - "{{ apache_svc }}"
+ - "{{ mysql_svc }}"
+ - "{{ rng_svc }}"
+
+misp_services_nginx:
+ - "{{ apache_svc }}"
+ - "{{ mysql_svc }}"
+ - "{{ rng_svc }}"
+ - php7.4-fpm
+
+misp_testing_pkg:
+ - ruby
+ - rake
+
+misp_webserver_apache2:
+ - apache2
+ - libapache2-mod-php
+ ## travis: "No package matching 'libapache2-mod-fastcgi' is available"
+ # - libapache2-mod-fastcgi
+
+misp_webserver_nginx:
+ - nginx
+ - php-fpm
+
+php_confdir: /etc/php/7.4/mods-available
+php_confext: ini
+php_ini: /etc/php/7.4/apache2/php.ini
+php_ini_nginx: /etc/php/7.4/fpm/php.ini
+php_confenable: /etc/php/7.4/apache2/conf.d
+php_bin: /usr/bin/php7.4
+nginx_sock: /run/php/php7.4-fpm.sock
+fpm_user: www-data
+
+gnupg_privdir: "{{ misp_rootdir }}/.gnupg/private-keys-v1.d"
+
+mispmodules_libyarapath: /usr/local/lib/python3.6/dist-packages/usr/lib
+
+apacheetc: /etc/apache2
+ssl_user: ssl-cert
+ssl_dir: /etc/ssl/certs
+ssl_privatedir: /etc/ssl/private
+
+supervisor_conf: /etc/supervisor/supervisord.conf
+supervisor_confdir: /etc/supervisor/conf.d
+supervisor_ext: conf
+supervisor_service: supervisor
