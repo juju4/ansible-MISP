@@ -31,6 +31,7 @@ platforms:
   - name: ubuntu-20.04
   - name: centos-8
   - name: centos-7
+  - name: debian-bullseye
 
 suites:
   - name: default
