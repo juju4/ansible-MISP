@@ -22,13 +22,13 @@ provisioner:
   ansible_cfg_path: test/vagrant/ansible.cfg
 
 platforms:
-  - name: ubuntu-20.04
   - name: centos-8
   - name: centos-7
     driver_config:
       network:
         - ["forwarded_port", {guest: 80, host: 8589}]
   - name: debian-bullseye
+  - name: ubuntu-20.04
 
 suites:
   - name: default
