@@ -25,6 +25,8 @@ jobs:
           - molecule_distro: 'centos:7'
             # SSL CERTIFICATE_VERIFY_FAILED remirepo
             experimental: true
+          - molecule_ditro: 'debian:bullseye'
+            experimental: false
           - molecule_distro: 'ubuntu:22.04'
             experimental: true
           - molecule_distro: 'ubuntu:20.04'
