@@ -28,6 +28,7 @@ platforms:
     driver_config:
       network:
         - ["forwarded_port", {guest: 80, host: 8589}]
+  - name: debian-bullseye
 
 suites:
   - name: default
