@@ -42,6 +42,7 @@ platforms:
     driver:
       config:
         security.privileged: true
+  - name: debian-bullseye
 
 suites:
   - name: default
