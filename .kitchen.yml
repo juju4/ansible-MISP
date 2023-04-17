@@ -31,8 +31,6 @@ provisioner:
   ansible_omnibus_url: https://raw.githubusercontent.com/juju4/omnibus-ansible/master/ansible_install.sh
 
 platforms:
-  - name: ubuntu-22.04
-  - name: ubuntu-20.04
   - name: centos-9-Stream
   - name: centos-8-Stream
   - name: centos-7
@@ -43,6 +41,8 @@ platforms:
       config:
         security.privileged: true
   - name: debian-bullseye
+  - name: ubuntu-22.04
+  - name: ubuntu-20.04
 
 suites:
   - name: default
