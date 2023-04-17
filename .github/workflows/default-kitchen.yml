@@ -32,6 +32,7 @@ jobs:
             experimental: true
           - distribution: debian
             version: bullseye
+            version2: bullseye
             suite: default
             experimental: false
           - distribution: ubuntu
