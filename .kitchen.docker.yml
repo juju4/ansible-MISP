@@ -28,10 +28,10 @@ provisioner:
   ansible_connection: ssh
 
 platforms:
-  - name: ubuntu-20.04
   - name: centos-8
   - name: centos-7
   - name: debian-bullseye
+  - name: ubuntu-20.04
 
 suites:
   - name: default
