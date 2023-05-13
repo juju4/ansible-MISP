@@ -14,14 +14,16 @@
   when: ansible_os_family == "RedHat"
 
 - name: RedHat9 | Enable PowerTools repo
-  ansible.builtin.command: dnf config-manager --enable crb
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: dnf config-manager --enable crb
   become: yes
   when:
     - ansible_os_family == "RedHat"
     - ansible_distribution_major_version | int == 9
 
 - name: RedHat8 | Enable PowerTools repo
-  ansible.builtin.command: dnf config-manager --set-enabled powertools
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: dnf config-manager --set-enabled powertools
   become: yes
   when:
     - ansible_os_family == "RedHat"

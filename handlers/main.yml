@@ -6,7 +6,8 @@
   when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
 - name: Restart webserver - docker,debian
-  ansible.builtin.command: "apache2ctl restart"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "apache2ctl restart"
   environment:
     APACHE_RUN_USER: www-data
     APACHE_RUN_GROUP: www-data
@@ -20,7 +21,8 @@
     - ansible_os_family == "Debian"
 
 - name: Restart webserver - docker,redhat
-  ansible.builtin.command: "apachectl restart"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "apachectl restart"
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "RedHat"
@@ -36,7 +38,8 @@
     state: restarted
 
 - name: Updating existing MISP submodules - minor releases
-  ansible.builtin.command: "git submodule update --init --force"  # noqa command-instead-of-module
+  ansible.builtin.command:  # noqa command-instead-of-module no-changed-when
+    cmd: "git submodule update --init --force"
   args:
     chdir: "{{ misp_rootdir }}"
 
@@ -44,3 +47,8 @@
   ansible.builtin.service:
     name: "{{ supervisor_service }}"
     state: "restarted"
+
+- name: Restart mysql
+  ansible.builtin.service:
+    name: mysql
+    state: restarted

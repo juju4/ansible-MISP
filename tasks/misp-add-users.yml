@@ -11,7 +11,8 @@
   register: ap
 - name: Set admin password
   # ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Password \"{{ misp_web_user }}\" \"{{ misp_web_pass }}\""
-  ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake user change_pw \"{{ misp_web_user }}\" \"{{ misp_web_pass }}\""
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "{{ misp_rootdir }}/app/Console/cake user change_pw \"{{ misp_web_user }}\" \"{{ misp_web_pass }}\""
   become: yes
   become_user: "{{ www_user }}"
   when: not ap.stat.exists

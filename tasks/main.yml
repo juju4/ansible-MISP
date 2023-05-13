@@ -60,10 +60,13 @@
     ansible_os_family == "Debian"
   block:
     - name: Debian | Docker | Manually initialize mysql
-      ansible.builtin.shell: >
-        mysqld --initialize --datadir='/var/lib/mysql' 2>&1 | tee /tmp/mysql_install_db.out
+      ansible.builtin.shell:
+        cmd: >
+          set -o pipefail
+          mysqld --initialize --datadir='/var/lib/mysql' 2>&1 | tee /tmp/mysql_install_db.out
       args:
         creates: /tmp/mysql_install_db.out
+        executable: /bin/bash
       become: yes
       become_user: mysql
 
@@ -169,7 +172,8 @@
   # when: not m.stat.exists
 
 - name: Update git submodules
-  ansible.builtin.command: "{{ item }}"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "{{ item }}"
   args:
     chdir: "{{ misp_rootdir }}"
   with_items:
@@ -493,7 +497,8 @@
     mode: "0600"
   when: not gkey.stat.exists
 - name: Redhat | start gpg-agent
-  ansible.builtin.command: "gpg-agent --daemon --homedir={{ misp_rootdir }}/.gnupg"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "gpg-agent --daemon --homedir={{ misp_rootdir }}/.gnupg"
   become: yes
   become_user: "{{ www_user }}"
   when: not gkey.stat.exists and (ansible_os_family == "RedHat") and misp_webserver == 'nginx'

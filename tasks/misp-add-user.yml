@@ -2,7 +2,8 @@
 
 # - debug: var=list
 - name: Add user {{ user.email }}
-  ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./add_user.py -e {{ user.email }} -o {{ user.org }} -r {{ user.role }}"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "{{ misp_virtualenv }}/bin/python ./add_user.py -e {{ user.email }} -o {{ user.org }} -r {{ user.role }}"
   become: yes
   become_user: "{{ www_user }}"
   args:

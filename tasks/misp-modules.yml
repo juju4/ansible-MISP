@@ -119,7 +119,8 @@
   become_flags: -H
 
 - name: Redhat8+ | install zbar-py dependencies for MISP modules (pip)
-  ansible.builtin.command: "{{ misp_virtualenv }}/bin/pip install zbar-py"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "{{ misp_virtualenv }}/bin/pip install zbar-py"
   args:
     chdir: "{{ mispmodules_rootdir }}/misp-modules"
   when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8
@@ -173,7 +174,8 @@
   changed_when: false
   ignore_errors: true
 - name: Start MISP modules app
-  ansible.builtin.shell: "{{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.start 2>&1 &"
+  ansible.builtin.shell:  # noqa no-changed-when
+    cmd: "{{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.start 2>&1 &"
   become: yes
   become_user: "{{ www_user }}"
   when: "'misp-modules' not in ps.stdout"
