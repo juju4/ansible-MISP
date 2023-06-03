@@ -30,6 +30,11 @@ jobs:
             version2: 8-Stream
             suite: default
             experimental: true
+          - distribution: debian
+            version: bullseye
+            version2: bullseye
+            suite: default
+            experimental: false
           - distribution: ubuntu
             version: '22.04'
             version2: 2204
