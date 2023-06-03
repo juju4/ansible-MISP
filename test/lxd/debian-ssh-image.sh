@@ -14,7 +14,7 @@ lxc exec $guest -- dhclient eth0
 lxc exec $guest -- ping -c 1 8.8.8.8
 lxc exec $guest -- apt-get -y update
 lxc exec $guest -- apt-get -y upgrade
-lxc exec $guest -- apt-get install -y openssh-server sudo
+lxc exec $guest -- apt-get install -y openssh-server sudo python3-pip
 lxc exec $guest -- pip3 install ansible
 lxc exec $guest -- which ansible
 lxc exec $guest -- ansible --version
