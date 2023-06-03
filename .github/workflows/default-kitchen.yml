@@ -4,6 +4,7 @@ name: default-kitchen
 on:
   push:
   pull_request:
+  workflow_dispatch:
   schedule:  # run weekly, every Thursday 06:00
     - cron: '0 6 * * 4'
 
