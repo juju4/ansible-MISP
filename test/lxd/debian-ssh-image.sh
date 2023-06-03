@@ -1,6 +1,7 @@
 #!/bin/sh
 # add ssh to default lxd debian image
 
+image="debian-$1"
 guest=default-$image
 template="$image"-nossh
 publishalias="$image"
