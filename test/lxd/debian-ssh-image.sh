@@ -16,6 +16,8 @@ lxc exec $guest -- apt-get -y update
 lxc exec $guest -- apt-get -y upgrade
 lxc exec $guest -- apt-get install -y openssh-server sudo
 lxc exec $guest -- pip3 install ansible
+lxc exec $guest -- which ansible
+lxc exec $guest -- ansible --version
 lxc exec $guest -- ln -s /usr/bin/pip3 /usr/bin/pip
 lxc exec $guest -- mkdir /root/.ssh || true
 
