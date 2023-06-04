@@ -1,8 +1,11 @@
 ---
 
-- name: Include version-specific variables for Debian/Ubuntu
+- name: Include version-specific variables for Ubuntu
   ansible.builtin.include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_distribution == 'Ubuntu'
+- name: Include version-specific variables for Debian
+  ansible.builtin.include_vars: "Debian-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  when: ansible_distribution == 'Debian'
 - name: Include version-specific variables for RedHat
   ansible.builtin.include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
   when: ansible_os_family == "RedHat"
