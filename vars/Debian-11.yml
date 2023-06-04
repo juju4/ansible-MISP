@@ -36,7 +36,8 @@ misp_pkg_list:
  #
  - php-redis
  - python3-mysqldb
- - rng-tools
+ # rng-tools-debian or rng-tools5 per https://packages.debian.org/bullseye/rng-tools-debian
+ - rng-tools-debian
  # misp-modules
  - python3
  - libpq5
@@ -69,7 +70,7 @@ python3_bin: python3
 python3_pip: pip3
 
 mysql_svc: mysql
-rng_svc: rng-tools
+rng_svc: rng-tools-debian
 redis_svc: redis
 redis_conf: /etc/redis/redis.conf
 misp_services:
