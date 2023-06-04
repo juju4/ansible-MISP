@@ -14,12 +14,12 @@ lxc exec $guest -- dhclient eth0
 lxc exec $guest -- ping -c 1 8.8.8.8
 lxc exec $guest -- apt-get -y update
 lxc exec $guest -- apt-get -y upgrade
-lxc exec $guest -- apt-get install -y openssh-server sudo python3-pip
+lxc exec $guest -- apt-get install -y openssh-server sudo python3-pip ruby curl wget
 lxc exec $guest -- pip3 install ansible
 lxc exec $guest -- which ansible
 lxc exec $guest -- ansible --version
-lxc exec $guest -- ln -s /usr/bin/pip3 /usr/bin/pip
 lxc exec $guest -- mkdir /root/.ssh || true
+lxc exec $guest -- gem install busser
 
 lxc stop $guest --force
 lxc publish $guest --alias $publishalias
