@@ -35,7 +35,7 @@ jobs:
             version: bullseye
             version2: bullseye
             suite: default
-            experimental: false
+            experimental: true
           - distribution: ubuntu
             version: '22.04'
             version2: 2204
