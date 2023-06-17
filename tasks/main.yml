@@ -460,7 +460,7 @@
   vars:
     secretdir: "{{ misp_rootdir }}"
     secretprefix: .misp-
-    name: salt
+    name_random: salt
 - name: Set salt
   ansible.builtin.set_fact:
     salt: "{{ secret }}"
@@ -471,7 +471,7 @@
   vars:
     secretdir: "{{ misp_rootdir }}"
     secretprefix: .misp-
-    name: encryption_key
+    name_random: encryption_key
 - name: Set salt
   ansible.builtin.set_fact:
     salt2: "{{ secret }}"

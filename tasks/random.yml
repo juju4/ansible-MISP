@@ -1,7 +1,7 @@
 ---
 # secretdir
 # secretprefix
-# name
+# name_random
 
 - name: Ensure openssl is present
   ansible.builtin.package:
@@ -13,21 +13,21 @@
 - name: Generating salt  # noqa no-free-form
   ansible.builtin.shell: |
     set -o pipefail
-    openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;'| tee {{ secretdir }}/{{ secretprefix }}-{{ name }}
+    openssl rand -base64 32 | sed 's@[=\\/\\+]@@g;'| tee {{ secretdir }}/{{ secretprefix }}-{{ name_random }}
   args:
     executable: /bin/bash
-    creates: "{{ secretdir }}/{{ secretprefix }}-{{ name }}"
+    creates: "{{ secretdir }}/{{ secretprefix }}-{{ name_random }}"
   register: secrets
   changed_when: false
   no_log: true
 
 - name: Check if existing secrets
   ansible.builtin.stat:
-    path: "{{ secretdir }}/{{ secretprefix }}-{{ name }}"
+    path: "{{ secretdir }}/{{ secretprefix }}-{{ name_random }}"
   register: s
 
 - name: Recover existing salt
-  ansible.builtin.command: "cat {{ secretdir }}/{{ secretprefix }}-{{ name }}"
+  ansible.builtin.command: "cat {{ secretdir }}/{{ secretprefix }}-{{ name_random }}"
   changed_when: false
   register: s2
   when: s.stat.exists

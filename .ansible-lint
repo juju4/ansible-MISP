@@ -1,3 +1,5 @@
 ---
 warn_list:
   - experimental
+exclude_paths:
+  - .github/workflows/galaxy.yml
