@@ -23,12 +23,17 @@ provisioner:
   require_ansible_omnibus: true
   # planned for deprecation per https://docs.chef.io/workstation/config_yml_kitchen/
   require_chef_omnibus: true
-  require_chef_for_busser: true
+  # https://github.com/neillturner/kitchen-ansible#ruby-install-to-run-serverspec-verify
+  require_chef_for_busser: false
   require_ruby_for_busser: false
   chef_omnibus_url: https://omnitruck.chef.io/install.sh
   enable_yum_epel: true
   ansible_connection: ssh
   ansible_omnibus_url: https://raw.githubusercontent.com/juju4/omnibus-ansible/master/ansible_install.sh
+
+verifier:
+  name: serverspec
+  sudo_path: true
 
 platforms:
   - name: centos-9-Stream
