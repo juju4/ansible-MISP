@@ -133,6 +133,7 @@ jobs:
           sudo gem install bcrypt_pbkdf rbnacl-libsodium
           sudo -H ssh-keygen -t ed25519 -f /root/.ssh/id_rsa -P ""
           sudo ls -lA /root/.ssh/
+          curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
           cd $GITHUB_WORKSPACE/juju4.misp && sudo kitchen diagnose --all
       # https://github.com/actionshub/test-kitchen
       - name: Install Chef
