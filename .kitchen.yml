@@ -32,8 +32,7 @@ provisioner:
   ansible_omnibus_url: https://raw.githubusercontent.com/juju4/omnibus-ansible/master/ansible_install.sh
 
 verifier:
-  name: serverspec
-  sudo_path: true
+  name: inspec
 
 platforms:
   - name: centos-9-Stream

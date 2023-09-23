@@ -127,7 +127,7 @@ jobs:
           sudo gem install kitchen-ansible
           sudo gem install kitchen-sync
           sudo gem install kitchen-lxd_cli
-          sudo gem install kitchen-verifier-serverspec
+          sudo gem install kitchen-verifier-inspec
           sudo apt-get install -y libsodium23
           sudo gem install rbnacl --version 4.0.2
           sudo gem install bcrypt_pbkdf rbnacl-libsodium
