@@ -128,7 +128,7 @@ jobs:
           { echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
           sudo lxc file push ansible.cfg $LXDGUEST/root/ansible.cfg
           sudo lxc exec $LXDGUEST -- pwd
-          sudo lxc exec $LXDGUEST -- pip install ansible
+          sudo lxc exec $LXDGUEST -- pip3 install ansible
           sudo lxc exec $LXDGUEST -- which ansible-playbook
       - name: Converge
         run: |
