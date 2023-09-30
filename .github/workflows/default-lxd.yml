@@ -80,7 +80,7 @@ jobs:
           whoami
           grep lxd /etc/group
           echo "# remote list"
-          lxc remote list
+          sudo lxc remote list
           echo "# image list"
           sudo lxc image list
           echo "# download image"
@@ -114,152 +114,152 @@ jobs:
       - name: Start lxd instance
         run: |
           set -x
-          lxc init $LXDIMAGE $LXDGUEST
-          lxc start $LXDGUEST
+          sudo lxc init $LXDIMAGE $LXDGUEST
+          sudo lxc start $LXDGUEST
       - name: Mount GITHUB_WORKSPACE in lxd
         run: |
           set -x
-          lxc exec $LXDGUEST -- install -d -m 755 /tmp/workspace
-          lxc config device add $LXDGUEST sharedworkspace disk source=$GITHUB_WORKSPACE/ path=/tmp/workspace
+          sudo lxc exec $LXDGUEST -- install -d -m 755 /tmp/workspace
+          sudo lxc config device add $LXDGUEST sharedworkspace disk source=$GITHUB_WORKSPACE/ path=/tmp/workspace
       - name: Ansible dependencies in lxd
         run: |
           cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE
           [ -f get-dependencies.sh ] && lxc exec $LXDGUEST -- sh -x /tmp/workspace/$ANSIBLE_ROLE/get-dependencies.sh
-          lxc exec $LXDGUEST -- "{ echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg"
+          sudo lxc exec $LXDGUEST -- "{ echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg"
       - name: Converge
         run: |
-          lxc exec $LXDGUEST -- ansible-playbook -i localhost, --connection=local --become -vvv /tmp/workspace/$ANSIBLE_ROLE/test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS}
+          sudo lxc exec $LXDGUEST -- ansible-playbook -i localhost, --connection=local --become -vvv /tmp/workspace/$ANSIBLE_ROLE/test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS}
         env:
           TERM: xterm-256color
       - name: Idempotency run
         run: |
-          lxc exec $LXDGUEST -- "ansible-playbook -i localhost, --connection=local --become -vvv /tmp/workspace/$ANSIBLE_ROLE/test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS} | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 0)"
+          sudo lxc exec $LXDGUEST -- "ansible-playbook -i localhost, --connection=local --become -vvv /tmp/workspace/$ANSIBLE_ROLE/test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS} | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 0)"
       - name: On failure
         run: |
           set -x
-          lxc exec $LXDGUEST -- 'ansible -i inventory --connection=local -m setup localhost' || true
-          lxc exec $LXDGUEST -- 'systemctl -l --no-pager status' || true
-          lxc exec $LXDGUEST -- 'systemctl -l --no-pager --failed' || true
-          lxc exec $LXDGUEST -- 'ls -l /usr/bin/ | egrep "(python|pip|ansible)"' || true
-          lxc exec $LXDGUEST -- 'pip freeze' || true
-          lxc exec $LXDGUEST -- 'pip3 freeze' || true
-          lxc exec $LXDGUEST -- 'ip addr' || true
-          lxc exec $LXDGUEST -- 'cat /etc/resolv.conf' || true
-          lxc exec $LXDGUEST -- 'host www.google.com' || true
-          lxc exec $LXDGUEST -- 'ping -c 1 www.google.com' || true
-          lxc exec $LXDGUEST -- 'ping -c 1 8.8.8.8' || true
-          lxc exec $LXDGUEST -- 'ls -l /usr/bin/php* /usr/local/bin/php*' || true
-          lxc exec $LXDGUEST -- 'php --version' || true
-          lxc exec $LXDGUEST -- 'ls /etc/apache2/mods-enabled/' || true
-          lxc exec $LXDGUEST -- 'ls -l /var/www/_MISP/MISP/tests/' || true
-          lxc exec $LXDGUEST -- 'cat /var/log/apache2/misp.local_error.log' || true
-          lxc exec $LXDGUEST -- 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log' || true
-          lxc exec $LXDGUEST -- 'ls -lA /etc/yum.repos.d/' || true
-          lxc exec $LXDGUEST -- 'cat /etc/yum.repos.d/CentOS-PowerTools.repo' || true
+          sudo lxc exec $LXDGUEST -- 'ansible -i inventory --connection=local -m setup localhost' || true
+          sudo lxc exec $LXDGUEST -- 'systemctl -l --no-pager status' || true
+          sudo lxc exec $LXDGUEST -- 'systemctl -l --no-pager --failed' || true
+          sudo lxc exec $LXDGUEST -- 'ls -l /usr/bin/ | egrep "(python|pip|ansible)"' || true
+          sudo lxc exec $LXDGUEST -- 'pip freeze' || true
+          sudo lxc exec $LXDGUEST -- 'pip3 freeze' || true
+          sudo lxc exec $LXDGUEST -- 'ip addr' || true
+          sudo lxc exec $LXDGUEST -- 'cat /etc/resolv.conf' || true
+          sudo lxc exec $LXDGUEST -- 'host www.google.com' || true
+          sudo lxc exec $LXDGUEST -- 'ping -c 1 www.google.com' || true
+          sudo lxc exec $LXDGUEST -- 'ping -c 1 8.8.8.8' || true
+          sudo lxc exec $LXDGUEST -- 'ls -l /usr/bin/php* /usr/local/bin/php*' || true
+          sudo lxc exec $LXDGUEST -- 'php --version' || true
+          sudo lxc exec $LXDGUEST -- 'ls /etc/apache2/mods-enabled/' || true
+          sudo lxc exec $LXDGUEST -- 'ls -l /var/www/_MISP/MISP/tests/' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/log/apache2/misp.local_error.log' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log' || true
+          sudo lxc exec $LXDGUEST -- 'ls -lA /etc/yum.repos.d/' || true
+          sudo lxc exec $LXDGUEST -- 'cat /etc/yum.repos.d/CentOS-PowerTools.repo' || true
         if: ${{ failure() }}
         continue-on-error: true
       - name: After script - python
         run: |
           set -x
-          lxc exec $LXDGUEST -- 'which pip'
-          lxc exec $LXDGUEST -- 'pip freeze'
-          lxc exec $LXDGUEST -- 'which pip3'
-          lxc exec $LXDGUEST -- 'pip3 install pipdeptree'
-          lxc exec $LXDGUEST -- 'pip3 freeze'
-          lxc exec $LXDGUEST -- 'pipdeptree -r'
-          lxc exec $LXDGUEST -- '/var/www/_MISP/venv/bin/python --version'
-          lxc exec $LXDGUEST -- '/var/www/_MISP/venv/bin/pip install pipdeptree'
-          lxc exec $LXDGUEST -- '/var/www/_MISP/venv/bin/pipdeptree -r'
+          sudo lxc exec $LXDGUEST -- 'which pip'
+          sudo lxc exec $LXDGUEST -- 'pip freeze'
+          sudo lxc exec $LXDGUEST -- 'which pip3'
+          sudo lxc exec $LXDGUEST -- 'pip3 install pipdeptree'
+          sudo lxc exec $LXDGUEST -- 'pip3 freeze'
+          sudo lxc exec $LXDGUEST -- 'pipdeptree -r'
+          sudo lxc exec $LXDGUEST -- '/var/www/_MISP/venv/bin/python --version'
+          sudo lxc exec $LXDGUEST -- '/var/www/_MISP/venv/bin/pip install pipdeptree'
+          sudo lxc exec $LXDGUEST -- '/var/www/_MISP/venv/bin/pipdeptree -r'
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - MISP files
         run: |
           set -x
-          lxc exec $LXDGUEST -- 'find /var/www/_MISP/venv/ -type f | tail -500'
-          lxc exec $LXDGUEST -- 'cat /opt/misp-modules/REQUIREMENTS'
-          lxc exec $LXDGUEST -- '/var/www/_MISP/venv/bin/misp-modules -t'
-          lxc exec $LXDGUEST -- 'ls -la /var/www/_MISP/MISP/'
-          lxc exec $LXDGUEST -- 'ls -la /var/www/.cache/pip/http/'
-          lxc exec $LXDGUEST -- 'cat /var/www/_MISP/MISP/app/Config/bootstrap.php'
-          lxc exec $LXDGUEST -- 'ls -la /var/www/_MISP/MISP/app/tmp/cache/models/'
-          lxc exec $LXDGUEST -- 'getfacl /var/www/_MISP/MISP/app/tmp/cache/models'
-          lxc exec $LXDGUEST -- 'find /usr -iname "*libyara*.so"'
+          sudo lxc exec $LXDGUEST -- 'find /var/www/_MISP/venv/ -type f | tail -500'
+          sudo lxc exec $LXDGUEST -- 'cat /opt/misp-modules/REQUIREMENTS'
+          sudo lxc exec $LXDGUEST -- '/var/www/_MISP/venv/bin/misp-modules -t'
+          sudo lxc exec $LXDGUEST -- 'ls -la /var/www/_MISP/MISP/'
+          sudo lxc exec $LXDGUEST -- 'ls -la /var/www/.cache/pip/http/'
+          sudo lxc exec $LXDGUEST -- 'cat /var/www/_MISP/MISP/app/Config/bootstrap.php'
+          sudo lxc exec $LXDGUEST -- 'ls -la /var/www/_MISP/MISP/app/tmp/cache/models/'
+          sudo lxc exec $LXDGUEST -- 'getfacl /var/www/_MISP/MISP/app/tmp/cache/models'
+          sudo lxc exec $LXDGUEST -- 'find /usr -iname "*libyara*.so"'
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - MISP error logs
         run: |
           set -x
-          lxc exec $LXDGUEST -- 'cat /var/log/apache2/misp.local_access.log' || true
-          lxc exec $LXDGUEST -- 'cat /var/log/apache2/misp.local_error.log' || true
-          lxc exec $LXDGUEST -- 'cat /var/log/httpd/misp.local_access.log' || true
-          lxc exec $LXDGUEST -- 'cat /var/log/httpd/misp.local_error.log' || true
-          lxc exec $LXDGUEST -- 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log' || true
-          lxc exec $LXDGUEST -- 'cat /var/www/_MISP/MISP/app/tmp/logs/debug.log' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/log/apache2/misp.local_access.log' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/log/apache2/misp.local_error.log' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/log/httpd/misp.local_access.log' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/log/httpd/misp.local_error.log' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/www/_MISP/MISP/app/tmp/logs/error.log' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/www/_MISP/MISP/app/tmp/logs/debug.log' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - redis logs
         run: |
           set -x
-          lxc exec $LXDGUEST -- 'ls -lA /var/log/redis/' || true
-          lxc exec $LXDGUEST -- 'cat /var/log/redis/redis.log' || true
-          lxc exec $LXDGUEST -- 'cat /var/log/redis/redis-server.log' || true
+          sudo lxc exec $LXDGUEST -- 'ls -lA /var/log/redis/' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/log/redis/redis.log' || true
+          sudo lxc exec $LXDGUEST -- 'cat /var/log/redis/redis-server.log' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
         run: |
-          lxc exec $LXDGUEST -- 'curl -vk http://localhost:6666'
+          sudo lxc exec $LXDGUEST -- 'curl -vk http://localhost:6666'
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - PyMISP
         run: |
-          lxc exec $LXDGUEST -- 'cd /var/www/_MISP/MISP/PyMISP/examples && /var/www/_MISP/venv/bin/python /var/www/_MISP/MISP/PyMISP/examples/users_list.py'
+          sudo lxc exec $LXDGUEST -- 'cd /var/www/_MISP/MISP/PyMISP/examples && /var/www/_MISP/venv/bin/python /var/www/_MISP/MISP/PyMISP/examples/users_list.py'
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - system
         run: |
           set -x
-          lxc exec $LXDGUEST -- 'netstat -anp' || true
-          lxc exec $LXDGUEST -- 'ss -nlp' || true
-          lxc exec $LXDGUEST -- 'systemctl -l --no-pager status apache2' || true
-          lxc exec $LXDGUEST -- 'systemctl -l --no-pager status redis' || true
-          lxc exec $LXDGUEST -- 'systemctl -l --no-pager status httpd' || true
-          lxc exec $LXDGUEST -- 'systemctl -l --no-pager status httpd-init' || true
-          lxc exec $LXDGUEST -- 'systemctl -l --no-pager status' || true
+          sudo lxc exec $LXDGUEST -- 'netstat -anp' || true
+          sudo lxc exec $LXDGUEST -- 'ss -nlp' || true
+          sudo lxc exec $LXDGUEST -- 'systemctl -l --no-pager status apache2' || true
+          sudo lxc exec $LXDGUEST -- 'systemctl -l --no-pager status redis' || true
+          sudo lxc exec $LXDGUEST -- 'systemctl -l --no-pager status httpd' || true
+          sudo lxc exec $LXDGUEST -- 'systemctl -l --no-pager status httpd-init' || true
+          sudo lxc exec $LXDGUEST -- 'systemctl -l --no-pager status' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - journalctl
         run: |
-          lxc exec $LXDGUEST -- 'journalctl -xe --no-pager' || true
+          sudo lxc exec $LXDGUEST -- 'journalctl -xe --no-pager' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - redhat
         run: |
-          lxc exec $LXDGUEST -- 'sudo dnf repolist' || true
-          lxc exec $LXDGUEST -- 'find /etc/yum.repos.d/ -exec cat {} \;' || true
+          sudo lxc exec $LXDGUEST -- 'sudo dnf repolist' || true
+          sudo lxc exec $LXDGUEST -- 'find /etc/yum.repos.d/ -exec cat {} \;' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - mysql
         run: |
-          lxc exec $LXDGUEST -- 'mysql -e "SHOW TABLES" misp' || true
-          lxc exec $LXDGUEST -- 'mysql -e "SELECT * from users;" misp' || true
+          sudo lxc exec $LXDGUEST -- 'mysql -e "SHOW TABLES" misp' || true
+          sudo lxc exec $LXDGUEST -- 'mysql -e "SELECT * from users;" misp' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - php
         run: |
           set -x
-          lxc exec $LXDGUEST -- 'which php' || true
-          lxc exec $LXDGUEST -- '`which php` --version' || true
-          lxc exec $LXDGUEST -- 'which php7.4' || true
-          lxc exec $LXDGUEST -- 'ls -lF /usr/bin/php* /usr/local/bin/php*' || true
-          lxc exec $LXDGUEST -- 'dpkg -L php' || true
-          lxc exec $LXDGUEST -- 'dpkg -L php7.4' || true
+          sudo lxc exec $LXDGUEST -- 'which php' || true
+          sudo lxc exec $LXDGUEST -- '`which php` --version' || true
+          sudo lxc exec $LXDGUEST -- 'which php7.4' || true
+          sudo lxc exec $LXDGUEST -- 'ls -lF /usr/bin/php* /usr/local/bin/php*' || true
+          sudo lxc exec $LXDGUEST -- 'dpkg -L php' || true
+          sudo lxc exec $LXDGUEST -- 'dpkg -L php7.4' || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - misp
         run: |
           set -x
-          lxc exec $LXDGUEST -- 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin securityAudit' || true
-          lxc exec $LXDGUEST -- 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin configLint' || true
-          lxc exec $LXDGUEST -- 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin live' || true
+          sudo lxc exec $LXDGUEST -- 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin securityAudit' || true
+          sudo lxc exec $LXDGUEST -- 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin configLint' || true
+          sudo lxc exec $LXDGUEST -- 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin live' || true
         if: ${{ always() }}
         continue-on-error: true
