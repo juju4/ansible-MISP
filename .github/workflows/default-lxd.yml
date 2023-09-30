@@ -124,7 +124,7 @@ jobs:
       - name: Ansible dependencies in lxd
         run: |
           cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE
-          [ -f get-dependencies.sh ] && sh -x /tmp/workspace/$ANSIBLE_ROLE/get-dependencies.sh
+          [ -f get-dependencies.sh ] && sh -x get-dependencies.sh
           sudo lxc exec $LXDGUEST -- "{ echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg"
       - name: Converge
         run: |
