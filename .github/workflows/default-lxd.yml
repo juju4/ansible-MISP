@@ -128,11 +128,9 @@ jobs:
           { echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
           sudo lxc file push ansible.cfg $LXDGUEST/root/ansible.cfg
           sudo lxc exec $LXDGUEST -- pwd
-          sudo lxc exec $LXDGUEST -- which pip3
           [ "X${{ matrix.distribution }}" == "Xdebian" ] && sudo lxc exec $LXDGUEST -- apt-get install -y python3-pip
           [ "X${{ matrix.distribution }}" == "Xubuntu" ] && sudo lxc exec $LXDGUEST -- apt-get install -y python3-pip
           sudo lxc exec $LXDGUEST -- pip3 install ansible
-          sudo lxc exec $LXDGUEST -- which ansible-playbook
       - name: Converge
         run: |
           sudo lxc exec $LXDGUEST -- ansible-playbook -i localhost, --connection=local --become -vvv /tmp/workspace/$ANSIBLE_ROLE/test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS}
