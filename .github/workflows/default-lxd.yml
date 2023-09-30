@@ -128,8 +128,8 @@ jobs:
           { echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
           sudo lxc file push ansible.cfg $LXDGUEST/root/ansible.cfg
           sudo lxc exec $LXDGUEST -- pwd
-          [ "X${{ matrix.distribution }}" == "Xdebian" ] && sudo lxc exec $LXDGUEST -- apt-get install -y python3-pip
-          [ "X${{ matrix.distribution }}" == "Xubuntu" ] && sudo lxc exec $LXDGUEST -- apt-get install -y python3-pip
+          [ "X${{ matrix.distribution }}" == "Xdebian" -o "X${{ matrix.distribution }}" == "Xubuntu" ] && sudo lxc exec $LXDGUEST -- apt-get update
+          [ "X${{ matrix.distribution }}" == "Xdebian" -o "X${{ matrix.distribution }}" == "Xubuntu" ] && sudo lxc exec $LXDGUEST -- apt-get install -y python3-pip
           sudo lxc exec $LXDGUEST -- pip3 install ansible
       - name: Converge
         run: |
