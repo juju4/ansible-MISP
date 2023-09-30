@@ -127,6 +127,9 @@ jobs:
           [ -f get-dependencies.sh ] && sh -x get-dependencies.sh
           { echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
           sudo lxc file push ansible.cfg $LXDGUEST/root/ansible.cfg
+          sudo lxc exec $LXDGUEST -- pwd
+          sudo lxc exec $LXDGUEST -- pip install ansible
+          sudo lxc exec $LXDGUEST -- which ansible-playbook
       - name: Converge
         run: |
           sudo lxc exec $LXDGUEST -- ansible-playbook -i localhost, --connection=local --become -vvv /tmp/workspace/$ANSIBLE_ROLE/test/integration/default/default.yml ${ANSIBLE_EXTRA_VARS}
