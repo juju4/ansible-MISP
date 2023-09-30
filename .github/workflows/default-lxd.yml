@@ -128,6 +128,10 @@ jobs:
           { echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
           sudo lxc file push ansible.cfg $LXDGUEST/root/ansible.cfg
           sudo lxc exec $LXDGUEST -- pwd
+          sudo lxc exec $LXDGUEST -- ip address
+          sudo lxc exec $LXDGUEST -- ip route
+          sudo lxc exec $guest -- dhclient eth0
+          sudo lxc exec $guest -- ping -c 1 8.8.8.8
           [ "X${{ matrix.distribution }}" == "Xdebian" -o "X${{ matrix.distribution }}" == "Xubuntu" ] && sudo lxc exec $LXDGUEST -- apt-get update
           [ "X${{ matrix.distribution }}" == "Xdebian" -o "X${{ matrix.distribution }}" == "Xubuntu" ] && sudo lxc exec $LXDGUEST -- apt-get install -y python3-pip
           sudo lxc exec $LXDGUEST -- pip3 install ansible
