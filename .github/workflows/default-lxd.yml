@@ -91,13 +91,9 @@ jobs:
           sudo lxc info
           sudo lxc network list
           sudo lxc network show lxdbr0
-          cat /etc/default/lxd-bridge || true
           ps ax | grep dnsmasq
-          systemctl status -l --no-pager lxd || true
-          cat /etc/network/interfaces.d/50-cloud-init.cfg || true
           # storage pool
           sudo lxc storage list
-          sudo zpool list
           sudo lxc profile show default
           # check nftables
           sudo nft list ruleset || true
