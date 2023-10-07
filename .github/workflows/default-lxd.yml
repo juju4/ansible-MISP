@@ -71,24 +71,21 @@ jobs:
           pwd
           env
           find . -ls
-      - name: Install lxd requirements
+      # https://github.com/canonical/setup-lxd
+      - name: Setup LXD
+        uses: canonical/setup-lxd@4e959f8e0d9c5feb27d44c5e4d9a330a782edee0
+        with:
+          channel: latest/stable
+      - name: lxd information
         run: |
           set -x
-          sudo apt-get update -qq
-          sudo apt-get -y install acl dnsmasq-base zfsutils-linux -q
-          sudo snap install lxd
           whoami
           grep lxd /etc/group
           echo "# remote list"
           sudo lxc remote list
           echo "# image list"
           sudo lxc image list
-          echo "# download image"
-          [ ${{ matrix.distribution }} == ubuntu ] || sudo lxc image copy images:${{ matrix.distribution }}/${{ matrix.version }}/amd64 local: --alias=${{ matrix.distribution }}-${{ matrix.version }}-nossh || true
-          [ ${{ matrix.distribution }} == ubuntu ] && sudo lxc image copy ubuntu:${{ matrix.version }} local: --alias=${{ matrix.distribution }}-${{ matrix.version }} || true
-          echo "# image list"
-          sudo lxc image list
-          ## configure network
+          ## check network
           ifconfig -a || true
           ip addr || true
           # https://documentation.ubuntu.com/lxd/en/latest/howto/network_bridge_firewalld/#prevent-connectivity-issues-with-lxd-and-docker
@@ -98,30 +95,21 @@ jobs:
           sudo lxc network list
           sudo lxc network create lxdbr0
           sudo lxc network show lxdbr0
-          sudo lxc network attach-profile lxdbr0 default eth0
-          sudo lxc profile device get default eth0 nictype || true
           cat /etc/default/lxd-bridge || true
           sudo service lxd-bridge restart || true
           ps ax | grep dnsmasq
           systemctl status -l --no-pager lxd || true
           cat /etc/network/interfaces.d/50-cloud-init.cfg || true
-          sudo lxc network list
-          # configure storage pool
-          sudo lxc storage list
-          sudo lxc storage create pool1 zfs
+          # storage pool
           sudo lxc storage list
           sudo zpool list
-          sudo lxc profile device add default root disk path=/ pool=pool1
           sudo lxc profile show default
-          [ "X${{ matrix.distribution }}" == "Xcentos" ] && cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && sudo sh -x ./test/lxd/centos-ssh-image.sh ${{ matrix.version }} || true
-          [ "X${{ matrix.distribution }}" == "Xdebian" ] && cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && sudo sh -x ./test/lxd/debian-ssh-image.sh ${{ matrix.version }} || true
           # check nftables
-          nft list ruleset || true
+          sudo nft list ruleset || true
       - name: Start lxd instance
         run: |
           set -x
-          sudo lxc init $LXDIMAGE $LXDGUEST
-          sudo lxc start $LXDGUEST
+          sudo lxc launch $LXDIMAGE $LXDGUEST
       - name: Mount GITHUB_WORKSPACE in lxd
         run: |
           set -x
