@@ -116,7 +116,6 @@ jobs:
           sudo lxc exec $LXDGUEST -- pwd
           sudo lxc exec $LXDGUEST -- ip address
           sudo lxc exec $LXDGUEST -- ip route
-          sudo lxc exec $LXDGUEST -- dhclient eth0
           sudo lxc exec $LXDGUEST -- ping -c 1 8.8.8.8
           [ "X${{ matrix.distribution }}" == "Xdebian" -o "X${{ matrix.distribution }}" == "Xubuntu" ] && sudo lxc exec $LXDGUEST -- apt-get update
           [ "X${{ matrix.distribution }}" == "Xdebian" -o "X${{ matrix.distribution }}" == "Xubuntu" ] && sudo lxc exec $LXDGUEST -- apt-get install -y python3-pip
