@@ -91,13 +91,17 @@ jobs:
           ## configure network
           ifconfig -a || true
           ip addr || true
+          # https://documentation.ubuntu.com/lxd/en/latest/howto/network_bridge_firewalld/#prevent-connectivity-issues-with-lxd-and-docker
+          sudo ip link delete docker0
+          ip addr || true
           sudo lxc info
           sudo lxc network list
           sudo lxc network create lxdbr0
           sudo lxc network show lxdbr0
           sudo lxc network attach-profile lxdbr0 default eth0
           sudo lxc profile device get default eth0 nictype || true
-          sudo service lxd restart || true
+          cat /etc/default/lxd-bridge || true
+          sudo service lxd-bridge restart || true
           ps ax | grep dnsmasq
           systemctl status -l --no-pager lxd || true
           cat /etc/network/interfaces.d/50-cloud-init.cfg || true
@@ -111,6 +115,8 @@ jobs:
           sudo lxc profile show default
           [ "X${{ matrix.distribution }}" == "Xcentos" ] && cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && sudo sh -x ./test/lxd/centos-ssh-image.sh ${{ matrix.version }} || true
           [ "X${{ matrix.distribution }}" == "Xdebian" ] && cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && sudo sh -x ./test/lxd/debian-ssh-image.sh ${{ matrix.version }} || true
+          # check nftables
+          nft list ruleset || true
       - name: Start lxd instance
         run: |
           set -x
