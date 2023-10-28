@@ -1,0 +1,211 @@
+---
+
+- name: Verify MISP setup
+  hosts: mispgroup
+  gather_facts: true
+  vars:
+    misp_home: /var/www/_MISP
+    misp_rootdir: "{{ misp_home }}/MISP"
+    misp_config: "{{ misp_rootdir }}/app/Config/config.php"
+    ports:
+      # apache
+      - { h: 0.0.0.0, p: 443 }
+      # mysql
+      - { h: localhost, p: 3306 }
+      # redis
+      - { h: localhost, p: 6379 }
+    url: https://localhost
+    is_container: false
+    misp_pymisp_test: false
+    apache_process: apache2
+    apache_user: www-data
+    php_pkg: php
+  pre_tasks:
+    - name: Debug | var ansible_virtualization_type
+      ansible.builtin.debug:
+        var: ansible_virtualization_type
+    - name: Set fact is_container
+      ansible.builtin.set_fact:
+        is_container: true
+      when: >
+        (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        )
+    - name: RedHat | Set fact
+      ansible.builtin.set_fact:
+        apache_process: httpd
+        apache_user: root
+      when: ansible_os_family == 'RedHat'
+    - name: Jammy, RHEL9 | Set fact php7.4
+      ansible.builtin.set_fact:
+        php_pkg: php7.4
+      when: >
+        (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 22)
+        or
+        (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 9)
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+    - name: Validate that needed packages are present
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.packages[php_pkg]
+          - ansible_facts.packages['redis-server']
+          - ansible_facts.packages['python3']
+
+    - name: Check misp config file
+      ansible.builtin.stat:
+        path: "{{ misp_config }}"
+      register: cfg1
+    - name: Validate misp configuration file is present
+      ansible.builtin.assert:
+        that: cfg1.stat.exists and cfg1.stat.size != 0
+
+    - name: Ensure apache process is running
+      ansible.builtin.command: "pgrep -u {{ apache_user }} {{ apache_process }}"
+      register: ps1
+      changed_when: false
+      failed_when: false
+    - name: Validate ps output
+      ansible.builtin.assert:
+        that: ps1.stdout
+      when:
+        - not is_container|bool
+
+    - name: Check all processes
+      ansible.builtin.command: ps aux
+      changed_when: false
+      register: psa
+    - name: Debug | ps aux output
+      ansible.builtin.debug:
+        var: psa
+        verbosity: 1
+
+    - name: Ensure ports are listening
+      ansible.builtin.wait_for:
+        host: "{{ item.h }}"
+        port: "{{ item.p }}"
+        timeout: 10
+      with_items: "{{ ports }}"
+      when:
+        - not is_container|bool
+
+    - name: Fetch localhost endpoint
+      ansible.builtin.uri:
+        url: "{{ url }}"
+        validate_certs: no
+        return_content: yes
+      register: web
+      failed_when: false
+    - name: Validate localhost endpoint
+      ansible.builtin.assert:
+        that: >
+          "'Users - MISP' in web.content"
+      when:
+        - not is_container|bool
+
+    - name: Check misp errors
+      ansible.builtin.command: "grep Error: {{ misp_rootdir }}/app/tmp/logs/error.log"
+      changed_when: false
+      failed_when: false
+      register: errors
+
+    - name: Check misp debug
+      ansible.builtin.command: "cat {{ misp_rootdir }}/app/tmp/logs/debug.log"
+      changed_when: false
+      failed_when: false
+      register: debug
+
+    - name: Check apache2 access
+      ansible.builtin.command: "tail -50 /var/log/apache2/misp.local_access.log"
+      changed_when: false
+      failed_when: false
+      register: apache2access
+
+    - name: Check apache2 errors
+      ansible.builtin.command: "tail -50 /var/log/apache2/misp.local_error.log"
+      changed_when: false
+      failed_when: false
+      register: apache2error
+
+    - name: Check redis logs
+      ansible.builtin.command: "tail -50 /var/log/redis/redis-server.log"
+      changed_when: false
+      failed_when: false
+      register: redis
+
+    - name: Check pymisp API
+      ansible.builtin.command: "{{ misp_home }}/venv/bin/python {{ misp_rootdir }}/PyMISP/examples/users_list.py"
+      changed_when: false
+      failed_when: false
+      register: pymisp
+    - name: Validate pymisp users list
+      ansible.builtin.assert:
+        that:
+          - "'admin@admin.test' in pymisp.stdout"
+      when: misp_pymisp_test | bool
+
+    - name: Check cake Admin configLint
+      ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Admin configLint"
+      become: yes
+      become_user: www-data
+      changed_when: false
+      failed_when: false
+      register: configlint
+    - name: Validate config lint
+      ansible.builtin.assert:
+        that:
+          - not configlint.stdout|string
+          - not configlint.stderr|string
+
+    - name: Check cake Admin live
+      ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Admin live"
+      become: yes
+      become_user: www-data
+      changed_when: false
+      failed_when: false
+      register: live
+    - name: Validate live
+      ansible.builtin.assert:
+        that:
+          - "'True' in live.stdout"
+          - not live.stderr|string
+
+    - name: Check cake Admin securityAudit
+      ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Admin securityAudit"
+      become: yes
+      become_user: www-data
+      changed_when: false
+      failed_when: false
+      register: securityaudit
+    - name: Validate securityaudit
+      ansible.builtin.assert:
+        that:
+          - "'Error: ' not in securityaudit.stdout"
+          - not securityaudit.stderr|string
+      when: false
+
+    - name: Check mysql misp tables
+      ansible.builtin.command: mysql -e "SHOW TABLES" misp
+      changed_when: false
+      failed_when: false
+      register: mysql1
+
+    - name: Check mysql misp users
+      ansible.builtin.command: mysql -e "SELECT * from users;" misp
+      changed_when: false
+      failed_when: false
+      register: mysql2
+
+    - name: Check misp-workers under supervisor  # noqa command-instead-of-module
+      ansible.builtin.command: supervisorctl status
+      changed_when: false
+      failed_when: false
+      register: sup
+    - name: Validate supervisor status
+      ansible.builtin.assert:
+        that:
+          - "'misp-workers:' in sup.stdout"
+          - "'RUNNING' in sup.stdout"
+          - sup.rc == 0

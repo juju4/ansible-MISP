@@ -1,0 +1,21 @@
+---
+
+collections:
+  - ansible.posix
+  - community.vagrant
+
+roles:
+  - src: https://github.com/juju4/ansible-redhat-epel/
+    version: main
+    name: juju4.redhat_epel
+  - src: https://github.com/juju4/ansible-harden-apache/
+    version: main
+    name: juju4.harden_apache
+  - src: https://github.com/juju4/ansible-harden-nginx/
+    version: main
+    name: juju4.harden_nginx
+  - src: https://github.com/juju4/ansible-faup/
+    version: main
+    name: juju4.faup
+  - name: geerlingguy.nginx
+  - name: geerlingguy.apache

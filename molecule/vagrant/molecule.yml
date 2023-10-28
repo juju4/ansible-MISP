@@ -1,0 +1,48 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+    type: libvirt
+    options:
+      memory: 4096 # lol, ubuntu 22.04 will deadlock on boot due to lack of memory.
+      cpus: 1
+platforms:
+  - name: instance
+    box: ${MOLECULE_DISTRO:-generic/ubuntu2004}
+    interfaces:
+      - auto_config: true
+        network_name: private_network
+        type: static
+        ip: 192.168.10.10
+    # env:
+    #   http_proxy: ${http_proxy}
+    #   https_proxy: ${https_proxy}
+    #   no_proxy: ${no_proxy}
+    groups:
+      - mispgroup
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      verbosity: 2
+  connection_options:
+    ansible_ssh_user: vagrant
+    ansible_become: true
+scenario:
+  name: default
+  test_sequence:
+    - dependency
+    # - lint
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    # - idempotence
+    - verify
+verifier:
+  name: ansible

@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    misp_pymisp_validation_fatal: false
+  roles:
+    - juju4.misp
