@@ -257,3 +257,4 @@ jobs:
           sudo lxc exec $LXDGUEST -- 'sudo -u www-data /var/www/_MISP/MISP/app/Console/cake Admin live' || true
         if: ${{ always() }}
         continue-on-error: true
+
