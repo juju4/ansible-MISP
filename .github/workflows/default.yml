@@ -21,15 +21,15 @@ jobs:
           - molecule_distro: 'centos:7'
             experimental: true    # SSL CERTIFICATE_VERIFY_FAILED remirepo
           - molecule_ditro: 'debian:bullseye'
-            experimental: false
+            experimental: true
           - molecule_distro: 'rockylinux:9'
             experimental: true
           - molecule_distro: 'rockylinux:8'
             experimental: true
           - molecule_distro: 'ubuntu:22.04'
-            experimental: true
-          - molecule_distro: 'ubuntu:20.04'
             experimental: false
+          - molecule_distro: 'ubuntu:20.04'
+            experimental: true
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       MOLECULE_NO_LOG: "false"
