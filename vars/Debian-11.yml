@@ -54,6 +54,7 @@ misp_pkg_list:
  - openssl
  - libfuzzy-dev
  - ruby-pygments.rb
+ - ruby-dev
  - libsm6
  - libzbar0
  - libzbar-dev

@@ -59,6 +59,7 @@ misp_pkg_list:
  - zbar
  - poppler-cpp-devel
  - libXrender
+ - ruby-devel
 
 python3_bin: python3.6
 python3_pip: /usr/local/bin/pip3

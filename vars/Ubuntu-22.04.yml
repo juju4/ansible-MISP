@@ -58,6 +58,7 @@ misp_pkg_list:
  - libfuzzy-dev
  - ruby-pygments.rb
  - ruby-rubygems
+ - ruby-dev
  - libsm6
  - libzbar0
  - libzbar-dev

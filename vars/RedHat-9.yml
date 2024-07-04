@@ -63,6 +63,7 @@ misp_pkg_list:
  - libXrender
  ## CentOS PowerTools x86_64
  - poppler-cpp-devel
+ - ruby-devel
 
 python3_bin: python3
 python3_pip: /usr/bin/pip3
