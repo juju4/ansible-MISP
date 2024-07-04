@@ -1,7 +1,7 @@
 ---
 
 - name: Redhat | remi yum-utils
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: yum-utils
     state: present
     update_cache: yes
@@ -40,7 +40,7 @@
     - ansible_distribution_major_version | int >= 8
 
 - name: Redhat | remove possible conflicting packages
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name:
       - curl-minimal
     state: absent
@@ -48,7 +48,7 @@
   until: pkg_result is success
 
 - name: Redhat | MISP dependencies install
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: "{{ misp_pkg_list + webserver }}"
     state: present
     update_cache: yes
