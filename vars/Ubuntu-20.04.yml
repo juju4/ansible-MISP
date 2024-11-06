@@ -15,6 +15,7 @@ misp_pkg_list:
  - php-intl
  - php-bcmath
  - php-gd
+ - php-curl
  - postfix
  - gcc
  - zip
