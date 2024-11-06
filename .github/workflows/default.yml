@@ -18,13 +18,15 @@ jobs:
       max-parallel: 4
       matrix:
         include:
-          - molecule_distro: 'centos:7'
-            experimental: true    # SSL CERTIFICATE_VERIFY_FAILED remirepo
+          - molecule_ditro: 'debian:bookworm'
+            experimental: true
           - molecule_ditro: 'debian:bullseye'
             experimental: true
           - molecule_distro: 'rockylinux:9'
             experimental: true
           - molecule_distro: 'rockylinux:8'
+            experimental: true
+          - molecule_distro: 'ubuntu:24.04'
             experimental: true
           - molecule_distro: 'ubuntu:22.04'
             experimental: false
