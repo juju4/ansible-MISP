@@ -64,6 +64,7 @@ misp_pkg_list:
  - libxrender1
 
 misp_gem_list:
+ - { name: css_parser, v: 1.17.1 }
  - { name: public_suffix, v: 4.0.7 }
  - { name: asciidoctor-pdf, v: 2.3.2 }
 
