@@ -70,7 +70,6 @@ misp_pkg_list:
  - libxrender1
  # for numpy
  - libopenblas-dev
- - libopenblas-base
  - libatlas-base-dev
  - libatlas3-base
 
