@@ -35,7 +35,6 @@ misp_pkg_list:
  - python3-setuptools
  - libxml2-dev
  - libxslt1-dev
- - libgl1-mesa-glx
  - libzbar0
  - zlib1g-dev
  - curl
