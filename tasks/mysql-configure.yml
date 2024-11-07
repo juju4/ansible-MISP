@@ -18,8 +18,8 @@
         login_user: "{{ misp_mysql_user }}"
         login_password: ""
       when:
-        - misp_mysql_user|string
-        - misp_mysql_pass|string
+        - misp_mysql_user is defined and misp_mysql_user|length > 0
+        - misp_mysql_pass is defined and misp_mysql_pass|length > 0
     - name: Creating mysql misp db
       community.mysql.mysql_db:
         name: misp
