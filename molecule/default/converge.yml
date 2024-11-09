@@ -36,6 +36,7 @@
         misp_version: '2.5'
         misp_php_snuffleupagus_enable: false
         harden_php7_snuffleupagus: false
+        misp_modules_enable: false
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
   vars:
     misp_pymisp_validation_fatal: false
