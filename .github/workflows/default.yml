@@ -19,9 +19,9 @@ jobs:
       matrix:
         include:
           - molecule_ditro: 'debian:bookworm'
-            experimental: true
+            experimental: false
           - molecule_ditro: 'debian:bullseye'
-            experimental: true
+            experimental: false
           - molecule_distro: 'rockylinux:9'
             experimental: true
           - molecule_distro: 'rockylinux:8'
@@ -31,7 +31,7 @@ jobs:
           - molecule_distro: 'ubuntu:22.04'
             experimental: false
           - molecule_distro: 'ubuntu:20.04'
-            experimental: true
+            experimental: false
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       MOLECULE_NO_LOG: "false"
