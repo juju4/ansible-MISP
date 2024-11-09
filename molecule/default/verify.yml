@@ -43,6 +43,11 @@
         (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 22)
         or
         (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 9)
+    - name: Noble | Set fact php8.3
+      ansible.builtin.set_fact:
+        php_pkg: php8.3
+      when: >
+        (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 24)
   tasks:
     - name: Gather package facts
       ansible.builtin.package_facts:
