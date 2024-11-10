@@ -14,6 +14,14 @@
   ansible.builtin.include_vars: "{{ misp_webserver }}-{{ ansible_distribution }}.yml"
 
 - name: Import debian
+  ansible.builtin.fail:
+    msg: "MISP 2.5 requires PHP 8 which starts with Ubuntu 24.04 and Debian 12"
+  when:
+    - misp_version == '2.5'
+    - not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version >= 24)
+    - not (ansible_distribution == 'Debian' and ansible_distribution_major_version >= 12)
+
+- name: Import debian
   ansible.builtin.import_tasks: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
@@ -261,16 +269,19 @@
 - name: Import composer
   ansible.builtin.import_tasks: composer.yml
 
-### https://github.com/geerlingguy/ansible-role-php-pecl/blob/master/tasks/main.yml
-### FIXME! pecl/redis requires PHP (version >= 7.0.0, version <= 7.1.0, excluded versions: 6.0.0)
-# - name: Install PECL libraries.
-#   ansible.builtin.shell: "yes \"\" | pecl install {{ item }}"
-#   register: pecl_result
-#   changed_when: "pecl_result.rc == 0"
-#   failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
-#   with_items:
-#     - redis
-#   when: ansible_os_family == "RedHat"
+- name: Install PECL libraries.
+  ansible.builtin.command: "{{ item }}"
+  loop:
+    - pecl channel-update pecl.php.net
+    - pecl install brotli
+    - pecl install simdjson
+    - pecl install zstd
+  register: pecl_result
+  changed_when: "pecl_result.rc == 0"
+  failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_major_version >= 24
 
 - name: Setup MISP Cake config
   ansible.builtin.copy:
