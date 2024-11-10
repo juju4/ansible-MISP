@@ -95,7 +95,7 @@
         state: directory
         owner: nobody
         group: nobody
-        mode: 0755
+        mode: '0755'
 
     - name: Set php-fpm user/group to nginx
       ansible.builtin.replace:

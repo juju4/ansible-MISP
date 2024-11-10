@@ -88,13 +88,13 @@
   ansible.builtin.file:
     dest: "{{ misp_rootdir }}"
     owner: "{{ www_user }}"
-    mode: 0755
+    mode: '0755'
   become: yes
 - name: MISP tree permissions
   ansible.builtin.file:
     dest: "{{ item }}"
     owner: "{{ www_user }}"
-    mode: 0755
+    mode: '0755'
   ## Note: recurse is only valid if directory and can't select them from fileglob
   # with_fileglob:
   #   - "{{ misp_rootdir }}/*"

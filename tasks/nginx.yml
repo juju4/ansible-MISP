@@ -11,7 +11,7 @@
   ansible.builtin.template:
     src: nginx-misp.conf.j2
     dest: "{{ apache_sitedir }}/misp.conf"
-    mode: 0644
+    mode: '0644'
   notify:
     - Restart webserver
 
@@ -37,7 +37,7 @@
   ansible.builtin.template:
     src: nginx-empty.conf.j2
     dest: /etc/nginx/nginx.conf
-    mode: 0644
+    mode: '0644'
     backup: yes
   notify:
     - Restart webserver

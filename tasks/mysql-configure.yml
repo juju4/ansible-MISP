@@ -73,6 +73,6 @@
       ansible.builtin.copy:
         src: disable_strict_mode.cnf
         dest: /etc/mysql/conf.d/disable_strict_mode.cnf
-        mode: 0644
+        mode: '0644'
       notify:
         - Restart mysql
