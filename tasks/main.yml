@@ -269,10 +269,18 @@
 - name: Import composer
   ansible.builtin.import_tasks: composer.yml
 
+- name: PECL channel-update
+  ansible.builtin.command:
+    cmd: pecl channel-update pecl.php.net
+  register: pecl_update
+  changed_when: "'Update of Channel' in pecl_update.sdtout"
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_major_version | int >= 24
+
 - name: Install PECL libraries.
   ansible.builtin.command: "{{ item }}"
   loop:
-    - pecl channel-update pecl.php.net
     - pecl install brotli
     - pecl install simdjson
     - pecl install zstd
