@@ -281,7 +281,7 @@
   failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
   when:
     - ansible_distribution == 'Ubuntu'
-    - ansible_distribution_major_version >= 24
+    - ansible_distribution_major_version | int >= 24
 
 - name: Setup MISP Cake config
   ansible.builtin.copy:
