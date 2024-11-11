@@ -273,7 +273,7 @@
   ansible.builtin.command:
     cmd: pecl channel-update pecl.php.net
   register: pecl_update
-  changed_when: "'Update of Channel' in pecl_update.sdtout"
+  changed_when: "'Update of Channel' in pecl_update.stdout"
   when:
     - ansible_distribution == 'Ubuntu'
     - ansible_distribution_major_version | int >= 24
