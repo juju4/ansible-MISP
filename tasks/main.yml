@@ -12,6 +12,22 @@
 ## must be last to override previous vars
 - name: Include webserver+distribution-specific variables
   ansible.builtin.include_vars: "{{ misp_webserver }}-{{ ansible_distribution }}.yml"
+- name: Include MISP 2.4 variables
+  ansible.builtin.include_vars: "misp24.yml"
+  when:
+    - misp_version == '2.4'
+- name: Include MISP 2.5 variables
+  ansible.builtin.include_vars: "misp25.yml"
+  when:
+    - misp_version == '2.5'
+
+- name: Set fact is_container
+  ansible.builtin.set_fact:
+    is_container: true
+  when: >
+    (ansible_virtualization_type is defined and
+      (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+    )
 
 - name: Import debian
   ansible.builtin.fail:
@@ -235,6 +251,8 @@
     PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   become: yes
   become_user: "{{ www_user }}"
+  when:
+    - misp_version == '2.4'
 
 - name: Install python dependencies with pip - python, latest
   ansible.builtin.pip:
@@ -298,6 +316,8 @@
     mode: '0644'
     remote_src: true
     backup: yes
+  when:
+    - misp_version == '2.4'
 
 - name: Validate permissions
   ansible.builtin.file:
@@ -610,7 +630,7 @@
 
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
-  ansible.builtin.command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php ! -path {{ misp_rootdir }}/app/Config/email.php ! -path {{ misp_rootdir }}/app/Vendor/ -exec chmod 0444 {} \\;"  # noqa no-changed-when
+  ansible.builtin.command: "find {{ misp_rootdir }}/app/ -type f -iname '{{ item }}' ! -path {{ misp_rootdir }}/app/Config/config.php ! -name include_paths.php ! -path {{ misp_rootdir }}/app/Config/bootstrap.php ! -path {{ misp_rootdir }}/app/Config/database.php ! -path {{ misp_rootdir }}/app/Config/core.php ! -path {{ misp_rootdir }}/app/Config/email.php ! -path {{ misp_rootdir }}/app/Vendor -exec chmod 0444 {} \\;"  # noqa no-changed-when
   with_items:
     - '*.php'
     - '*.ctp'
@@ -644,20 +664,16 @@
   ansible.posix.patch:
     src: "{{ item.s }}"
     basedir: "{{ item.b }}"
-  with_items:
-    - { s: patch-cakephp-snuffleupagus-strict, b: "{{ misp_rootdir }}/app/Lib" }
-    - { s: patch-app-Lib-cakephp-lib-Cake-Model-Datasource-Database, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource/Database" }
-    - { s: patch-app-Lib-Cackephp-lib-Cake-Core-Configure_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Core" }
-    - { s: patch-app-Lib-Cackephp-lib-Cake-Network-CakeRequest_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Network" }
-    - { s: patch-app-Lib-Cackephp-lib-Cake-Model-Datasource-Database-Mysql_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource/Database" }
-    - { s: patch-app-Lib-Cackephp-lib-Cake-Model-Datasource-DboSource_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource" }
-    - { s: patch-app-Lib-Cackephp-lib-cakephp-lib-Cake-Model-Datasource-CakeSession_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource" }
-  when: misp_php_snuffleupagus_enable
+  with_items: "{{ misp_php_harden_patches | default([]) }}"
+  when:
+    - misp_php_snuffleupagus_enable | bool
 - name: Patch kamisama/php-resque-ex with stricter casting to support sp.global_strict
   ansible.posix.patch:
     src: patch-php-resque-ex-master-lib-Resque-Redis.php
     basedir: "{{ misp_rootdir }}/app/Vendor/kamisama/php-resque-ex/lib/Resque"
-  when: misp_php_snuffleupagus_enable
+  when:
+    - misp_php_snuffleupagus_enable | bool
+    - misp_version == '2.4'
 
 - name: Import lief
   ansible.builtin.import_tasks: lief.yml
@@ -665,9 +681,13 @@
 
 - name: Import misp-modules
   ansible.builtin.import_tasks: misp-modules.yml
-  when: misp_modules_enable|bool
+  when:
+    - misp_modules_enable|bool
+
 - name: Import misp-gem
   ansible.builtin.import_tasks: misp-gem.yml
+  when:
+    - misp_version == '2.4'
 
 - name: Import background-jobs
   ansible.builtin.import_tasks: background-jobs.yml

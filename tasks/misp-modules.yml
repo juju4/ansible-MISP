@@ -1,58 +1,6 @@
 ---
 ## https://github.com/MISP/misp-modules
 
-- name: Ensure misp-modules directory exists
-  ansible.builtin.file:
-    dest: "{{ mispmodules_rootdir }}/misp-modules"
-    owner: "{{ www_user }}"
-    group: "{{ www_user }}"
-    state: directory
-    mode: '0755'
-
-- name: Git clone MISP modules
-  ansible.builtin.git:
-    repo: https://github.com/MISP/misp-modules.git
-    dest: "{{ mispmodules_rootdir }}/misp-modules"
-    version: "{{ mispmodules_version | default('eaff5700de16a2a24c4a8f6f4a7e06f903223eba') }}"
-    update: no
-    force: no
-  become: yes
-  become_user: "{{ www_user }}"
-
-- name: Ubuntu 16.04 | Disable PyIntel471 - Python 3.6+ required
-  ansible.builtin.lineinfile:
-    dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-    regexp: '^git\+https:\/\/github.com\/MISP\/PyIntel471.git'
-    state: absent
-    backup: yes
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
-
-- name: Ubuntu 18.04, RHEL8 | Disable Trustar - trustar-python#100
-  ansible.builtin.lineinfile:
-    dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-    regexp: '^trustar==.*'
-    state: absent
-  when: >
-    (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04') or
-    (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 8)
-
-- name: Ubuntu 22.04 | Update numpy - numpy#22520, opencv-python#571
-  ansible.builtin.lineinfile:
-    dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-    regexp: '^numpy==.*'
-    line: 'numpy==1.23.4'
-  when: >
-    (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04')
-
-- name: Enforce latest PyMISP
-  ansible.builtin.replace:
-    dest: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-    regexp: '^-e git\+https:\/\/github.com\/MISP\/PyMISP.git.*'
-    replace: '-e git+https://github.com/MISP/PyMISP.git#egg=pymisp'
-    mode: '0644'
-    backup: yes
-  when: misp_latest_pymisp
-
 - name: Ensure pip cache directory exists
   ansible.builtin.file:
     dest: "/var/www/.cache/pip/http"
@@ -60,30 +8,6 @@
     group: "{{ www_user }}"
     state: directory
     mode: '0755'
-
-- name: Debian | install pillow dependency for MISP modules (pip3)
-  ansible.builtin.pip:
-    name: pillow
-    virtualenv: "{{ misp_virtualenv }}"
-    virtualenv_python: "{{ python3_bin }}"
-    chdir: "{{ mispmodules_rootdir }}/misp-modules"
-  when: ansible_os_family == 'Debian'
-  register: pkg_result
-  until: pkg_result is success
-  become: yes
-  become_user: "{{ www_user }}"
-
-- name: Debian | install dependencies for MISP modules (pip3)
-  ansible.builtin.pip:
-    requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-    virtualenv: "{{ misp_virtualenv }}"
-    virtualenv_python: "{{ python3_bin }}"
-    chdir: "{{ mispmodules_rootdir }}/misp-modules"
-  when: ansible_os_family == 'Debian'
-  register: pkg_result
-  until: pkg_result is success
-  become: yes
-  become_user: "{{ www_user }}"
 
 - name: RedHat | ensure permissions for pip cache
   ansible.builtin.file:
@@ -94,47 +18,9 @@
     recurse: yes
   when: ansible_os_family == 'RedHat'
 
-## centos7: pip points to python3x
-- name: Redhat | install dependencies for MISP modules (pip)
-  # ansible.builtin.pip:
-  #   requirements: "{{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS"
-  #   virtualenv: "{{ misp_virtualenv }}"
-  #   virtualenv_python: "{{ python3_bin }}"
-  #   chdir: "{{ mispmodules_rootdir }}/misp-modules"
-  ansible.builtin.command: "{{ item.c }}"
-  args:
-    creates: "{{ item.t | default(omit) }}"
-    chdir: "{{ mispmodules_rootdir }}/misp-modules"
-  with_items:
-    - { c: "virtualenv -p {{ python3_bin }} {{ misp_virtualenv }}", t: "{{ misp_virtualenv }}" }
-    - { c: "{{ misp_virtualenv }}/bin/pip install --upgrade pip", t: "{{ misp_virtualenv }}/bin/pip.notest" }
-    - { c: "{{ misp_virtualenv }}/bin/pip install -r {{ mispmodules_rootdir }}/misp-modules/REQUIREMENTS" }
-  when: ansible_os_family == 'RedHat'
-  environment:
-    PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-  register: pkg_result
-  until: pkg_result is success
-  become: yes
-  become_user: "{{ www_user }}"
-  become_flags: -H
-
-- name: Redhat8+ | install zbar-py dependencies for MISP modules (pip)
-  ansible.builtin.command:  # noqa no-changed-when
-    cmd: "{{ misp_virtualenv }}/bin/pip install zbar-py"
-  args:
-    chdir: "{{ mispmodules_rootdir }}/misp-modules"
-  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8
-  environment:
-    PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-  register: pkg_result
-  until: pkg_result is success
-  become: yes
-  become_user: "{{ www_user }}"
-  become_flags: -H
-
 - name: Install MISP modules (pip3)
   ansible.builtin.pip:
-    name: "file://{{ mispmodules_rootdir }}/misp-modules"
+    name: misp-modules
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
   environment:
@@ -147,26 +33,21 @@
 - name: Debian | install dependencies for MISP modules (pip3) - post-install
   ansible.builtin.pip:
     name:
-      - censys
-      - pyfaup
+      - git+https://github.com/cartertemm/ODTReader.git
+      - git+https://github.com/abenassi/Google-Search-API
+      - git+https://github.com/SteveClement/trustar-python.git
+      - git+https://github.com/sebdraven/pydnstrails.git
+      - git+https://github.com/sebdraven/pyonyphe.git
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
     chdir: "{{ mispmodules_rootdir }}/misp-modules"
-  when: ansible_os_family == 'Debian'
   register: pkg_result
   until: pkg_result is success
   become: yes
   become_user: "{{ www_user }}"
 
-- name: Add MISP modules script for boot
-  ansible.builtin.lineinfile:
-    dest: /etc/rc.local
-    regexp: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules .* &"
-    line: "sudo -H -u {{ www_user }} {{ misp_virtualenv }}/bin/misp-modules -s > /tmp/misp-modules.boot 2>&1 &"
-    mode: '0755'
-    insertbefore: "^exit 0"
-    create: yes
-    backup: yes
+- name: Systemd
+  ansible.builtin.import_tasks: systemd-misp-modules.yml
 
 - name: Check if misp modules is running
   ansible.builtin.shell: "ps axu |grep misp-modules"
@@ -179,11 +60,3 @@
   become: yes
   become_user: "{{ www_user }}"
   when: "'misp-modules' not in ps.stdout"
-
-- name: Redhat7 | libpcre symlink for python yara module
-  ansible.builtin.file:
-    src: /usr/lib64/libpcre.so.1
-    dest: /usr/lib64/libpcre.so.3
-    mode: '0644'
-    state: link
-  when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'

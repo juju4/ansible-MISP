@@ -1,4 +1,22 @@
 ---
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  become: yes
+  become_user: root
+  when:
+    - not is_container|bool
+
+- name: Restart misp-modules
+  ansible.builtin.service:
+    name: misp-modules
+    state: restarted
+  become: yes
+  become_user: root
+  when:
+    - not is_container|bool
+
 - name: Restart webserver
   ansible.builtin.service:
     name: "{{ apache_svc }}"
@@ -51,4 +69,9 @@
 - name: Restart mysql
   ansible.builtin.service:
     name: mysql
+    state: restarted
+
+- name: Restart redis
+  ansible.builtin.service:
+    name: redis
     state: restarted

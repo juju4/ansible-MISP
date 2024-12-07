@@ -139,6 +139,8 @@ New ansible v2.2 letsencrypt module allow certificate creation but no renewal of
   * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Managing_Confined_Services/sect-Managing_Confined_Services-Configuration_examples-Changing_port_numbers.html
   * https://wiki.centos.org/HowTos/SELinux#head-ad837f60830442ae77a81aedd10c20305a811388
 
+* "Error, do this: mount -t proc proc /proc" in /var/log/apache2/error.log: Likely due to misp doing some process listing command requiring /proc (for workers for example) and server build on lxc (including proxmox). Ensure /proc is mounted and no proc restrictions for example at systemd level (InaccessiblePaths) for web user and service.
+
 ## TODO
 * role is not managing upgrade (Work in progress/git pull between minor releases)
 * monitoring unless using serverspec

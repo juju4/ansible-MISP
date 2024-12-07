@@ -1,0 +1,14 @@
+---
+
+misp_php_harden_patches:
+    - { s: patch-cakephp-snuffleupagus-strict, b: "{{ misp_rootdir }}/app/Lib" }
+    - { s: patch-app-Lib-cakephp-lib-Cake-Model-Datasource-Database, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource/Database" }
+    - { s: patch-app-Lib-Cackephp-lib-Cake-Core-Configure_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Core" }
+    - { s: patch-app-Lib-Cackephp-lib-Cake-Network-CakeRequest_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Network" }
+    - { s: patch-app-Lib-Cackephp-lib-Cake-Model-Datasource-Database-Mysql_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource/Database" }
+    - { s: patch-app-Lib-Cackephp-lib-Cake-Model-Datasource-DboSource_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource" }
+    - { s: patch-app-Lib-Cackephp-lib-cakephp-lib-Cake-Model-Datasource-CakeSession_php, b: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Model/Datasource" }
+misp_curl_tests: "{{ misp_rootdir }}/tests/curl_tests.sh"
+
+misp_config_src: "{{ misp_rootdir }}/INSTALL/setup/config.php"
+misp_config_dest: "{{ misp_rootdir }}/app/Plugin/CakeResque/Config/config.php"

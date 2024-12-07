@@ -48,6 +48,7 @@ misp_pkg_list:
  - acl
  - sudo
  - cron
+ - libgl1
  ## pillow
  - libtiff5-dev
  - libjpeg8-dev
@@ -72,6 +73,8 @@ misp_pkg_list:
  - libopenblas-dev
  - libatlas-base-dev
  - libatlas3-base
+ # attachment scan
+ - clamav-daemon
 
 misp_gem_list:
  - { name: asciidoctor-pdf, v: 2.3.2 }

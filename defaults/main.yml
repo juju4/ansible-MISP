@@ -7,11 +7,12 @@ install_archives: /var/_install
 
 ## branch or tags to use
 # misp_version: 'HEAD'
-misp_version: '2.4'
+misp_version: '2.5'
 misp_rootdir: /var/www/_MISP/MISP
 misp_virtualenv: /var/www/_MISP/venv
 misp_modules_enable: true
 mispmodules_rootdir: /opt
+mispmodules_version: '03165ad2cd7bae5f3fcfa1b5ba396b8031cc92a0'  # 2.4.199
 misp_webserver: 'apache2'
 # misp_webserver: 'nginx'
 misp_webserver_harden: true
@@ -21,12 +22,12 @@ misp_lief_rootdir: /var/lief
 misp_config_php_template: config.php.j2
 misp_git_update_force: false
 
-misp_pip_cybox_version: '2.1.0.20'
-misp_pip_stix_version: '1.2.0.7'
+misp_pip_cybox_version: '2.1.0.21'
+misp_pip_stix_version: '1.2.0.11'
 # v2.4.167/dec 2022 is the last one supporting python <3.10
 # overridden by misp-modules REQUIREMENTS
 # https://github.com/MISP/misp-modules/blob/main/REQUIREMENTS
-misp_pymisp_version: 'v2.4.162'
+misp_pymisp_version: 'v2.5.2'
 # HEAD in misp-modules REQUIREMENTS
 misp_latest_pymisp: false
 
@@ -79,6 +80,7 @@ misp_webusers_list: []
 # misp_web_apikey:
 
 misp_email_contact: email@address.com
+misp_email_reply_to: misp-no-reply@localhost
 
 ## default provided feeds. you need to know their id
 misp_enable_feeds:
@@ -111,8 +113,7 @@ misp_php_snuffleupagus_enable: false
 
 # if adding ::1, ensure IPv6 is functional. https://github.com/antirez/redis/issues/3241
 misp_redis_bind: '127.0.0.1'
-# FIXME! https://github.com/MISP/MISP/issues/3452
-# misp_redis_password: redis_password_to_change
+misp_redis_password: redis_password_to_change
 misp_redis_securecommands:
   - { re: '^rename-command FLUSHDB .*', l: 'rename-command FLUSHDB ""' }
   - { re: '^rename-command FLUSHALL .*', l: 'rename-command FLUSHALL ""' }
@@ -124,3 +125,7 @@ misp_redis_securecommands:
 # Update Galaxies, ObjectTemplates, Warninglists, Noticelists and Templates before first login
 misp_run_updates: false
 misp_run_updates_lock: "{{ misp_rootdir }}/.run_updates_lock"
+
+misp_cgroups_restriction_enable: true
+
+is_container: false

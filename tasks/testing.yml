@@ -17,7 +17,7 @@
 
 - name: Replace misp.local hostname
   ansible.builtin.replace:
-    dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
+    dest: "{{ misp_curl_tests }}"
     regexp: 'http:\/\/misp.local'
     replace: "{{ misp_base_url }}"
     mode: '0755'
@@ -162,7 +162,7 @@
 
 - name: Allow self-signed certificates in curl_tests.sh
   ansible.builtin.replace:
-    dest: "{{ misp_rootdir }}/tests/curl_tests.sh"
+    dest: "{{ misp_curl_tests }}"
     regexp: '^curl -([iH].)'
     replace: 'curl -k -\1'
     mode: '0755'

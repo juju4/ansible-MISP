@@ -1,0 +1,21 @@
+---
+
+- name: Ensure systemd is present
+  ansible.builtin.package:
+    name: systemd
+    state: present
+
+- name: Configure misp-modules systemd unit
+  ansible.builtin.template:
+    src: systemd-misp-modules.service.j2
+    dest: /etc/systemd/system/misp-modules.service
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - Restart misp-modules
+
+- name: Enable and start misp-modules service
+  ansible.builtin.service:
+    name: misp-modules
+    state: started
+    enabled: yes

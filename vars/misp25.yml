@@ -1,0 +1,6 @@
+---
+
+misp_curl_tests: "{{ misp_rootdir }}/tests/curl_tests_GH.sh"
+
+misp_config_src: "{{ misp_rootdir }}/app/Config/config.default.php"
+misp_config_dest: "{{ misp_rootdir }}/app/Config/config.php"
