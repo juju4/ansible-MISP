@@ -75,3 +75,5 @@
   ansible.builtin.service:
     name: redis
     state: restarted
+  when:
+    - not is_container|bool
