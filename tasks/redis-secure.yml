@@ -9,6 +9,8 @@
     line: "bind {{ misp_redis_bind }}"
     mode: '0644'
     backup: yes
+  notify:
+    - Restart redis
 
 - name: Redis | require password
   ansible.builtin.lineinfile:
@@ -18,6 +20,8 @@
     mode: '0644'
     backup: yes
   when: misp_redis_password is defined and misp_redis_password
+  notify:
+    - Restart redis
 
 - name: Redis | rename dangerous commands
   ansible.builtin.lineinfile:
@@ -27,3 +31,13 @@
     mode: '0644'
   with_items: "{{ misp_redis_securecommands }}"
   when: misp_redis_securecommands is defined and misp_redis_securecommands != []
+  notify:
+    - Restart redis
+
+- name: Redis | overcommit
+  ansible.posix.sysctl:
+    name: vm.overcommit_memory
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
