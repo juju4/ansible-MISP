@@ -5,12 +5,15 @@ on:
   push:
   pull_request:
   workflow_dispatch:
-  schedule:  # run weekly, every monday 01:00
+  schedule:  # run weekly, every Monday 01:00
     - cron: '0 1 * * 1'
+
+permissions: {}
 
 jobs:
   build:
-
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
