@@ -107,6 +107,7 @@ jobs:
           systemctl -l --no-pager status misp-modules || true
           systemctl -l --no-pager status supervisor || true
           systemctl -l --no-pager status apache2 || true
+          systemctl -l --no-pager status mysql || true
           systemd-analyze --no-pager security || true
           systemd-analyze --no-pager security misp-modules || true
           systemd-analyze --no-pager security apache2 || true
@@ -122,8 +123,19 @@ jobs:
       - name: After script - mysql
         run: |
           set -x
-          mysql -e 'show tables' misp
-          mysql -e 'show schemas' misp
+          ls -l /etc/mysql/
+          ls -l /var/lib/mysql/
+          sudo ls -l ~/.my.cnf /root/.my.cnf || true
+          mysql -e 'show tables' misp || true
+          mysql -e 'show schemas' misp || true
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - mysql logs
+        run: |
+          set -x
+          ls -l /var/log/mysql/*.log || true
+          sudo tail -n50 /var/log/mysql/*.log || true
+          sudo tail -n50 /var/lib/mysql/*.log || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - curl
