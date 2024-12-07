@@ -31,7 +31,7 @@ jobs:
             experimental: false
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
-      ANSIBLE_EXTRA_VARS: ""
+      ANSIBLE_EXTRA_VARS: "-e misp_mysql_user=root -e misp_mysql_pass=root"
       ANSIBLE_ROLE: juju4.misp
       ANSIBLE_SUITE: ${{ matrix.suite }}
 
@@ -128,6 +128,8 @@ jobs:
           sudo ls -l ~/.my.cnf /root/.my.cnf || true
           mysql -e 'show tables' misp || true
           mysql -e 'show schemas' misp || true
+          mysql -u root -p root -e 'show tables' misp || true
+          mysql -u root -p root -e 'show schemas' misp || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - mysql logs
