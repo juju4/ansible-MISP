@@ -74,7 +74,7 @@
       # Host header is a numeric IP address
       - { re: '^SecRuleRemoveById 920350', l: 'SecRuleRemoveById 920350' }
     misp_php_snuffleupagus_enable: false
-    harden_php7_snuffleupagus: true
+    harden_php7_snuffleupagus: false
     harden_php7_snuffleupagus_rules_template: 'misp-snuffleupagus-rules.ini.j2'
     harden_apache_php_variants: ['apache2', 'cli']
     harden_apache_php74_rhel9_enable: true
