@@ -1,0 +1,24 @@
+---
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: List installed php packages
+  ansible.builtin.debug:
+    msg: "{{ item }}"
+  loop: "{{ ansible_facts.packages | select('match', '^php-*') | list }}"
+
+- name: Check debian alternatives
+  ansible.builtin.command:
+    cmd: update-alternatives --config php
+  become: yes
+  changed_when: false
+
+- name: Set debian alternatives
+  ansible.builtin.command:
+    cmd: update-alternatives --set php /usr/bin/php7.4
+  become: yes
+  changed_when: false
+  when:
+    - (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 22)

@@ -52,6 +52,9 @@
   ansible.builtin.import_tasks: nginx.yml
   when: misp_webserver is defined and misp_webserver == 'nginx'
 
+- name: Import php-conflict
+  ansible.builtin.import_tasks: php-conflict.yml
+
 - name: Ensure Random source is configured
   ansible.builtin.lineinfile:
     dest: /etc/default/rng-tools
