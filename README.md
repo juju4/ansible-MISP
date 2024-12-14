@@ -121,6 +121,8 @@ see task 'docker redis workaround ???'
 
 * `PHP Fatal error: Uncaught TypeError: Return value of Symfony\\Component\\Process\\Process::close() must be of the type int, null returned in phar:///usr/local/bin/composer/vendor/symfony/process/Process.php:1466` (rhel/rockylinux8 and 9): root cause not identified, possibly container/docker related as only failing in molecule/docker and not bare github-hosted images.
 
+* "Error, do this: mount -t proc proc /proc" in /var/log/apache2/error.log: Likely due to misp doing some process listing command requiring /proc (for workers for example) and server build on lxc (including proxmox). Ensure /proc is mounted and no proc restrictions for example at systemd level (InaccessiblePaths) for web user and service.
+
 ## FAQ
 
 * usage of roles dependencies like geerlinguy.{mysql,nginx,apache} are not required but allow more fine-tuning.
@@ -138,8 +140,6 @@ New ansible v2.2 letsencrypt module allow certificate creation but no renewal of
 * RedHat Selinux references:
   * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Managing_Confined_Services/sect-Managing_Confined_Services-Configuration_examples-Changing_port_numbers.html
   * https://wiki.centos.org/HowTos/SELinux#head-ad837f60830442ae77a81aedd10c20305a811388
-
-* "Error, do this: mount -t proc proc /proc" in /var/log/apache2/error.log: Likely due to misp doing some process listing command requiring /proc (for workers for example) and server build on lxc (including proxmox). Ensure /proc is mounted and no proc restrictions for example at systemd level (InaccessiblePaths) for web user and service.
 
 ## TODO
 * role is not managing upgrade (Work in progress/git pull between minor releases)
