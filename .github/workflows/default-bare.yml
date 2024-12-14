@@ -28,7 +28,7 @@ jobs:
           - distribution: ubuntu
             version: '22.04'
             suite: default
-            experimental: true
+            experimental: false
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       ANSIBLE_EXTRA_VARS: "-e misp_mysql_user=root -e misp_mysql_pass=root"
