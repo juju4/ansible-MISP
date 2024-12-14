@@ -61,6 +61,8 @@ jobs:
           pwd
           env
           find -ls
+          dpkg -l | grep php
+          update-alternatives --config php
       - name: Cleaning
         run: |
           set -x
@@ -111,6 +113,13 @@ jobs:
           systemd-analyze --no-pager security || true
           systemd-analyze --no-pager security misp-modules || true
           systemd-analyze --no-pager security apache2 || true
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - php
+        run: |
+          set -x
+          dpkg -l | grep php
+          update-alternatives --config php
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - python
