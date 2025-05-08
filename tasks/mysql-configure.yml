@@ -6,26 +6,14 @@
       community.mysql.mysql_db:
         name: misp
         state: present
-        login_user: "{{ misp_mysql_user | default(omit) }}"
-        login_password: "{{ misp_mysql_pass | default(omit) }}"
+        login_unix_socket: "/var/lib/mysql/mysql.sock"
       no_log: "{{ misp_no_log }}"
   rescue:
-    - name: Ensure db user has not empty password
-      community.mysql.mysql_user:
-        name: "{{ misp_mysql_user }}"
-        password: "{{ misp_mysql_pass }}"
-        state: present
-        login_user: "{{ misp_mysql_user }}"
-        login_password: ""
-      when:
-        - misp_mysql_user is defined and misp_mysql_user|length > 0
-        - misp_mysql_pass is defined and misp_mysql_pass|length > 0
     - name: Creating mysql misp db
       community.mysql.mysql_db:
         name: misp
         state: present
-        login_user: "{{ misp_mysql_user | default(omit) }}"
-        login_password: "{{ misp_mysql_pass | default(omit) }}"
+        login_unix_socket: "/var/lib/mysql/mysql.sock"
       no_log: "{{ misp_no_log }}"
 - name: Check if mysql import done
   ansible.builtin.stat:
@@ -46,8 +34,7 @@
     name: misp
     state: import
     target: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
-    login_user: "{{ misp_mysql_user | default(omit) }}"
-    login_password: "{{ misp_mysql_pass | default(omit) }}"
+    login_unix_socket: "/var/lib/mysql/mysql.sock"
   no_log: "{{ misp_no_log }}"
   when: not mispdbloaded.stat.exists
 - name: Add marker for mysql import
@@ -62,8 +49,7 @@
     password: "{{ misp_db_pass }}"
     priv: "*.*:USAGE/misp.*:ALL"
     state: present
-    login_user: "{{ misp_mysql_user | default(omit) }}"
-    login_password: "{{ misp_mysql_pass | default(omit) }}"
+    login_unix_socket: "/var/lib/mysql/mysql.sock"
   no_log: "{{ misp_no_log }}"
 
 - name: Ubuntu xenial
