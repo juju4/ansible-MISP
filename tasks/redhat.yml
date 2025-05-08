@@ -53,7 +53,6 @@
     state: present
     update_cache: yes
   async: 3600
-  poll: 300
   register: pkg_result
   until: pkg_result is success
 
