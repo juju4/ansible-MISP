@@ -55,7 +55,7 @@
     timeout: 300
 
 - name: Ensure PyMISP API working
-  ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./last.py -l 10"
+  ansible.builtin.command: "{{ misp_virtualenv }}/bin/python -W ignore ./last.py -l 10"
   become: yes
   become_user: "{{ www_user }}"
   args:
@@ -70,7 +70,7 @@
 - name: Test MISP API
   block:
     - name: List current users
-      ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./users_list.py"
+      ansible.builtin.command: "{{ misp_virtualenv }}/bin/python -W ignore ./users_list.py"
       become: yes
       become_user: "{{ www_user }}"
       args:
