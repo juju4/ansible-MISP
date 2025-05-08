@@ -66,6 +66,9 @@
   register: test
   changed_when: false
   ignore_errors: true
+  retries: 3
+  delay: 5
+  until: test.rc == 0
 
 - name: Test MISP API
   block:
@@ -79,6 +82,9 @@
         PYTHONPATH: /usr/local/lib/python3.12/site-packages
       register: listusers
       changed_when: false
+      retries: 3
+      delay: 5
+      until: listusers.rc == 0
   rescue:
     - name: Check MISP logs
       ansible.builtin.command: "tail -n100 {{ misp_rootdir }}/app/tmp/logs/error.log {{ misp_rootdir }}/app/tmp/logs/debug.log"
