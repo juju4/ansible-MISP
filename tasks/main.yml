@@ -188,6 +188,13 @@
   ansible.builtin.stat:
     path: "{{ misp_rootdir }}/INSTALL"
   register: m
+
+- name: "Clear other files from MISP path"
+  file:
+    path: "{{ misp_rootdir }}"
+    state: absent
+  when: not m.stat.exists
+
 - name: Git clone MISP
   ansible.builtin.git:
     repo: https://github.com/MISP/MISP.git
