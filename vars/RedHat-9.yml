@@ -92,7 +92,7 @@ nginx_sock: /var/run/php-fpm/php-fpm.sock
 php_confdir: /etc/php.d
 php_confext: ini
 php_ini: /etc/php.ini
-php_remi_version: 74
+php_remi_version: 84
 fpm_user: nobody
 
 gnupg_privdir: "{{ misp_rootdir }}/.gnupg"
