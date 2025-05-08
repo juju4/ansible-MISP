@@ -1,0 +1,10 @@
+---
+
+webserver: "{{ misp_webserver_nginx }}"
+
+apache_svc: nginx
+www_user: nginx
+
+apache_sitedir: /etc/nginx/conf.d
+php_ini: /etc/php.ini
+fpm_user: nginx
