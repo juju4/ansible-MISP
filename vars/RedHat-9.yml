@@ -26,8 +26,8 @@ misp_pkg_list:
  - git
  - redis
  - make
- - python3-devel
- - python3-pip
+ - python3.12-devel
+ - python3.12-pip
  - python3-virtualenv
  - python3-policycoreutils
  - policycoreutils-python-utils
@@ -40,8 +40,8 @@ misp_pkg_list:
  - "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rng-tools{% endif %}"
  - wget
  # misp-modules
- - python3
- - python3-devel
+ - python3.12
+ - python3.12-devel
  - python3-PyMySQL
  - libpq
  ## misc
@@ -65,8 +65,8 @@ misp_pkg_list:
  - poppler-cpp-devel
  - ruby-devel
 
-python3_bin: python3
-python3_pip: /usr/bin/pip3
+python3_bin: python3.12
+python3_pip: /usr/bin/pip3.12
 
 misp_webserver_apache2:
  - httpd

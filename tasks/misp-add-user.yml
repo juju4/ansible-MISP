@@ -9,7 +9,7 @@
   args:
     chdir: "{{ misp_rootdir }}/PyMISP/examples"
   environment:
-    PYTHONPATH: /usr/local/lib/python3.6/site-packages
+    PYTHONPATH: /usr/local/lib/python3.12/site-packages
   when:
     - user.email is defined
     - list.stdout.find(user.email) == -1

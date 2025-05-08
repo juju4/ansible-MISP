@@ -62,7 +62,7 @@
     chdir: "{{ misp_rootdir }}/PyMISP/examples"
   environment:
     debug: 'True'
-    PYTHONPATH: /usr/local/lib/python3.6/site-packages
+    PYTHONPATH: /usr/local/lib/python3.12/site-packages
   register: test
   changed_when: false
   ignore_errors: true
@@ -76,7 +76,7 @@
       args:
         chdir: "{{ misp_rootdir }}/PyMISP/examples"
       environment:
-        PYTHONPATH: /usr/local/lib/python3.6/site-packages
+        PYTHONPATH: /usr/local/lib/python3.12/site-packages
       register: listusers
       changed_when: false
   rescue:
