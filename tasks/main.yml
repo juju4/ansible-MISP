@@ -538,6 +538,14 @@
   tags:
     - salt
 
+- name: Updating MISP email config
+  ansible.builtin.template:
+    src: "email.php.j2"
+    dest: "{{ misp_rootdir }}/app/Config/email.php"
+    mode: '0600'
+    backup: yes
+    owner: "{{ www_user }}"
+
 - name: Check if webroot gpg.asc exists
   ansible.builtin.stat:
     path: "{{ misp_rootdir }}/app/webroot/gpg.asc"

@@ -82,6 +82,18 @@ misp_webusers_list: []
 misp_email_contact: email@address.com
 misp_email_reply_to: misp-no-reply@localhost
 
+# Mail - Send using PHP mail function
+# Smtp - Send using SMTP
+# Debug - Do not send the email, just return the result
+misp_email_transport: "Mail"
+
+misp_email_sender_address: "site@localhost"
+misp_email_sender_name: "My Site"
+misp_email_host: "localhost"
+misp_email_port: 25
+misp_email_username: "user"
+misp_email_password: "secret"
+
 ## default provided feeds. you need to know their id
 misp_enable_feeds:
   # - CIRCL OSINT Feed
