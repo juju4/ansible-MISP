@@ -12,7 +12,7 @@ Requires=network.target
 Type=simple
 User={{ www_user }}
 Group={{ www_user }}
-ExecStart={{ misp_virtualenv }}/bin/misp-modules -l 127.0.0.1 -s
+ExecStart={{ misp_virtualenv }}/bin/misp-modules
 Restart=on-failure
 RestartSec=15
 
