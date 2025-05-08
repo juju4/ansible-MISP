@@ -12,6 +12,7 @@
     src: nginx-misp.conf.j2
     dest: "{{ apache_sitedir }}/misp.conf"
     mode: '0644'
+    force: no #this allows this file to be customized
   notify:
     - Restart webserver
 

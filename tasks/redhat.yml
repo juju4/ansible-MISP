@@ -53,7 +53,6 @@
     state: present
     update_cache: yes
   async: 3600
-  poll: 300
   register: pkg_result
   until: pkg_result is success
 
@@ -86,6 +85,7 @@
         - { re: '^;listen.group = nobody', rep: 'listen.group = {{ fpm_user }}' }
         - { re: '^listen.owner = .*$', rep: 'listen.owner = {{ fpm_user }}' }
         - { re: '^listen.group = .*$', rep: 'listen.group = {{ fpm_user }}' }
+        - { re: '^php_value\[session\.save_path] *= .*$', rep: 'php_value[session.save_path] = {{ misp_rootdir }}/app/tmp/sessions' }
       notify:
         - Restart php-fpm
 

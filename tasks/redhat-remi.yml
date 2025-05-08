@@ -56,5 +56,5 @@
     - ansible_facts.packages['php-fpm'][0]['version'] is version_compare('7.4', '<')
 - name: RHEL8 | enable remi repository for php
   ansible.builtin.command:  # noqa no-changed-when
-    cmd: "dnf module enable php:remi-7.4 -y"
+    cmd: "dnf module enable php:remi-8.4 -y"
   when: ansible_distribution_major_version | int >= 8

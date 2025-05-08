@@ -36,6 +36,7 @@
     - misp_version == '2.5'
     - not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 24)
     - not (ansible_distribution == 'Debian' and ansible_distribution_major_version | int >= 12)
+    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Import debian
   ansible.builtin.import_tasks: debian.yml
@@ -187,6 +188,13 @@
   ansible.builtin.stat:
     path: "{{ misp_rootdir }}/INSTALL"
   register: m
+
+- name: "Clear other files from MISP path"
+  file:
+    path: "{{ misp_rootdir }}"
+    state: absent
+  when: not m.stat.exists
+
 - name: Git clone MISP
   ansible.builtin.git:
     repo: https://github.com/MISP/MISP.git
@@ -529,6 +537,14 @@
     owner: "{{ www_user }}"
   tags:
     - salt
+
+- name: Updating MISP email config
+  ansible.builtin.template:
+    src: "email.php.j2"
+    dest: "{{ misp_rootdir }}/app/Config/email.php"
+    mode: '0600'
+    backup: yes
+    owner: "{{ www_user }}"
 
 - name: Check if webroot gpg.asc exists
   ansible.builtin.stat:

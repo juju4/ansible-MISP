@@ -55,30 +55,36 @@
     timeout: 300
 
 - name: Ensure PyMISP API working
-  ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./last.py -l 10"
+  ansible.builtin.command: "{{ misp_virtualenv }}/bin/python -W ignore ./last.py -l 10"
   become: yes
   become_user: "{{ www_user }}"
   args:
     chdir: "{{ misp_rootdir }}/PyMISP/examples"
   environment:
     debug: 'True'
-    PYTHONPATH: /usr/local/lib/python3.6/site-packages
+    PYTHONPATH: /usr/local/lib/python3.12/site-packages
   register: test
   changed_when: false
   ignore_errors: true
+  retries: 3
+  delay: 5
+  until: test.rc == 0
 
 - name: Test MISP API
   block:
     - name: List current users
-      ansible.builtin.command: "{{ misp_virtualenv }}/bin/python ./users_list.py"
+      ansible.builtin.command: "{{ misp_virtualenv }}/bin/python -W ignore ./users_list.py"
       become: yes
       become_user: "{{ www_user }}"
       args:
         chdir: "{{ misp_rootdir }}/PyMISP/examples"
       environment:
-        PYTHONPATH: /usr/local/lib/python3.6/site-packages
+        PYTHONPATH: /usr/local/lib/python3.12/site-packages
       register: listusers
       changed_when: false
+      retries: 3
+      delay: 5
+      until: listusers.rc == 0
   rescue:
     - name: Check MISP logs
       ansible.builtin.command: "tail -n100 {{ misp_rootdir }}/app/tmp/logs/error.log {{ misp_rootdir }}/app/tmp/logs/debug.log"
