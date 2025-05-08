@@ -13,7 +13,7 @@
     - "{{ misp_rootdir }}/app/Plugin/CakeResque/tmp"
     - "{{ misp_rootdir }}/app/tmp"
     - "{{ misp_rootdir }}/app/tmp/cache/persistent"
-    - "{{ misp_rootdir }}/app/webroot/img/orgs"
+    - "{{ misp_rootdir }}/app/webroot/img/flags"
     - "{{ misp_rootdir }}/app/webroot/img/custom"
     - "{{ misp_rootdir }}/.gnupg"
     - "{{ misp_rootdir }}/app/Config/config.php"
