@@ -14,6 +14,8 @@
     cmd: update-alternatives --config php
   become: yes
   changed_when: false
+  when:
+      - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Set debian alternatives
   ansible.builtin.command:
