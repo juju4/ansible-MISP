@@ -36,13 +36,22 @@ jobs:
       ANSIBLE_SUITE: ${{ matrix.suite }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # tag=v4.2.2
         with:
           path: ${{ env.ANSIBLE_ROLE }}
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # tag=v5.6.0
         with:
           python-version: '3.x'
+      - name: Cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684  # tag=v4.2.3
+        with:
+          path: |
+            /var/cache/apt/archives
+            /var/lib/apt
+            /var/_install
+          key: cache-ansible-harden-${{ steps.get-date.outputs.date }}
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip

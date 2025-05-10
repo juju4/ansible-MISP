@@ -23,32 +23,41 @@ jobs:
         include:
           - molecule_ditro: 'debian:bookworm'
             experimental: false
+            suite: default
           - molecule_ditro: 'debian:bullseye'
             experimental: false
+            suite: default
           - molecule_distro: 'rockylinux:9'
             experimental: true
+            suite: default
           - molecule_distro: 'ubuntu:24.04'
             experimental: true
+            suite: default
           - molecule_distro: 'ubuntu:22.04'
             experimental: false
+            suite: default
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       MOLECULE_NO_LOG: "false"
       ANSIBLE_ROLE: juju4.misp
+      ANSIBLE_SUITE: ${{ matrix.suite }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # tag=v4.2.2
         with:
           path: ${{ env.ANSIBLE_ROLE }}
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # tag=v5.6.0
         with:
           python-version: '3.x'
       - name: Install dependencies
         run: |
+          set -x
           python -m pip install --upgrade pip
-          pip install molecule[docker] ansible-lint flake8 testinfra ansible
-          mkdir -p $HOME/.ansible/roles && ln -s $GITHUB_WORKSPACE/$ANSIBLE_ROLE $HOME/.ansible/roles/
+          pip install molecule molecule-plugins docker ansible-lint flake8 testinfra ansible
+          mkdir -p $HOME/.ansible/roles && ln -s $GITHUB_WORKSPACE/$ANSIBLE_ROLE $HOME/.ansible/roles/ || true
+          [ -f molecule/${ANSIBLE_SUITE}/requirements.yml ] && ansible-galaxy install -r molecule/${ANSIBLE_SUITE}/requirements.yml || true
           # template search only in currently executed role root/tasks/templates folders and molecule scenario root/templates folders
           cp $GITHUB_WORKSPACE/$ANSIBLE_ROLE/templates/misp-snuffleupagus-rules.ini.j2 $GITHUB_WORKSPACE/$ANSIBLE_ROLE/molecule/default/
       - name: Fetch central settings repository
@@ -63,13 +72,31 @@ jobs:
         continue-on-error: true
       - name: Environment
         run: |
+          set -x
+          ansible --version
+          ansible-config dump --only-changed -t all
+          ansible-galaxy collection list || true
+          ansible-galaxy role list || true
           pwd
           env
           find -ls
+      - name: Galaxy dependencies
+        run: |
+          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && ansible-galaxy install --timeout 120 --verbose -r molecule/$ANSIBLE_SUITE/requirements.yml
+        continue-on-error: true
       - name: run test
         run: |
-          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && molecule test
+          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && molecule test --scenario-name ${ANSIBLE_SUITE}
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.molecule_distro }}
+      - name: After script | Environment
+        run: |
+          set -x
+          ansible --version
+          ansible-config dump --only-changed -t all
+          ansible-galaxy collection list || true
+          ansible-galaxy role list || true
+        if: ${{ always() }}
+        continue-on-error: true
