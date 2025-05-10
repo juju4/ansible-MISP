@@ -27,6 +27,9 @@ jobs:
           - molecule_ditro: 'debian:bullseye'
             experimental: false
             suite: default
+          - molecule_distro: 'almalinux:10-kitten'
+            experimental: true
+            suite: default
           - molecule_distro: 'rockylinux:9'
             experimental: true
             suite: default
