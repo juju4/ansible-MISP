@@ -36,10 +36,10 @@ jobs:
           - molecule_distro: 'debian:trixie-slim'
             experimental: true
             suite: default
-          - molecule_distro: 'debian:12'
+          - molecule_distro: 'debian:bookworm'
             experimental: false
             suite: default
-          - molecule_distro: 'debian:11'
+          - molecule_distro: 'debian:bullseye'
             experimental: false
             suite: default
     env:
