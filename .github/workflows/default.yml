@@ -39,9 +39,6 @@ jobs:
           - molecule_distro: 'debian:bookworm'
             experimental: false
             suite: default
-          - molecule_distro: 'debian:bullseye'
-            experimental: false
-            suite: default
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       MOLECULE_NO_LOG: "false"
