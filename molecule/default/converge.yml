@@ -40,6 +40,17 @@
         misp_php_snuffleupagus_enable: false
         harden_php7_snuffleupagus: false
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
+    - name: Redhat 9 | Enable phpremi 8.4
+      ansible.builtin.set_fact:
+        harden_apache_phpremi_rhel_enable: true
+        harden_apache_phpremi_rhel_version: 8.4
+      when: >
+        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int == 9)
+    - name: Redhat 10 | Disable mod_security
+      ansible.builtin.set_fact:
+        hardenwebserver_modsecurity_enable: false
+      when: >
+        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 10)
   vars:
     misp_local_base_url: "https://localhost"
     misp_pymisp_base_url: "https://localhost"
