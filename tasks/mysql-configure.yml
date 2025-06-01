@@ -15,7 +15,9 @@
   changed_when: false
   failed_when: false
 
-- name: Database initialization
+- name: Ubuntu - Database initialization
+  when:
+    - ansible_distribution == 'Ubuntu'
   block:
     - name: Creating mysql misp db
       community.mysql.mysql_db:
@@ -42,6 +44,34 @@
         login_user: "{{ misp_mysql_user | default(omit) }}"
         login_password: "{{ misp_mysql_pass | default(omit) }}"
       no_log: "{{ misp_no_log }}"
+
+- name: Non-Ubuntu - Database initialization
+  when:
+    - ansible_distribution != 'Ubuntu'
+  block:
+    - name: Creating mysql misp db
+      community.mysql.mysql_db:
+        name: misp
+        state: present
+        login_unix_socket: "{{ misp_mysql_socket }}"
+      no_log: "{{ misp_no_log }}"
+  rescue:
+    - name: Ensure db user has not empty password
+      community.mysql.mysql_user:
+        name: "{{ misp_mysql_user }}"
+        password: "{{ misp_mysql_pass }}"
+        state: present
+        login_unix_socket: "{{ misp_mysql_socket }}"
+      when:
+        - misp_mysql_user is defined and misp_mysql_user|length > 0
+        - misp_mysql_pass is defined and misp_mysql_pass|length > 0
+    - name: Creating mysql misp db
+      community.mysql.mysql_db:
+        name: misp
+        state: present
+        login_unix_socket: "{{ misp_mysql_socket }}"
+      no_log: "{{ misp_no_log }}"
+
 - name: Check if mysql import done
   ansible.builtin.stat:
     path: /root/.mysql_misp_imported
