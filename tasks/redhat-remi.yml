@@ -14,9 +14,6 @@
     key: "{{ item }}"
     state: present
   with_items:
-    - https://rpms.remirepo.net/RPM-GPG-KEY-remi
-    - https://rpms.remirepo.net/RPM-GPG-KEY-remi2017
-    - https://rpms.remirepo.net/RPM-GPG-KEY-remi2018
     - https://rpms.remirepo.net/RPM-GPG-KEY-remi2021
   register: pkg_result
   until: pkg_result is success
@@ -29,14 +26,14 @@
   register: pkg_result
   until: pkg_result is success
 
-- name: Check if remi-php repo is enabled
+- name: RedHat | Check if remi-php repo is enabled
   ansible.builtin.command: "grep '^enabled=' /etc/yum.repos.d/remi-php{{ php_remi_version }}.repo"
   register: remistate
   changed_when: false
   when: ansible_distribution_major_version | int < 8
 
 # https://github.com/ansible/ansible-modules-extras/issues/2384
-- name: Enable remi repository for php
+- name: RedHat | Enable remi repository for php
   ansible.builtin.command:  # noqa no-changed-when
     cmd: "yum-config-manager --enable remi-php{{ php_remi_version }}"
   # yum_repository:
@@ -47,14 +44,18 @@
     - remistate.stdout is defined
     - not ('enabled=1' in remistate.stdout)
 
-- name: RHEL8 | reset php stream to use remi latest
+- name: RedHat | reset php stream to use remi latest
   ansible.builtin.command:  # noqa no-changed-when
     cmd: "dnf module reset php -y"
   when:
     - ansible_distribution_major_version | int >= 8
     - ansible_facts.packages['php-fpm'] is defined
     - ansible_facts.packages['php-fpm'][0]['version'] is version_compare('7.4', '<')
-- name: RHEL8 | enable remi repository for php
+- name: RedHat | enable remi repository for php
   ansible.builtin.command:  # noqa no-changed-when
-    cmd: "dnf module enable php:remi-7.4 -y"
+    cmd: "dnf module enable php:remi-{{ php_remi_version_long }} -y"
   when: ansible_distribution_major_version | int >= 8
+  register: remirepo
+  changed_when:
+    - remirepo.rc != 0
+    - '"Nothing to do." not in remirepo.stdout'
