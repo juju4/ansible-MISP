@@ -15,6 +15,7 @@
     state: present
   with_items:
     - https://rpms.remirepo.net/RPM-GPG-KEY-remi2021
+    - https://rpms.remirepo.net/enterprise/10/RPM-GPG-KEY-remi
   register: pkg_result
   until: pkg_result is success
 
