@@ -72,7 +72,7 @@
     name: misp
     state: import
     target: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
-    login_unix_socket: "/var/lib/mysql/mysql.sock"
+    login_unix_socket: "{{ misp_mysql_socket }}"
   no_log: "{{ misp_no_log }}"
   when:
     - not mispdbloaded.stat.exists

@@ -71,6 +71,7 @@ python3_bin: python3
 python3_pip: pip3
 
 mysql_svc: mysql
+misp_mysql_socket: "/var/run/mysqld/mysqld.sock"
 rng_svc: rng-tools-debian
 redis_svc: redis
 redis_conf: /etc/redis/redis.conf
