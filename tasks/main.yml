@@ -125,17 +125,38 @@
         creates: /tmp/mysql_install_db.out
       become: yes
       become_user: mysql
+    - name: RedHat | Ensure right permissions for log
+      ansible.builtin.file:
+        path: /var/log/mariadb/mariadb.log
+        mode: '0644'
+        owner: 'mysql'
+        state: touch
 
 - name: Docker
   when: >
     (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
   block:
+    - name: Debian | Ensure right permissions for /run/mysqld
+      ansible.builtin.file:
+        path: /run/mysqld
+        mode: '0755'
+        owner: 'mysql'
+        state: directory
+      when:
+        - ansible_distribution == "Debian"
+
     - name: Docker | Manually start mysql service
       ansible.builtin.shell: >
-        /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &
+        nohup /usr/bin/mysqld_safe --datadir='/var/lib/mysql' > /tmp/mysqld_safe.out 2>&1 &
       args:
         creates: /tmp/mysqld_safe.out
         chdir: /var/lib/mysql
+      become: yes
+      become_user: mysql
+    - name: Docker | Check mysqld out
+      ansible.builtin.command:
+        cmd: cat /tmp/mysqld_safe.out
+      changed_when: false
 
 - name: Import redis-secure
   ansible.builtin.import_tasks: redis-secure.yml
