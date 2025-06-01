@@ -57,6 +57,12 @@
         misp_php_snuffleupagus_enable: false
         harden_php7_snuffleupagus: false
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
+    - name: Debian 13 | Set fact
+      ansible.builtin.set_fact:
+        misp_version: '2.5'
+        # python < 3.13
+        misp_modules_enable: false
+      when: (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 13)
     - name: Redhat 9 | Enable phpremi 8.4
       ansible.builtin.set_fact:
         harden_apache_phpremi_rhel_enable: true
