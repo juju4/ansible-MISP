@@ -41,11 +41,12 @@
 
 - name: Import debian
   ansible.builtin.fail:
-    msg: "MISP 2.5 requires PHP 8 which starts with Ubuntu 24.04 and Debian 12"
+    msg: "MISP 2.5 requires PHP 8 which starts with Ubuntu 24.04, Debian 12, and RedHat 10 (RedHat 9 with phpremi)"
   when:
     - misp_version == '2.5'
     - not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 24)
     - not (ansible_distribution == 'Debian' and ansible_distribution_major_version | int >= 12)
+    - not (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 9)
 
 - name: Import debian
   ansible.builtin.import_tasks: debian.yml
