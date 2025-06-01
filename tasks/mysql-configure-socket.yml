@@ -1,0 +1,64 @@
+---
+
+- name: Database initialization - socket
+  block:
+    - name: Creating mysql misp db
+      community.mysql.mysql_db:
+        name: misp
+        state: present
+        login_unix_socket: "{{ misp_mysql_socket }}"
+      no_log: "{{ misp_no_log }}"
+  rescue:
+    - name: Ensure db user has not empty password
+      community.mysql.mysql_user:
+        name: "{{ misp_mysql_user }}"
+        password: "{{ misp_mysql_pass }}"
+        state: present
+        login_unix_socket: "{{ misp_mysql_socket }}"
+      when:
+        - misp_mysql_user is defined and misp_mysql_user|length > 0
+        - misp_mysql_pass is defined and misp_mysql_pass|length > 0
+    - name: Creating mysql misp db
+      community.mysql.mysql_db:
+        name: misp
+        state: present
+        login_unix_socket: "{{ misp_mysql_socket }}"
+      no_log: "{{ misp_no_log }}"
+
+- name: Check if mysql import done
+  ansible.builtin.stat:
+    path: /root/.mysql_misp_imported
+  register: mispdbloaded
+
+- name: Pre-mysql5.6 | force MyISAM mysql engine to support FULLTEXT indexes
+  ansible.builtin.replace:
+    dest: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
+    regexp: "ENGINE=\\w+"
+    replace: "ENGINE=MyISAM"
+    mode: '0644'
+    backup: yes
+  when: ansible_distribution_major_version == '7'
+
+- name: Importing mysql misp db template - socket
+  community.mysql.mysql_db:
+    name: misp
+    state: import
+    target: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
+    login_unix_socket: "{{ misp_mysql_socket }}"
+  no_log: "{{ misp_no_log }}"
+  when:
+    - not mispdbloaded.stat.exists
+- name: Add marker for mysql import
+  ansible.builtin.file:
+    dest: /root/.mysql_misp_imported
+    mode: '0600'
+    state: touch
+  when: not mispdbloaded.stat.exists
+- name: Creating mysql misp db user - socket
+  community.mysql.mysql_user:
+    name: "{{ misp_db_user }}"
+    password: "{{ misp_db_pass }}"
+    priv: "*.*:USAGE/misp.*:ALL"
+    state: present
+    login_unix_socket: "{{ misp_mysql_socket }}"
+  no_log: "{{ misp_no_log }}"
