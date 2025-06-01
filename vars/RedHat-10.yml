@@ -14,7 +14,7 @@ misp_pkg_list:
  # php-pecl-* from remi repository
  - php-pecl-redis
  - php-pecl-ssdeep
- - php84-pecl-gnupg
+ - php84-php-pecl-gnupg
  - php-opcache
  - php-xml
  - php-gd
