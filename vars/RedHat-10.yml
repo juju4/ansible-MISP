@@ -14,7 +14,7 @@ misp_pkg_list:
  # php-pecl-* from remi repository
  - php-pecl-redis
  - php-pecl-ssdeep
- - php-pecl-gnupg
+ - php84-pecl-gnupg
  - php-opcache
  - php-xml
  - php-gd
@@ -24,11 +24,9 @@ misp_pkg_list:
  - "@Development tools"
  - zip
  - git
- - redis
  - make
  - python3-devel
  - python3-pip
- - python3-virtualenv
  - python3-policycoreutils
  - policycoreutils-python-utils
  - libxml2-devel
@@ -37,7 +35,6 @@ misp_pkg_list:
  - curl
  - gnupg
  #
- - "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rng-tools{% endif %}"
  - wget
  # misp-modules
  - python3
@@ -62,7 +59,6 @@ misp_pkg_list:
  # - zbar
  - libXrender
  ## CentOS PowerTools x86_64
- - poppler-cpp-devel
  - ruby-devel
 
 python3_bin: python3
