@@ -14,7 +14,14 @@
 
 ## must be last to override previous vars
 - name: Include webserver+distribution-specific variables
-  ansible.builtin.include_vars: "{{ misp_webserver }}-{{ ansible_distribution }}.yml"
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ misp_webserver }}-{{ ansible_distribution }}.yml'
+        - '{{ misp_webserver }}-{{ ansible_os_family }}.yml'
+      paths:
+        - 'vars'
 - name: Include MISP 2.4 variables
   ansible.builtin.include_vars: "misp24.yml"
   when:
