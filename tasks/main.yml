@@ -51,7 +51,7 @@
 
 - name: Import debian
   ansible.builtin.import_tasks: debian.yml
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_os_family == 'Debian'
 
 - name: Import redhat
   ansible.builtin.import_tasks: redhat.yml
@@ -66,6 +66,7 @@
 
 - name: Import php-conflict
   ansible.builtin.import_tasks: php-conflict.yml
+  when: ansible_os_family == 'Debian'
 
 - name: Ensure Random source is configured
   ansible.builtin.lineinfile:
