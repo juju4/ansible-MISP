@@ -21,6 +21,18 @@
     apache_user: www-data
     php_pkg: php
   pre_tasks:
+    - name: RedHat | Ensure ps is present
+      ansible.builtin.package:
+        name:
+          - procps-ng
+        state: present
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
+    - name: Debian | Ensure ps is present
+      ansible.builtin.package:
+        name:
+          - procps
+        state: present
+      when: ansible_os_family == "Debian"
     - name: Debug | var ansible_virtualization_type
       ansible.builtin.debug:
         var: ansible_virtualization_type
