@@ -1,5 +1,20 @@
 ---
 
+- name: Check all processes
+  ansible.builtin.command: ps aux
+  changed_when: false
+  failed_when: false
+  register: psa
+- name: Debug | ps aux output
+  ansible.builtin.debug:
+    var: psa
+    verbosity: 1
+- name: Check for mysql sockets
+  ansible.builtin.command:
+    cmd: ls -l /var/run/mysqld
+  changed_when: false
+  failed_when: false
+
 - name: Database initialization
   block:
     - name: Creating mysql misp db
