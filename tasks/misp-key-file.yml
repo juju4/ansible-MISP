@@ -24,6 +24,10 @@
       loop_control:
         loop_var: d
       when: misp_web_user != 'admin@admin.test'
+    - name: Check for Vendor/autoload.php
+      ansible.builtin.command:
+        cmd: "ls -la {{ misp_rootdir }}/app/Vendor/"
+      changed_when: false
     - name: Generate key file - cake userInit
       ansible.builtin.shell: "{{ misp_rootdir }}/app/Console/cake userInit -q | tee {{ misp_key_file }}"
       args:
