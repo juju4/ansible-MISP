@@ -64,6 +64,8 @@
     login_user: "{{ misp_mysql_user | default(omit) }}"
     login_password: "{{ misp_mysql_pass | default(omit) }}"
   no_log: "{{ misp_no_log }}"
+  become: yes
+  become_user: mysql
   when: not mispdbloaded.stat.exists
 - name: Add marker for mysql import
   ansible.builtin.file:
