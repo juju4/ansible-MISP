@@ -27,6 +27,10 @@
       when: >
         (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16) or
         (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    - name: Debian | Refresh apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
     - name: RedHat | Ensure ps is present
       ansible.builtin.package:
         name:
