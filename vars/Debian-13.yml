@@ -4,6 +4,7 @@ misp_pkg_list:
  - openssh-server
  - mariadb-server
  - php
+ - php-curl
  - php-mysql
  - php-mbstring
  - php8.4-opcache
