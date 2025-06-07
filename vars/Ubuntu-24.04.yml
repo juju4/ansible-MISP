@@ -3,12 +3,12 @@
 misp_pkg_list:
  - openssh-server
  - mysql-server
- # MISP only supports PHP 7 on oct 2022
  - php8.3
+ - php8.3-apcu
  - php8.3-cli
+ - php8.3-curl
  - php8.3-dev
  - php8.3-dom
- - php8.3-curl
  - php8.3-mysql
  - php8.3-mbstring
  - php8.3-opcache
@@ -17,7 +17,6 @@ misp_pkg_list:
  - php8.3-zip
  - php8.3-redis
  - php8.3-gnupg
- - php8.3-apcu
  - php8.3-intl
  - php8.3-bcmath
  - php8.3-gd
