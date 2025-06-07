@@ -226,3 +226,5 @@
           - "'misp-workers:' in sup.stdout"
           - "'RUNNING' in sup.stdout"
           - sup.rc == 0
+      when:
+        - not (ansible_distribution == "Debian" and is_container | bool)
