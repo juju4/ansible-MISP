@@ -274,7 +274,7 @@
     mode: '0755'
     owner: "{{ www_user }}"
 
-- name: Install python dependencies with pip - python3
+- name: Install redis python dependencies with pip - python3
   ansible.builtin.pip:
     name: "{{ item.n }}"
     version: "{{ item.v }}"
@@ -283,13 +283,24 @@
     virtualenv_python: "{{ python3_bin }}"
   with_items:
     - { n: redis, v: '3.5.3' }
-    - { n: 'pymisp', v: "{{ misp_pymisp_version }}" }
   environment:
     PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   become: yes
   become_user: "{{ www_user }}"
   when:
     - misp_version == '2.4'
+
+- name: Install pymisp python dependencies with pip - python3
+  ansible.builtin.pip:
+    name: pymisp
+    version: "{{ misp_pymisp_version }}"
+    extra_args: '--exists-action=w'
+    virtualenv: "{{ misp_virtualenv }}"
+    virtualenv_python: "{{ python3_bin }}"
+  environment:
+    PATH: "{{ misp_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  become: yes
+  become_user: "{{ www_user }}"
 
 - name: Install python dependencies with pip - python, latest
   ansible.builtin.pip:
@@ -330,8 +341,8 @@
   register: pecl_update
   changed_when: "'Update of Channel' in pecl_update.stdout"
   when:
-    - ansible_distribution == 'Ubuntu'
-    - ansible_distribution_major_version | int >= 24
+    - (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 24) or
+      (ansible_os_family == 'Debian' and ansible_distribution_major_version | int >= 12)
 
 - name: Install PECL libraries.
   ansible.builtin.command: "{{ item }}"
@@ -343,8 +354,8 @@
   changed_when: "pecl_result.rc == 0"
   failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
   when:
-    - ansible_distribution == 'Ubuntu'
-    - ansible_distribution_major_version | int >= 24
+    - (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 24) or
+      (ansible_os_family == 'Debian' and ansible_distribution_major_version | int >= 12)
 
 - name: Setup MISP Cake config
   ansible.builtin.copy:
