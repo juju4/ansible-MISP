@@ -40,7 +40,7 @@
 
 - name: Restart webserver - docker,redhat
   ansible.builtin.command:  # noqa no-changed-when
-    cmd: "apachectl restart"
+    cmd: "pkill httpd; /usr/sbin/httpd"
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "RedHat"
