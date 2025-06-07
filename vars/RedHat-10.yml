@@ -23,6 +23,7 @@ misp_pkg_list:
  - "@Development tools"
  - zip
  - git
+ - redis
  - make
  - python3-devel
  - python3-pip
