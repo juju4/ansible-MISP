@@ -4,6 +4,10 @@ misp_pkg_list:
  - openssh-server
  - mariadb-server
  - php
+ - php-apcu
+ - php-cli
+ - php-curl
+ - php-dev
  - php-mysql
  - php-mbstring
  - php8.2-opcache
@@ -15,6 +19,8 @@ misp_pkg_list:
  - php-intl
  - php-bcmath
  - php-gd
+ - php8.2-simplexml
+ - php-xml
  - postfix
  - gcc
  - zip
@@ -30,11 +36,9 @@ misp_pkg_list:
  - libgl1-mesa-glx
  - libzbar0
  - zlib1g-dev
- - php-dev
  - curl
  - gnupg
  #
- - php-redis
  - python3-mysqldb
  # rng-tools-debian or rng-tools5 per https://packages.debian.org/bullseye/rng-tools-debian
  - rng-tools-debian
