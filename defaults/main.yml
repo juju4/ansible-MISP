@@ -27,7 +27,7 @@ misp_pip_stix_version: '1.2.0.11'
 # v2.4.167/dec 2022 is the last one supporting python <3.10
 # overridden by misp-modules REQUIREMENTS
 # https://github.com/MISP/misp-modules/blob/main/REQUIREMENTS
-misp_pymisp_version: 'v2.5.2'
+misp_pymisp_version: 'v2.5.12'
 # HEAD in misp-modules REQUIREMENTS
 misp_latest_pymisp: false
 
