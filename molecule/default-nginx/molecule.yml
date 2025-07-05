@@ -18,7 +18,7 @@ provisioner:
     defaults:
       verbosity: 2
 scenario:
-  name: default
+  name: default-nginx
   test_sequence:
     - dependency
     # - lint
