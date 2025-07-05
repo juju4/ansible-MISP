@@ -66,6 +66,7 @@ jobs:
           [ -f molecule/${ANSIBLE_SUITE}/requirements.yml ] && ansible-galaxy install -r molecule/${ANSIBLE_SUITE}/requirements.yml || true
           # template search only in currently executed role root/tasks/templates folders and molecule scenario root/templates folders
           cp $GITHUB_WORKSPACE/$ANSIBLE_ROLE/templates/misp-snuffleupagus-rules.ini.j2 $GITHUB_WORKSPACE/$ANSIBLE_ROLE/molecule/default/
+          cp $GITHUB_WORKSPACE/$ANSIBLE_ROLE/templates/nginx-misp.conf.j2 $GITHUB_WORKSPACE/$ANSIBLE_ROLE/molecule/default-nginx/
       - name: Fetch central settings repository
         run: |
           export settings_repo="https://raw.githubusercontent.com/juju4/ansible-ci-settings/main"
