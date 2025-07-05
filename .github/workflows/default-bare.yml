@@ -68,6 +68,8 @@ jobs:
           cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE
           [ -f molecule/$ANSIBLE_SUITE/requirements.yml ] && ansible-galaxy install -r molecule/$ANSIBLE_SUITE/requirements.yml
           { echo '[defaults]'; echo 'callback_enabled = profile_tasks, timer'; echo 'roles_path = ../:/home/runner/.ansible/roles'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
+          # template search only in currently executed role root/tasks/templates folders and molecule scenario root/templates folders
+          cp $GITHUB_WORKSPACE/$ANSIBLE_ROLE/templates/nginx-misp.conf.j2 $GITHUB_WORKSPACE/$ANSIBLE_ROLE/molecule/default-nginx/
       - name: Environment
         run: |
           set -x
