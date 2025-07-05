@@ -1,0 +1,69 @@
+---
+
+- name: Converge
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+  remote_user: root
+  pre_tasks:
+    - name: Ubuntu | Install python3
+      ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
+      register: python3
+      changed_when: "'installed' in python3.stdout"
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+    - name: RedHat | Install python3
+      ansible.builtin.raw: test -e /usr/bin/python3 || (yum install -y python3)
+      register: python3
+      changed_when: "'installed' in python3.stdout"
+      when: (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    - name: Gather Facts
+      ansible.builtin.setup:
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+    - name: Ubuntu Bionic+, Redhat 8+ | Enforce python3 for ansible
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+      when: >
+        (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16) or
+        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    - name: 22.04 | Set fact
+      ansible.builtin.set_fact:
+        misp_version: '2.4'
+        misp_pymisp_version: 'v2.4.200'
+        misp_modules_enable: false
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int <= 22)
+    - name: 24.04 | Set fact
+      ansible.builtin.set_fact:
+        misp_version: '2.5'
+        misp_php_snuffleupagus_enable: false
+        harden_php7_snuffleupagus: false
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
+  vars:
+    misp_local_base_url: "https://localhost"
+    misp_pymisp_base_url: "https://localhost"
+    misp_pymisp_verifycert: false
+    misp_pymisp_validation_fatal: false
+    misp_testing: true
+    misp_testing_user: _misp
+    misp_testing_user_home: "/home/{{ misp_testing_user }}"
+    misp_testing_key_file: "{{ misp_key_file }}"
+    misp_base_url: "https://{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
+    misp_base_ip: 127.0.0.1
+    misp_base_port: 443
+    misp_no_log: false
+    misp_webusers_list:
+      - { u: dupont@admin.test, p: 'dupont_passphrase.', email: dupont@localhost, org: 1, role: 2 }
+      - { u: dupond@admin.test, p: 'dupond_passphrase.', email: dupond@localhost, org: 1, role: 4 }
+    hardenwebserver_enable_defaultssl: false
+    harden_php_memory_limit: 2048M
+    harden_php_allow_url_fopen: On
+    harden_php_disable_functions: 'pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,chown,diskfreespace,disk_free_space,disk_total_space,dl,escapeshellcmd,fileinode,highlight_file,max_execution_time,passthru,proc_nice,proc_terminate,show_source,system,__construct, __destruct, __call,__wakeup'
+    hardenwebserver_header_csp: ''  # done by MISP directly
+    misp_php_snuffleupagus_enable: false
+    harden_nginx_php_variants: ['fpm', 'cli']
+    hardenwebserver_https_template: nginx-misp.conf.j2
+  roles:
+    - { role: juju4.redhat_epel, when: ansible_os_family == 'RedHat' }
+    - juju4.harden_nginx
+    - juju4.misp
