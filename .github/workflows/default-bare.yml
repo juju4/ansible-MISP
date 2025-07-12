@@ -124,10 +124,12 @@ jobs:
           systemctl -l --no-pager status misp-modules || true
           systemctl -l --no-pager status supervisor || true
           systemctl -l --no-pager status apache2 || true
+          systemctl -l --no-pager status nginx|| true
           systemctl -l --no-pager status mysql || true
           systemd-analyze --no-pager security || true
           systemd-analyze --no-pager security misp-modules || true
           systemd-analyze --no-pager security apache2 || true
+          systemd-analyze --no-pager security nginx || true
         if: ${{ always() }}
         continue-on-error: true
       - name: After script - php
@@ -183,5 +185,12 @@ jobs:
           set -x
           tail -50 /var/log/apache2/misp.local_access.log
           tail -50 /var/log/apache2/misp.local_error.log
+        if: ${{ always() }}
+        continue-on-error: true
+      - name: After script - nginx logs
+        run: |
+          set -x
+          tail -50 /var/log/nginx/misp.access.log
+          tail -50 /var/log/nginx/misp.error.log
         if: ${{ always() }}
         continue-on-error: true
