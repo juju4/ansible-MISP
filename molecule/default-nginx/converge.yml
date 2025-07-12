@@ -61,6 +61,7 @@
     harden_php_disable_functions: 'pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,chown,diskfreespace,disk_free_space,disk_total_space,dl,escapeshellcmd,fileinode,highlight_file,max_execution_time,passthru,proc_nice,proc_terminate,show_source,system,__construct, __destruct, __call,__wakeup'
     hardenwebserver_header_csp: ''  # done by MISP directly
     misp_php_snuffleupagus_enable: false
+    misp_webserver: 'nginx'
     harden_nginx_php_variants: ['fpm', 'cli']
     hardenwebserver_https_template: nginx-misp.conf.j2
   roles:
