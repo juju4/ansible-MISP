@@ -66,5 +66,5 @@
     hardenwebserver_https_template: nginx-misp.conf.j2
   roles:
     - { role: juju4.redhat_epel, when: ansible_os_family == 'RedHat' }
-    - juju4.misp
     - juju4.harden_nginx
+    - juju4.misp
