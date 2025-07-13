@@ -32,12 +32,14 @@
         misp_version: '2.4'
         misp_pymisp_version: 'v2.4.200'
         misp_modules_enable: false
+        nginx_sock: /run/php/php7.4-fpm.sock
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int <= 22)
     - name: 24.04 | Set fact
       ansible.builtin.set_fact:
         misp_version: '2.5'
         misp_php_snuffleupagus_enable: false
         harden_php7_snuffleupagus: false
+        nginx_sock: /run/php/php8.3-fpm.sock
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
   vars:
     misp_local_base_url: "https://localhost"
