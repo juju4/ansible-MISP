@@ -74,6 +74,7 @@
     misp_webserver: 'nginx'
     harden_nginx_php_variants: ['fpm', 'cli']
     hardenwebserver_https_template: nginx-misp.conf.j2
+    site_server_name: localhost
   roles:
     - { role: juju4.redhat_epel, when: ansible_os_family == 'RedHat' }
     - juju4.harden_nginx
