@@ -35,48 +35,20 @@
     - name: Debug | var ansible_virtualization_type
       ansible.builtin.debug:
         var: ansible_virtualization_type
-    - name: RedHat | Ensure ps is present
-      ansible.builtin.package:
-        name:
-          - procps-ng
-        state: present
-      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
-    - name: Debian | Ensure ps is present
-      ansible.builtin.package:
-        name:
-          - procps
-        state: present
-      when: ansible_os_family == "Debian"
     - name: 22.04 | Set fact
       ansible.builtin.set_fact:
         misp_version: '2.4'
         misp_pymisp_version: 'v2.4.200'
         misp_modules_enable: false
-        harden_apache_php74_debian_enable: true
+        nginx_sock: /run/php/php7.4-fpm.sock
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int <= 22)
     - name: 24.04 | Set fact
       ansible.builtin.set_fact:
         misp_version: '2.5'
         misp_php_snuffleupagus_enable: false
         harden_php7_snuffleupagus: false
+        nginx_sock: /run/php/php8.3-fpm.sock
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
-    - name: Debian 13 | Set fact
-      ansible.builtin.set_fact:
-        misp_version: '2.5'
-        # python < 3.13
-        misp_modules_enable: false
-      when: (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 13)
-    - name: Redhat 9 | Enable phpremi 8.4
-      ansible.builtin.set_fact:
-        harden_apache_phpremi_rhel_enable: true
-        harden_apache_phpremi_rhel_version: 8.4
-      when: >
-        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int == 9)
-    - name: Redhat 10 | Disable mod_security
-      ansible.builtin.set_fact:
-        hardenwebserver_modsecurity_enable: false
-      when: >
-        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 10)
   vars:
     misp_local_base_url: "https://localhost"
     misp_pymisp_base_url: "https://localhost"
@@ -98,24 +70,12 @@
     harden_php_allow_url_fopen: On
     harden_php_disable_functions: 'pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,chown,diskfreespace,disk_free_space,disk_total_space,dl,escapeshellcmd,fileinode,highlight_file,max_execution_time,passthru,proc_nice,proc_terminate,show_source,system,__construct, __destruct, __call,__wakeup'
     hardenwebserver_header_csp: ''  # done by MISP directly
-    harden_apache_stapling_enable: false
-    harden_apache_systemd_inaccessiblepaths: ''
-    harden_apache_modsecurity_lines:
-      ## https://isc.sans.edu/diary/Tracking+HTTP+POST+data+with+ELK/20345
-      - { re: '^SecRule REQUEST_METHOD POST id:1000,', l: 'SecRule REQUEST_METHOD POST id:1000,phase:2,ctl:auditEngine=On,nolog,pass' }
-      ## https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#sanitiseArg
-      - { re: '^SecAction nolog,phase:2,id:131,', l: 'SecAction nolog,phase:2,id:131,sanitiseArg:password,sanitiseArg:newPassword,sanitiseArg:oldPassword' }
-      - { re: '^SecTmpDir .*', l: 'SecTmpDir /tmp/modsectmp' }
-      - { re: '^SecDataDir .*', l: 'SecDataDir /tmp/modsecdata' }
-      # `grep ModSecurity /var/log/apache2/misp.local_error.log | sed 's/.*id "\([0-9]*\)".*/\1/' | sort | uniq -c`
-      # Host header is a numeric IP address
-      - { re: '^SecRuleRemoveById 920350', l: 'SecRuleRemoveById 920350' }
     misp_php_snuffleupagus_enable: false
-    harden_php7_snuffleupagus: false
-    harden_php7_snuffleupagus_rules_template: 'misp-snuffleupagus-rules.ini.j2'
-    harden_apache_php_variants: ['apache2', 'cli']
-    harden_apache_php74_rhel9_enable: true
+    misp_webserver: 'nginx'
+    harden_nginx_php_variants: ['fpm', 'cli']
+    hardenwebserver_https_template: nginx-misp.conf.j2
+    site_server_name: localhost
   roles:
     - { role: juju4.redhat_epel, when: ansible_os_family == 'RedHat' }
-    - juju4.harden_apache
+    - juju4.harden_nginx
     - juju4.misp

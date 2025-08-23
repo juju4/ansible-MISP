@@ -37,6 +37,7 @@
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "Debian"
+    - misp_webserver == 'apache2'
 
 - name: Restart webserver - docker,redhat
   ansible.builtin.shell:  # noqa no-changed-when
@@ -44,6 +45,7 @@
   when:
     - (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
     - ansible_os_family == "RedHat"
+    - misp_webserver == 'apache2'
 
 - name: Restart php-fpm
   ansible.builtin.service:

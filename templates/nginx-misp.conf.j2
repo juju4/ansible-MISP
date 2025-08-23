@@ -1,12 +1,31 @@
 {{ ansible_managed | comment }}
 
 server {
-    listen 80;
+    # listen 80;
+    listen 443 ssl http2;
 
     root {{ misp_rootdir }}/app/webroot/;
     index index.php index.html index.htm;
 
-    server_name _;
+    include /etc/nginx/harden-nginx-https;
+{% if hardenwebserver_cert is defined and hardenwebserver_cert == 'selfsigned' %}
+    ssl_certificate {{ hardenwebserver_ssl_cert | default( ssl_dir + "/" + ansible_fqdn + ".crt") }};
+    ssl_certificate_key {{ hardenwebserver_ssl_key | default( ssl_privatedir + "/" + ansible_fqdn + ".key") }};
+{% else %}
+    ssl_certificate {{ hardenwebserver_ssl_cert | default(ssl_fullchain) }};
+    ssl_certificate_key {{ hardenwebserver_ssl_key | default(ssl_privkey) }};
+{% endif %}
+
+    server_name {{ site_server_name | default(ansible_fqdn) }};
+
+    access_log /var/log/nginx/misp.access.log;
+    error_log /var/log/nginx/misp.error.log;
+{% if hardenwebserver_nginx_with_log_json is defined and hardenwebserver_nginx_with_log_json | bool %}
+    access_log /var/log/nginx/access_json.log combined_json;
+{% endif %}
+
+    server_tokens off;
+    etag off;
 
     location / {
             try_files $uri $uri/ /index.php;
