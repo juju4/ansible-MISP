@@ -46,10 +46,12 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             azure.archive.ubuntu.com:80
+            composer.github.io:443
             database.clamav.net:443
             esm.ubuntu.com:443
             files.pythonhosted.org:443
             galaxy.ansible.com:443
+            getcomposer.org:443
             github.com:443
             packages.microsoft.com:443
             pypi.org:443
