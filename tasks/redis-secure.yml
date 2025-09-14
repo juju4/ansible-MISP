@@ -19,7 +19,7 @@
     line: "requirepass {{ misp_redis_password }}"
     mode: '0644'
     backup: yes
-  when: misp_redis_password is defined and misp_redis_password
+  when: misp_redis_password is defined and misp_redis_password | length > 0
   notify:
     - Restart redis
 
