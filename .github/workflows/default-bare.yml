@@ -46,6 +46,7 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             azure.archive.ubuntu.com:80
+            database.clamav.net:443
             esm.ubuntu.com:443
             files.pythonhosted.org:443
             galaxy.ansible.com:443
