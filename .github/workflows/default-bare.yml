@@ -48,6 +48,7 @@ jobs:
             azure.archive.ubuntu.com:80
             esm.ubuntu.com:443
             files.pythonhosted.org:443
+            galaxy.ansible.com:443
             github.com:443
             packages.microsoft.com:443
             pypi.org:443
