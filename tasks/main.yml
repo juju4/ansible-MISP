@@ -197,13 +197,13 @@
   with_items: "{{ misp_git_signing_keys }}"
   register: import1
   changed_when: "'imported: [1-9]+' in import1.stdout"
-  when: misp_proxy_host is defined and misp_proxy_host
+  when: misp_proxy_host is defined and misp_proxy_host | length > 0
 
 - name: Git setup proxy
   community.general.git_config:
     name: http.proxy
     value: "{{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}"
-  when: misp_proxy_host is defined and misp_proxy_host
+  when: misp_proxy_host is defined and misp_proxy_host | length > 0
 
 - name: Ensure MISP root dir exists
   ansible.builtin.file:
@@ -264,7 +264,7 @@
     version: "{{ misp_version }}"
     update: yes
     force: yes
-  when: m.stat.exists and misp_git_update_force
+  when: m.stat.exists and misp_git_update_force | bool
   notify:
     - updating existing MISP submodules - minor releases
   become: yes
@@ -750,14 +750,14 @@
 
 - name: Import testing
   ansible.builtin.import_tasks: testing.yml
-  when: misp_testing is defined and misp_testing
+  when: misp_testing is defined and misp_testing | bool
 
 - name: Import misp-add-users
   ansible.builtin.import_tasks: misp-add-users.yml
 
 - name: Import misp-run-updates
   ansible.builtin.import_tasks: misp-run-updates.yml
-  when: misp_run_updates is defined and misp_run_updates
+  when: misp_run_updates is defined and misp_run_updates | bool
 
 - name: Import misp-feed
   ansible.builtin.import_tasks: misp-feeds.yml
