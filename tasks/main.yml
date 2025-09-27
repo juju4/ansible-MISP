@@ -203,7 +203,7 @@
   community.general.git_config:
     name: http.proxy
     value: "{{ misp_proxy_scheme }}://{{ misp_proxy_host }}:{{ misp_proxy_port }}"
-  when: misp_proxy_host is defined and misp_proxy_host
+  when: misp_proxy_host is defined and misp_proxy_host | length > 0
 
 - name: Ensure MISP root dir exists
   ansible.builtin.file:
@@ -528,7 +528,7 @@
     line: "Cache::config('default', array( 'engine' => 'File', 'mask' => 0600 ));"
     mode: '0640'
     backup: yes
-  when: misp_php_snuffleupagus_enable
+  when: misp_php_snuffleupagus_enable | bool
 - name: Set Cache::Config whole cakephp - mask acceptable for snuffleupagus  # noqa no-tabs
   ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/app/Lib/cakephp/lib/Cake/Cache/Engine/FileEngine.php"
@@ -536,7 +536,7 @@
     line: "\t\t\t'mask' => 0600"
     mode: '0644'
     backup: yes
-  when: misp_php_snuffleupagus_enable
+  when: misp_php_snuffleupagus_enable | bool
 - name: Add vendor/autoload.php to core
   ansible.builtin.lineinfile:
     dest: "{{ misp_rootdir }}/app/Config/core.php"
@@ -685,7 +685,7 @@
   with_items:
     - '*.php'
     - '*.ctp'
-  when: misp_php_snuffleupagus_enable
+  when: misp_php_snuffleupagus_enable | bool
 - name: Ensure config files are writeable by www user but not the world
   ansible.builtin.file:
     dest: "{{ item }}"
@@ -703,14 +703,14 @@
     cp -R {{ misp_rootdir }}/app/Lib/cakephp {{ misp_rootdir }}/app/Lib/cakephp.orig
   args:
     creates: "{{ misp_rootdir }}/app/Lib/cakephp.orig"
-  when: misp_testing is defined and misp_testing
+  when: misp_testing is defined and misp_testing | bool
 - name: Backup MISP
   ansible.builtin.copy:
     src: "{{ misp_rootdir }}/app/Controller/AppController.php"
     dest: "{{ misp_rootdir }}/app/Controller/AppController.php.orig"
     mode: '0644'
     remote_src: true
-  when: misp_testing is defined and misp_testing
+  when: misp_testing is defined and misp_testing | bool
 - name: Patch cakephp with stricter casting to support sp.global_strict
   ansible.posix.patch:
     src: "{{ item.s }}"
@@ -728,12 +728,12 @@
 
 - name: Import lief
   ansible.builtin.import_tasks: lief.yml
-  when: misp_lief_enable
+  when: misp_lief_enable | bool
 
 - name: Import misp-modules
   ansible.builtin.import_tasks: misp-modules.yml
   when:
-    - misp_modules_enable|bool
+    - misp_modules_enable | bool
 
 - name: Import misp-gem
   ansible.builtin.import_tasks: misp-gem.yml
@@ -750,14 +750,14 @@
 
 - name: Import testing
   ansible.builtin.import_tasks: testing.yml
-  when: misp_testing is defined and misp_testing
+  when: misp_testing is defined and misp_testing | bool
 
 - name: Import misp-add-users
   ansible.builtin.import_tasks: misp-add-users.yml
 
 - name: Import misp-run-updates
   ansible.builtin.import_tasks: misp-run-updates.yml
-  when: misp_run_updates is defined and misp_run_updates
+  when: misp_run_updates is defined and misp_run_updates | bool
 
 - name: Import misp-feed
   ansible.builtin.import_tasks: misp-feeds.yml
