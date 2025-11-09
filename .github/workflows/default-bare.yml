@@ -45,6 +45,7 @@ jobs:
         with:
           egress-policy: block
           allowed-endpoints: >
+            api.github.com:443
             api.launchpad.net:443
             azure.archive.ubuntu.com:80
             composer.github.io:443
@@ -54,8 +55,10 @@ jobs:
             galaxy.ansible.com:443
             getcomposer.org:443
             github.com:443
+            keyserver.ubuntu.com:80
             packages.microsoft.com:443
             pypi.org:443
+            repo.packagist.org:443
             www.google.com:1025
       - name: Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
