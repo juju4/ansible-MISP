@@ -1,12 +1,15 @@
 ---
-name: AnsibleCI
+name: AnsibleCI-monthly
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
-  schedule:  # run weekly, every Monday 01:00
-    - cron: '0 1 * * 1'
+  schedule:  # run weekly, on the 11th of the month
+    - cron: '30 1 11 * *'
+  merge_group:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
 
 permissions: {}
 
@@ -18,7 +21,7 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 2
       matrix:
         include:
           - molecule_distro: 'almalinux:10-kitten'
