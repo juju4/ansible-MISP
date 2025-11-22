@@ -52,6 +52,9 @@
     - not (ansible_distribution == 'Debian' and ansible_distribution_major_version | int >= 12)
     - not (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 9)
 
+- name: Import CI workaround
+  ansible.builtin.import_tasks: ci.yml
+
 - name: Import debian
   ansible.builtin.import_tasks: debian.yml
   when: ansible_os_family == 'Debian'

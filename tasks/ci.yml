@@ -1,9 +1,11 @@
 ---
-## Travis workaround
+## Long FQDN workaround
 
 ## Travis error:
 ##  "asn1 encoding routines:ASN1_mbstring_ncopy:string too longi:a_mbstr.c:154:maxsize=64" as
 ##  cn=testing-gce-4d114f77-0ff1-41fb-bd33-22879d3249da.c.eco-emissary-99515.internal
+## Github/Azure nginx
+##  could not build server_names_hash, you should increase server_names_hash_bucket_size: 64
 - name: Default | set certificate_cn
   ansible.builtin.set_fact:
     certificate_cn: "{{ ansible_fqdn }}"
@@ -30,3 +32,15 @@
     mode: '0755'
     recurse: yes
   when: gemdir.stat.exists
+
+- name: Github runner | set certificate_cn to shorter name to avoid nginx issue
+  ansible.builtin.set_fact:
+    certificate_cn: "testing.internal"
+    githubci: true
+    rolesroot: '/etc/ansible/roles'
+    # misp_testing_user: travis
+    # misp_testing_user_home: "/home/{{ misp_testing_user }}"
+    # misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
+  when:
+    - ansible_env['GITHUB_ACTIONS'] is defined
+    - ansible_env['GITHUB_ACTIONS'] == 'true'
