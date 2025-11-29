@@ -1,12 +1,10 @@
 ---
-name: default-bare
+name: default-bare-monthly
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
-  schedule:  # run weekly, every Monday 01:00
-    - cron: '0 1 * * 1'
+  schedule:  # run on the 11th of the month
+    - cron: '30 1 11 * *'
   merge_group:
 
 concurrency:
@@ -23,13 +21,21 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 2
       matrix:
         include:
           - distribution: ubuntu
             version: '24.04'
             suite: default
             experimental: false
+          - distribution: ubuntu
+            version: '22.04'
+            suite: default
+            experimental: false
+          - distribution: ubuntu
+            version: '24.04'
+            suite: default-nginx
+            experimental: true
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       ANSIBLE_EXTRA_VARS: "-e misp_mysql_user=root -e misp_mysql_pass=root"
