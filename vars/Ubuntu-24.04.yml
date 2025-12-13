@@ -39,7 +39,7 @@ misp_pkg_list:
  - curl
  - gnupg
  #
- - python3-mysqldb
+ - python3-pymysql
  - rng-tools5
  # misp-modules
  - python3
