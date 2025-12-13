@@ -7,7 +7,7 @@
 - name: List installed php packages
   ansible.builtin.debug:
     msg: "{{ item }}"
-  loop: "{{ ansible_facts['facts.packages'] | select('match', '^php-*') | list }}"
+  loop: "{{ ansible_facts.packages | select('match', '^php-*') | list }}"
 
 - name: Check debian alternatives
   ansible.builtin.command:

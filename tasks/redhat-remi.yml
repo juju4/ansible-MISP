@@ -6,7 +6,7 @@
 
 - name: Show packages
   ansible.builtin.debug:
-    var: ansible_facts['facts.packages']
+    var: ansible_facts.packages
     verbosity: 3
 
 - name: Import Remi rpm repository keys
@@ -50,8 +50,8 @@
     cmd: "dnf module reset php -y"
   when:
     - ansible_facts['distribution_major_version'] | int >= 8
-    - ansible_facts['facts.packages['php-fpm']'] is defined
-    - ansible_facts['facts.packages['php-fpm'][0]['version']'] is version_compare('7.4', '<')
+    - ansible_facts.packages['php-fpm'] is defined
+    - ansible_facts.packages['php-fpm'][0]['version'] is version_compare('7.4', '<')
 - name: RedHat | enable remi repository for php
   ansible.builtin.command:  # noqa no-changed-when
     cmd: "dnf module enable php:remi-{{ php_remi_version_long }} -y"
