@@ -85,7 +85,7 @@
     - Restart rng-tools
   when:
     - ansible_facts['os_family'] == "Debian"
-    - (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version|int'] < 22)
+    - (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version']|int < 22)
 
 - name: Ensure /var/run/mysqld exists
   ansible.builtin.file:
