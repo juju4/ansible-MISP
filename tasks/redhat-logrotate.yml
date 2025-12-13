@@ -13,7 +13,7 @@
     target: "{{ misp_rootdir }}/app/tmp/logs(/.*)?"
     setype: httpd_log_t
     state: present
-  when: ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
+  when: ansible_facts['selinux.status'] is defined and ansible_facts['selinux.status'] != 'disabled'
 
 - name: Allow logrotate to read /var/www
   ansible.builtin.command: "{{ item.c }}"
@@ -25,4 +25,4 @@
     }
     - { c: "semodule_package -o /root/misplogrotate.pp -m /root/misplogrotate.mod", t: "/root/misplogrotate.pp" }
     - { c: "semodule -i /root/misplogrotate.pp", t: "/tmp/doesnotexist" }
-  when: ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
+  when: ansible_facts['selinux.status'] is defined and ansible_facts['selinux.status'] != 'disabled'

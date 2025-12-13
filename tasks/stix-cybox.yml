@@ -44,4 +44,4 @@
   become_user: "{{ www_user }}"
   when:
     # https://github.com/MISP/cti-python-stix2/blob/main/pyproject.toml
-    - ansible_python_version is version('3.7', '>=')
+    - ansible_facts['python_version'] is version('3.7', '>=')

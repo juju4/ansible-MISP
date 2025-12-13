@@ -8,7 +8,7 @@
 ##  could not build server_names_hash, you should increase server_names_hash_bucket_size: 64
 - name: Default | set certificate_cn
   ansible.builtin.set_fact:
-    certificate_cn: "{{ ansible_fqdn }}"
+    certificate_cn: "{{ ansible_facts['fqdn'] }}"
 
 - name: Travis | set certificate_cn to shorter name to avoid openssl bug
   ansible.builtin.set_fact:

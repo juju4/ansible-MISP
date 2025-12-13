@@ -20,7 +20,7 @@
     - Restart webserver
     - Restart webserver - docker,debian
     - Restart webserver - docker,redhat
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'
 
 - name: Debian | ensure required modules are present
   community.general.apache2_module:
@@ -33,7 +33,7 @@
     - Restart webserver
     - Restart webserver - docker,debian
     - Restart webserver - docker,redhat
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu'
 
 - name: Debian | Enable misp apache config
   ansible.builtin.file:
@@ -45,4 +45,4 @@
     - Restart webserver
     - Restart webserver - docker,debian
     - Restart webserver - docker,redhat
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'

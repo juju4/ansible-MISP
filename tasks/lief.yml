@@ -14,8 +14,8 @@
     virtualenv: "{{ misp_virtualenv }}"
     virtualenv_python: "{{ python3_bin }}"
   when: >
-    ansible_os_family == 'Debian' or
-    (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 7)
+    ansible_facts['os_family'] == 'Debian' or
+    (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 7)
   register: pkg_result
   until: pkg_result is success
   become: yes

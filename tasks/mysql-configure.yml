@@ -18,15 +18,15 @@
 - name: Ubuntu - login
   ansible.builtin.import_tasks: mysql-configure-login.yml
   when:
-    - ansible_distribution == 'Ubuntu'
+    - ansible_facts['distribution'] == 'Ubuntu'
 
 - name: Non-Ubuntu - socket
   ansible.builtin.import_tasks: mysql-configure-socket.yml
   when:
-    - ansible_distribution != 'Ubuntu'
+    - ansible_facts['distribution'] != 'Ubuntu'
 
 - name: Ubuntu xenial
-  when: ansible_distribution_release == 'xenial'
+  when: ansible_facts['distribution_release'] == 'xenial'
   block:
     - name: Temporary workaround - mysql57 disable strict mode
       ansible.builtin.copy:

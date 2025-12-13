@@ -26,40 +26,40 @@
         name:
           - procps-ng
         state: present
-      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
+      when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8
     - name: Debian | Ensure ps is present
       ansible.builtin.package:
         name:
           - procps
         state: present
-      when: ansible_os_family == "Debian"
-    - name: Debug | var ansible_virtualization_type
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Debug | var ansible_facts['virtualization_type']
       ansible.builtin.debug:
-        var: ansible_virtualization_type
+        var: ansible_facts['virtualization_type']
     - name: Set fact is_container
       ansible.builtin.set_fact:
         is_container: true
       when: >
-        (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+        (ansible_facts['virtualization_type'] is defined and
+          (ansible_facts['virtualization_type'] == "docker" or ansible_facts['virtualization_type'] == "containerd")
         )
     - name: RedHat | Set fact
       ansible.builtin.set_fact:
         apache_process: httpd
         apache_user: root
-      when: ansible_os_family == 'RedHat'
+      when: ansible_facts['os_family'] == 'RedHat'
     - name: Jammy, RHEL9 | Set fact php7.4
       ansible.builtin.set_fact:
         php_pkg: php7.4
       when: >
-        (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 22)
+        (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int == 22)
         or
-        (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 9)
+        (ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] | int == 9)
     - name: Noble | Set fact php8.3
       ansible.builtin.set_fact:
         php_pkg: php8.3
       when: >
-        (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 24)
+        (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int == 24)
   tasks:
     - name: Gather package facts
       ansible.builtin.package_facts:
@@ -227,4 +227,4 @@
           - "'RUNNING' in sup.stdout"
           - sup.rc == 0
       when:
-        - not (ansible_distribution == "Debian" and is_container | bool)
+        - not (ansible_facts['distribution'] == "Debian" and is_container | bool)

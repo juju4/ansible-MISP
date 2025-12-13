@@ -7,7 +7,7 @@
 - name: List installed php packages
   ansible.builtin.debug:
     msg: "{{ item }}"
-  loop: "{{ ansible_facts.packages | select('match', '^php-*') | list }}"
+  loop: "{{ ansible_facts['facts.packages'] | select('match', '^php-*') | list }}"
 
 - name: Check debian alternatives
   ansible.builtin.command:
@@ -21,4 +21,4 @@
   become: yes
   changed_when: false
   when:
-    - (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 22)
+    - (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int == 22)

@@ -11,24 +11,24 @@
 - name: Import redhat-remi
   ansible.builtin.import_tasks: redhat-remi.yml
   when:
-    - ansible_os_family == "RedHat"
-    - ansible_distribution_major_version | int == 9
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] | int == 9
 
 - name: RedHat9 | Enable PowerTools repo
   ansible.builtin.command:  # noqa no-changed-when
     cmd: dnf config-manager --enable crb
   become: yes
   when:
-    - ansible_os_family == "RedHat"
-    - ansible_distribution_major_version | int == 9
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] | int == 9
 
 - name: RedHat8 | Enable PowerTools repo
   ansible.builtin.command:  # noqa no-changed-when
     cmd: dnf config-manager --set-enabled powertools
   become: yes
   when:
-    - ansible_os_family == "RedHat"
-    - ansible_distribution_major_version | int == 8
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] | int == 8
 
 - name: Check available repositories - list
   ansible.builtin.command: ls -l /etc/yum.repos.d/
@@ -37,8 +37,8 @@
   ansible.builtin.command: dnf repolist
   changed_when: false
   when:
-    - ansible_os_family == "RedHat"
-    - ansible_distribution_major_version | int >= 8
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] | int >= 8
 
 - name: Redhat | remove possible conflicting packages
   ansible.builtin.dnf:
@@ -49,7 +49,7 @@
   until: pkg_result is success
   when:
     # dnf depends on curl-minimal on 10
-    - ansible_distribution_major_version | int < 10
+    - ansible_facts['distribution_major_version'] | int < 10
 
 - name: Redhat | MISP dependencies install
   ansible.builtin.dnf:
@@ -70,7 +70,7 @@
   ansible.builtin.package:
     name: ['nss', 'curl', 'libcurl']
     state: latest  # noqa package-latest
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"
   register: pkg_result
   until: pkg_result is success
 
@@ -123,11 +123,11 @@
 
 # https://github.com/ansible/ansible/issues/16612
 - name: RedHat selinux facts
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"
   block:
-    - name: Debug | ansible_selinux var
+    - name: Debug | ansible_facts['selinux'] var
       ansible.builtin.debug:
-        var: ansible_selinux
+        var: ansible_facts['selinux']
     - name: RedHat7- | Ensure selinux dependencies are present
       ansible.builtin.package:
         name:
@@ -138,8 +138,8 @@
       register: pkg_result
       until: pkg_result is success
       when:
-        - ansible_os_family == "RedHat"
-        - ansible_distribution_major_version|int < 8
+        - ansible_facts['os_family'] == "RedHat"
+        - ansible_facts['distribution_major_version|int'] < 8
     - name: RedHat8+ | Ensure selinux dependencies are present
       ansible.builtin.package:
         name:
@@ -150,18 +150,18 @@
       register: pkg_result
       until: pkg_result is success
       when:
-        - ansible_os_family == "RedHat"
-        - ansible_distribution_major_version | int >= 8
+        - ansible_facts['os_family'] == "RedHat"
+        - ansible_facts['distribution_major_version'] | int >= 8
     - name: Re-collect facts
       ansible.builtin.setup:
-    - name: Debug | ansible_selinux var
+    - name: Debug | ansible_facts['selinux'] var
       ansible.builtin.debug:
-        var: ansible_selinux
+        var: ansible_facts['selinux']
 - name: RedHat selinux
   when:
-    - ansible_os_family == "RedHat"
-    - ansible_selinux.status is defined
-    - ansible_selinux.status != 'disabled'
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['selinux.status'] is defined
+    - ansible_facts['selinux.status'] != 'disabled'
   block:
     - name: RedHat | Allow proxy to network connect in selinux
       ansible.posix.seboolean:

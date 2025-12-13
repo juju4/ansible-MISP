@@ -12,71 +12,71 @@
       ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
       register: python3
       changed_when: "'installed' in python3.stdout"
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+      when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 16)
     - name: RedHat | Install python3
       ansible.builtin.raw: test -e /usr/bin/python3 || (yum install -y python3)
       register: python3
       changed_when: "'installed' in python3.stdout"
-      when: (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+      when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8)
     - name: Gather Facts
       ansible.builtin.setup:
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+      when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 16)
     - name: Ubuntu Bionic+, Redhat 8+ | Enforce python3 for ansible
       ansible.builtin.set_fact:
-        ansible_python_interpreter: /usr/bin/python3
+        ansible_facts['python_interpreter:'] /usr/bin/python3
       when: >
-        (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16) or
-        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+        (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 16) or
+        (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8)
     - name: Debian | Refresh apt cache
       ansible.builtin.apt:
         update_cache: yes
         cache_valid_time: 3600
-      when: ansible_os_family == "Debian"
-    - name: Debug | var ansible_virtualization_type
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Debug | var ansible_facts['virtualization_type']
       ansible.builtin.debug:
-        var: ansible_virtualization_type
+        var: ansible_facts['virtualization_type']
     - name: RedHat | Ensure ps is present
       ansible.builtin.package:
         name:
           - procps-ng
         state: present
-      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
+      when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8
     - name: Debian | Ensure ps is present
       ansible.builtin.package:
         name:
           - procps
         state: present
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
     - name: 22.04 | Set fact
       ansible.builtin.set_fact:
         misp_version: '2.4'
         misp_pymisp_version: 'v2.4.200'
         misp_modules_enable: false
         harden_apache_php74_debian_enable: true
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int <= 22)
+      when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int <= 22)
     - name: 24.04 | Set fact
       ansible.builtin.set_fact:
         misp_version: '2.5'
         misp_php_snuffleupagus_enable: false
         harden_php7_snuffleupagus: false
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
+      when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 24)
     - name: Debian 13 | Set fact
       ansible.builtin.set_fact:
         misp_version: '2.5'
         # python < 3.13
         misp_modules_enable: false
-      when: (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 13)
+      when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] | int >= 13)
     - name: Redhat 9 | Enable phpremi 8.4
       ansible.builtin.set_fact:
         harden_apache_phpremi_rhel_enable: true
         harden_apache_phpremi_rhel_version: 8.4
       when: >
-        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int == 9)
+        (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int == 9)
     - name: Redhat 10 | Disable mod_security
       ansible.builtin.set_fact:
         hardenwebserver_modsecurity_enable: false
       when: >
-        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 10)
+        (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 10)
   vars:
     misp_local_base_url: "https://localhost"
     misp_pymisp_base_url: "https://localhost"
@@ -86,7 +86,7 @@
     misp_testing_user: _misp
     misp_testing_user_home: "/home/{{ misp_testing_user }}"
     misp_testing_key_file: "{{ misp_key_file }}"
-    misp_base_url: "https://{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
+    misp_base_url: "https://{{ ansible_facts['default_ipv4.address'] | default(ansible_facts['all_ipv4_addresses'][0]) }}"
     misp_base_ip: 127.0.0.1
     misp_base_port: 443
     misp_no_log: false
@@ -116,6 +116,8 @@
     harden_apache_php_variants: ['apache2', 'cli']
     harden_apache_php74_rhel9_enable: true
   roles:
-    - { role: juju4.redhat_epel, when: ansible_os_family == 'RedHat' }
+    - { role: juju4.redhat_epel,
+        when: ansible_facts.os_family == 'RedHat'
+    }
     - juju4.harden_apache
     - juju4.misp
