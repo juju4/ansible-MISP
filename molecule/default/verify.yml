@@ -67,9 +67,9 @@
     - name: Validate that needed packages are present
       ansible.builtin.assert:
         that:
-          - ansible_facts.packages[php_pkg]
-          - ansible_facts.packages['redis-server']
-          - ansible_facts.packages['python3']
+          - ansible_facts.packages[php_pkg] is defined
+          - ansible_facts.packages['redis-server'] is defined
+          - ansible_facts.packages['python3'] is defined
 
     - name: Check misp config file
       ansible.builtin.stat:
@@ -86,7 +86,8 @@
       failed_when: false
     - name: Validate ps output
       ansible.builtin.assert:
-        that: ps1.stdout
+        that:
+          - ps1.stdout | length > 0
       when:
         - not is_container|bool
 
@@ -187,7 +188,7 @@
       ansible.builtin.assert:
         that:
           - "'True' in live.stdout"
-          - not live.stderr|string
+          - live.stderr | length == 0
 
     - name: Check cake Admin securityAudit
       ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Admin securityAudit"
@@ -200,7 +201,7 @@
       ansible.builtin.assert:
         that:
           - "'Error: ' not in securityaudit.stdout"
-          - not securityaudit.stderr|string
+          - securityaudit.stderr | length == 0
       when: false
 
     - name: Check mysql misp tables
