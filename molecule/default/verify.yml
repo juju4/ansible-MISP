@@ -1,7 +1,7 @@
 ---
 
 - name: Verify MISP setup
-  hosts: mispgroup
+  hosts: "{{ playbook_hosts | default('all') }}"
   gather_facts: true
   vars:
     misp_home: /var/www/_MISP
