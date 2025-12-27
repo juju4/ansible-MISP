@@ -1,7 +1,7 @@
 ---
 
 - name: Verify MISP setup
-  hosts: mispgroup
+  hosts: "{{ playbook_hosts | default('all') }}"
   gather_facts: true
   vars:
     misp_home: /var/www/_MISP
@@ -21,6 +21,18 @@
     user: www-data
     php_pkg: php
   pre_tasks:
+    - name: RedHat | Ensure ps is present
+      ansible.builtin.package:
+        name:
+          - procps-ng
+        state: present
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
+    - name: Debian | Ensure ps is present
+      ansible.builtin.package:
+        name:
+          - procps
+        state: present
+      when: ansible_os_family == "Debian"
     - name: Debug | var ansible_virtualization_type
       ansible.builtin.debug:
         var: ansible_virtualization_type
@@ -55,9 +67,9 @@
     - name: Validate that needed packages are present
       ansible.builtin.assert:
         that:
-          - ansible_facts.packages[php_pkg]
-          - ansible_facts.packages['redis-server']
-          - ansible_facts.packages['python3']
+          - ansible_facts.packages[php_pkg] is defined
+          - ansible_facts.packages['redis-server'] is defined
+          - ansible_facts.packages['python3'] is defined
 
     - name: Check misp config file
       ansible.builtin.stat:
@@ -74,7 +86,8 @@
       failed_when: false
     - name: Validate ps output
       ansible.builtin.assert:
-        that: ps1.stdout
+        that:
+          - ps1.stdout | length > 0
       when:
         - not is_container|bool
 
@@ -105,8 +118,8 @@
       failed_when: false
     - name: Validate localhost endpoint
       ansible.builtin.assert:
-        that: >
-          "'Users - MISP' in web.content"
+        that:
+          - "'Users - MISP' in web.content"
       when:
         - not is_container|bool
 
@@ -161,8 +174,8 @@
     - name: Validate config lint
       ansible.builtin.assert:
         that:
-          - not configlint.stdout|string
-          - not configlint.stderr|string
+          - configlint.stdout | length == 0
+          - configlint.stderr | length == 0
 
     - name: Check cake Admin live
       ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Admin live"
@@ -175,7 +188,7 @@
       ansible.builtin.assert:
         that:
           - "'True' in live.stdout"
-          - not live.stderr|string
+          - live.stderr | length == 0
 
     - name: Check cake Admin securityAudit
       ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Admin securityAudit"
@@ -188,7 +201,7 @@
       ansible.builtin.assert:
         that:
           - "'Error: ' not in securityaudit.stdout"
-          - not securityaudit.stderr|string
+          - securityaudit.stderr | length == 0
       when: false
 
     - name: Check mysql misp tables
@@ -214,3 +227,5 @@
           - "'misp-workers:' in sup.stdout"
           - "'RUNNING' in sup.stdout"
           - sup.rc == 0
+      when:
+        - not (ansible_distribution == "Debian" and is_container | bool)

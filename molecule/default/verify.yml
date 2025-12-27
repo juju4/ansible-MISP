@@ -118,8 +118,8 @@
       failed_when: false
     - name: Validate localhost endpoint
       ansible.builtin.assert:
-        that: >
-          "'Users - MISP' in web.content"
+        that:
+          - "'Users - MISP' in web.content"
       when:
         - not is_container|bool
 
@@ -174,8 +174,8 @@
     - name: Validate config lint
       ansible.builtin.assert:
         that:
-          - not configlint.stdout|string
-          - not configlint.stderr|string
+          - configlint.stdout | length == 0
+          - configlint.stderr | length == 0
 
     - name: Check cake Admin live
       ansible.builtin.command: "{{ misp_rootdir }}/app/Console/cake Admin live"
