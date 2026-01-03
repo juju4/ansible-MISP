@@ -72,7 +72,7 @@ misp_webserver_nginx:
 
 mysql_svc: mariadb
 misp_mysql_socket: "/var/lib/mysql/mysql.sock"
-rng_svc: "{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8) and ansible_virtualization_type is defined %}haveged{% else %}rngd{% endif %}"
+rng_svc: "{% if (ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] | int >= 8) and ansible_facts['virtualization_type'] is defined %}haveged{% else %}rngd{% endif %}"
 redis_svc: redis
 redis_conf: /etc/redis/redis.conf
 misp_services:
