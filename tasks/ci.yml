@@ -8,7 +8,7 @@
 ##  could not build server_names_hash, you should increase server_names_hash_bucket_size: 64
 - name: Default | set certificate_cn
   ansible.builtin.set_fact:
-    certificate_cn: "{{ ansible_fqdn }}"
+    certificate_cn: "{{ ansible_facts['fqdn'] }}"
 
 - name: Travis | set certificate_cn to shorter name to avoid openssl bug
   ansible.builtin.set_fact:
@@ -18,7 +18,7 @@
     # misp_testing_user: travis
     # misp_testing_user_home: "/home/{{ misp_testing_user }}"
     # misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
-  when: ansible_env['TRAVIS'] is defined and ansible_env['TRAVIS'] == 'true'
+  when: ansible_facts['env']['TRAVIS'] is defined and ansible_facts['env']['TRAVIS'] == 'true'
 
 - name: Check if /home/kitchen/.gem exists
   ansible.builtin.stat:
@@ -42,5 +42,5 @@
     # misp_testing_user_home: "/home/{{ misp_testing_user }}"
     # misp_testing_key_file: "{{ misp_testing_user_home }}/build/key.txt"
   when:
-    - ansible_env['GITHUB_ACTIONS'] is defined
-    - ansible_env['GITHUB_ACTIONS'] == 'true'
+    - ansible_facts['env']['GITHUB_ACTIONS'] is defined
+    - ansible_facts['env']['GITHUB_ACTIONS'] == 'true'

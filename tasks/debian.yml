@@ -2,7 +2,7 @@
 
 - name: Import debian-php74
   ansible.builtin.import_tasks: debian-php74.yml
-  when: ansible_distribution_release == 'jammy'
+  when: ansible_facts['distribution_release'] == 'jammy'
 
 - name: Debian | MISP dependencies install
   ansible.builtin.apt:

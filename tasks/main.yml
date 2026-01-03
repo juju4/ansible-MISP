@@ -5,11 +5,11 @@
   vars:
     params:
       files:
-        - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
-        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-        - '{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml'
-        - '{{ ansible_distribution }}.yml'
-        - '{{ ansible_os_family }}.yml'
+        - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+        - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+        - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+        - "{{ ansible_facts['distribution'] }}.yml"
+        - "{{ ansible_facts['os_family'] }}.yml"
       paths:
         - 'vars'
 
@@ -19,8 +19,8 @@
   vars:
     params:
       files:
-        - '{{ misp_webserver }}-{{ ansible_distribution }}.yml'
-        - '{{ misp_webserver }}-{{ ansible_os_family }}.yml'
+        - "{{ misp_webserver }}-{{ ansible_facts['distribution'] }}.yml"
+        - "{{ misp_webserver }}-{{ ansible_facts['os_family'] }}.yml"
       paths:
         - 'vars'
 - name: Include MISP 2.4 variables
@@ -36,10 +36,10 @@
   ansible.builtin.set_fact:
     is_container: true
   when: >
-    (ansible_virtualization_type is defined and
-      (ansible_virtualization_type == "docker"
-       or ansible_virtualization_type == "container"
-       or ansible_virtualization_type == "containerd"
+    (ansible_facts['virtualization_type'] is defined and
+      (ansible_facts['virtualization_type'] == "docker"
+       or ansible_facts['virtualization_type'] == "container"
+       or ansible_facts['virtualization_type'] == "containerd"
       )
     )
 
@@ -48,20 +48,20 @@
     msg: "MISP 2.5 requires PHP 8 which starts with Ubuntu 24.04, Debian 12, and RedHat 10 (RedHat 9 with phpremi)"
   when:
     - misp_version == '2.5'
-    - not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 24)
-    - not (ansible_distribution == 'Debian' and ansible_distribution_major_version | int >= 12)
-    - not (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 9)
+    - not (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int >= 24)
+    - not (ansible_facts['distribution'] == 'Debian' and ansible_facts['distribution_major_version'] | int >= 12)
+    - not (ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] | int >= 9)
 
 - name: Import CI workaround
   ansible.builtin.import_tasks: ci.yml
 
 - name: Import debian
   ansible.builtin.import_tasks: debian.yml
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'
 
 - name: Import redhat
   ansible.builtin.import_tasks: redhat.yml
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"
 
 - name: Debug | misp_webserver var
   ansible.builtin.debug:
@@ -72,7 +72,7 @@
 
 - name: Import php-conflict
   ansible.builtin.import_tasks: php-conflict.yml
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'
 
 - name: Ensure Random source is configured
   ansible.builtin.lineinfile:
@@ -84,8 +84,8 @@
   notify:
     - Restart rng-tools
   when:
-    - ansible_os_family == "Debian"
-    - (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int < 22)
+    - ansible_facts['os_family'] == "Debian"
+    - (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version']|int < 22)
 
 - name: Ensure /var/run/mysqld exists
   ansible.builtin.file:
@@ -93,7 +93,7 @@
     state: directory
     mode: '0755'
     owner: mysql
-  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+  when: (ansible_facts['virtualization_type'] is defined and ansible_facts['virtualization_type'] == "docker")
 
 - name: Ensure services are enabled and started
   ansible.builtin.service:
@@ -101,12 +101,12 @@
     state: "started"
     enabled: "yes"
   with_items: "{{ misp_services }}"
-  when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+  when: not (ansible_facts['virtualization_type'] is defined and ansible_facts['virtualization_type'] == "docker")
 
 - name: Debian Docker
   when: >
-    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker") and
-    ansible_os_family == "Debian"
+    (ansible_facts['virtualization_type'] is defined and ansible_facts['virtualization_type'] == "docker") and
+    ansible_facts['os_family'] == "Debian"
   block:
     - name: Debian | Docker | Manually initialize mysql
       ansible.builtin.shell:
@@ -121,8 +121,8 @@
 
 - name: RedHat Docker
   when: >
-    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
-    and ansible_os_family == "RedHat"
+    (ansible_facts['virtualization_type'] is defined and ansible_facts['virtualization_type'] == "docker")
+    and ansible_facts['os_family'] == "RedHat"
   block:
     - name: RedHat | Docker | Manually initialize mysql
       ansible.builtin.shell: >
@@ -140,7 +140,7 @@
 
 - name: Docker
   when: >
-    (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+    (ansible_facts['virtualization_type'] is defined and ansible_facts['virtualization_type'] == "docker")
   block:
     - name: Debian | Ensure right permissions for /run/mysqld
       ansible.builtin.file:
@@ -149,7 +149,7 @@
         owner: 'mysql'
         state: directory
       when:
-        - ansible_distribution == "Debian"
+        - ansible_facts['distribution'] == "Debian"
 
     - name: Docker | Manually start mysql service
       ansible.builtin.shell: >
@@ -347,8 +347,8 @@
   register: pecl_update
   changed_when: "'Update of Channel' in pecl_update.stdout"
   when:
-    - (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 24) or
-      (ansible_os_family == 'Debian' and ansible_distribution_major_version | int >= 12)
+    - (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int >= 24) or
+      (ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution_major_version'] | int >= 12)
 
 - name: Install PECL libraries.
   ansible.builtin.command: "{{ item }}"
@@ -360,8 +360,8 @@
   changed_when: "pecl_result.rc == 0"
   failed_when: "not (('already installed' in pecl_result.stdout) or ('install ok:' in pecl_result.stdout))"
   when:
-    - (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 24) or
-      (ansible_os_family == 'Debian' and ansible_distribution_major_version | int >= 12)
+    - (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int >= 24) or
+      (ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution_major_version'] | int >= 12)
 
 - name: Setup MISP Cake config
   ansible.builtin.copy:
@@ -465,7 +465,7 @@
     - Restart webserver - docker,debian
     - Restart webserver - docker,redhat
   when: >
-    (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and
+    (ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu') and
     (misp_webserver is not defined or misp_webserver == 'apache2')
 
 - name: Check if bootstrap.php exists
@@ -485,7 +485,7 @@
     - core
     ## done later
     # - config
-  when: not conffiles.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  when: not conffiles.stat.exists and (ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu')
 - name: Create config files from default
   ansible.builtin.copy:
     src: "{{ misp_rootdir }}/app/Config/{{ item }}.default.php"
@@ -497,7 +497,7 @@
     - database
     - core
     # - config
-  when: not conffiles.stat.exists and not (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  when: not conffiles.stat.exists and not (ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu')
 - name: Ensure right permissions for conf files
   ansible.builtin.file:
     dest: "{{ misp_rootdir }}/app/Config/{{ item }}.php"
@@ -597,7 +597,7 @@
     cmd: "gpg-agent --daemon --homedir={{ misp_rootdir }}/.gnupg"
   become: yes
   become_user: "{{ www_user }}"
-  when: not gkey.stat.exists and (ansible_os_family == "RedHat") and misp_webserver == 'nginx'
+  when: not gkey.stat.exists and (ansible_facts['os_family'] == "RedHat") and misp_webserver == 'nginx'
 - name: Create gnupg key for {{ misp_email }}
   ansible.builtin.command: "{{ item.s }}"
   args:
@@ -637,23 +637,23 @@
     - { d: "{{ misp_rootdir }}/.gnupg/secring.gpg", m: '0600' }
   when: >
     not (
-          (ansible_distribution == 'Debian' and ansible_distribution_major_version | int >= 11) or
-          (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 18) or
-          (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+          (ansible_facts['distribution'] == 'Debian' and ansible_facts['distribution_major_version'] | int >= 11) or
+          (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int >= 18) or
+          (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8)
         )
 
 - name: Import redhat-logrotate
   ansible.builtin.import_tasks: redhat-logrotate.yml
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"
 
 - name: Import selinux-context
   ansible.builtin.import_tasks: selinux-context.yml
-  when: ansible_os_family == "RedHat" and ansible_selinux.status is defined and ansible_selinux.status != 'disabled'
+  when: ansible_facts['os_family'] == "RedHat" and ansible_facts['selinux'].status is defined and ansible_facts['selinux'].status != 'disabled'
 
 - name: Ubuntu Xenial Docker
   when: >
-    ansible_virtualization_type is defined and ansible_virtualization_type == "docker"
-    and ansible_distribution == "Ubuntu" and ansible_distribution_release == 'xenial'
+    ansible_facts['virtualization_type'] is defined and ansible_facts['virtualization_type'] == "docker"
+    and ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_release'] == 'xenial'
   block:
     - name: Docker redis workaround ???
       ansible.builtin.replace:
@@ -671,7 +671,7 @@
     name: "{{ redis_svc }}"
     state: started
     enabled: yes
-  when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+  when: not (ansible_facts['virtualization_type'] is defined and ansible_facts['virtualization_type'] == "docker")
 
 - name: Docker | Manually start redis
   ansible.builtin.shell: "/usr/bin/redis-server {{ redis_conf }} --daemonize yes > /tmp/redis.out"
@@ -680,7 +680,7 @@
   become_flags: -H
   args:
     creates: /tmp/redis.out
-  when: (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+  when: (ansible_facts['virtualization_type'] is defined and ansible_facts['virtualization_type'] == "docker")
 
 # snuffleupagus sp.readonly_exec.enable() = php file must be non-writeable (issue with auto-update?)
 - name: Ensure that webroot files are not executable and not writeable
@@ -747,8 +747,8 @@
   ansible.builtin.import_tasks: background-jobs.yml
   when: >
     (
-      (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 20) or
-      (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+      (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int >= 20) or
+      (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8)
     )
 
 - name: Import testing

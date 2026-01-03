@@ -3,9 +3,9 @@
 - name: Debug | apache_sitedir var
   ansible.builtin.debug:
     var: apache_sitedir
-- name: Debug | ansible_distribution var
+- name: Debug | ansible_facts['distribution'] var
   ansible.builtin.debug:
-    var: ansible_distribution
+    var: ansible_facts['distribution']
 
 - name: Set misp nginx configuration
   ansible.builtin.template:
@@ -16,7 +16,7 @@
     - Restart webserver
 
 - name: Debian
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu'
   block:
     - name: Debian | enable misp configuration
       ansible.builtin.file:
@@ -41,4 +41,4 @@
     backup: yes
   notify:
     - Restart webserver
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"

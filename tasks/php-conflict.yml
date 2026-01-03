@@ -21,4 +21,4 @@
   become: yes
   changed_when: false
   when:
-    - (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 22)
+    - (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int == 22)

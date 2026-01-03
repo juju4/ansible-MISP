@@ -37,7 +37,7 @@
     replace: "ENGINE=MyISAM"
     mode: '0644'
     backup: yes
-  when: ansible_distribution_major_version == '7'
+  when: ansible_facts['distribution_major_version'] == '7'
 
 - name: Importing mysql misp db template - socket
   community.mysql.mysql_db:
