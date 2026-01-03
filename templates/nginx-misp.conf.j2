@@ -9,14 +9,14 @@ server {
 
     include /etc/nginx/harden-nginx-https;
 {% if hardenwebserver_cert is defined and hardenwebserver_cert == 'selfsigned' %}
-    ssl_certificate {{ hardenwebserver_ssl_cert | default( ssl_dir + "/" + ansible_fqdn + ".crt") }};
-    ssl_certificate_key {{ hardenwebserver_ssl_key | default( ssl_privatedir + "/" + ansible_fqdn + ".key") }};
+    ssl_certificate {{ hardenwebserver_ssl_cert | default( ssl_dir + "/" + ansible_facts['fqdn'] + ".crt") }};
+    ssl_certificate_key {{ hardenwebserver_ssl_key | default( ssl_privatedir + "/" + ansible_facts['fqdn'] + ".key") }};
 {% else %}
     ssl_certificate {{ hardenwebserver_ssl_cert | default(ssl_fullchain) }};
     ssl_certificate_key {{ hardenwebserver_ssl_key | default(ssl_privkey) }};
 {% endif %}
 
-    server_name {{ site_server_name | default(ansible_fqdn) }};
+    server_name {{ site_server_name | default(ansible_facts['fqdn']) }};
 
     access_log /var/log/nginx/misp.access.log;
     error_log /var/log/nginx/misp.error.log;

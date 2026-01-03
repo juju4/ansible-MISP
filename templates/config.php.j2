@@ -11,8 +11,8 @@ $config = array (
     'org' => 'ORGNAME',
     'showorg' => true,
 {% if (
-      (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 20) or
-      (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+      (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int >= 20) or
+      (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8)
     ) %}
     'background_jobs' => true,
 {% endif %}
@@ -260,8 +260,8 @@ $config = array (
     'Export_cisco_firesight_manager_ACL_rule_export_enabled' => false,
   ),
 {% if (
-      (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 20) or
-      (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+      (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] | int >= 20) or
+      (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8)
     ) %}
   'SimpleBackgroundJobs' =>
   array (
