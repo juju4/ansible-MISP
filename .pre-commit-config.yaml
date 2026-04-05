@@ -20,7 +20,7 @@ repos:
       - id: ansible-lint
         files: \.(yaml|yml)$
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
         args: [-I, .codespellignore, --exclude-file, files/pgp-09e2cd4944e6cbcd.asc]
