@@ -47,6 +47,7 @@ jobs:
             azure.archive.ubuntu.com:80
             composer.github.io:443
             database.clamav.net:443
+            dl.google.com:443
             esm.ubuntu.com:443
             files.pythonhosted.org:443
             galaxy.ansible.com:443

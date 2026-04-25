@@ -51,6 +51,7 @@ jobs:
             api.github.com:443
             api.launchpad.net:443
             azure.archive.ubuntu.com:80
+            dl.google.com:443
             composer.github.io:443
             database.clamav.net:443
             esm.ubuntu.com:443
