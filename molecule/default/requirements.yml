@@ -1,6 +1,7 @@
 ---
 
 collections:
+  - ansible.mysql
   - ansible.posix
 
 roles:
