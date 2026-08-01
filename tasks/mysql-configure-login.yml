@@ -3,7 +3,7 @@
 - name: Database initialization
   block:
     - name: Creating mysql misp db
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         name: misp
         state: present
         login_user: "{{ misp_mysql_user | default(omit) }}"
@@ -11,7 +11,7 @@
       no_log: "{{ misp_no_log }}"
   rescue:
     - name: Ensure db user has not empty password
-      community.mysql.mysql_user:
+      ansible.mysql.mysql_user:
         name: "{{ misp_mysql_user }}"
         password: "{{ misp_mysql_pass }}"
         state: present
@@ -21,7 +21,7 @@
         - misp_mysql_user is defined and misp_mysql_user|length > 0
         - misp_mysql_pass is defined and misp_mysql_pass|length > 0
     - name: Creating mysql misp db
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         name: misp
         state: present
         login_user: "{{ misp_mysql_user | default(omit) }}"
@@ -43,7 +43,7 @@
   when: ansible_facts['distribution_major_version'] == '7'
 
 - name: Importing mysql misp db template
-  community.mysql.mysql_db:
+  ansible.mysql.mysql_db:
     name: misp
     state: import
     target: "{{ misp_rootdir }}/INSTALL/MYSQL.sql"
@@ -59,7 +59,7 @@
     state: touch
   when: not mispdbloaded.stat.exists
 - name: Creating mysql misp db user
-  community.mysql.mysql_user:
+  ansible.mysql.mysql_user:
     name: "{{ misp_db_user }}"
     password: "{{ misp_db_pass }}"
     priv: "*.*:USAGE/misp.*:ALL"
