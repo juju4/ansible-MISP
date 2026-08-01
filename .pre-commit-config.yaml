@@ -14,11 +14,6 @@ repos:
       - id: check-case-conflict
       - id: double-quote-string-fixer
       - id: requirements-txt-fixer
-  - repo: https://github.com/ansible-community/ansible-lint.git
-    rev: v26.6.0
-    hooks:
-      - id: ansible-lint
-        files: \.(yaml|yml)$
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
     hooks:
@@ -30,3 +25,10 @@ repos:
 #      - id: detect-secrets
 #        args: ['--baseline', '.secrets.baseline']
 #        exclude: .*/tests/.*
+  - repo: https://github.com/ansible-community/ansible-lint.git
+    rev: v26.6.0
+    hooks:
+      - id: ansible-lint
+        files: \.(yaml|yml)$
+        additional_dependencies:
+          - ansible
