@@ -1,7 +1,7 @@
-[![Actions Status - Master](https://github.com/juju4/ansible-MISP/workflows/AnsibleCI/badge.svg)](https://github.com/juju4/ansible-MISP/actions?query=branch%3Amaster)
-[![Actions Status - Devel](https://github.com/juju4/ansible-MISP/workflows/AnsibleCI/badge.svg?branch=devel)](https://github.com/juju4/ansible-MISP/actions?query=branch%3Adevel)
-
 # MISP ansible role
+
+[![Actions Status - Main](https://github.com/juju4/ansible-MISP/workflows/AnsibleCI/badge.svg)](https://github.com/juju4/ansible-MISP/actions?query=branch%3Amain)
+[![Actions Status - Devel](https://github.com/juju4/ansible-MISP/workflows/AnsibleCI/badge.svg?branch=devel)](https://github.com/juju4/ansible-MISP/actions?query=branch%3Adevel)
 
 Ansible role to setup MISP, Malware Information Sharing Platform & Threat Sharing
 * http://www.misp-project.org/
